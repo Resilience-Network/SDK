@@ -5,6 +5,8 @@ implemented canonical codecs/hashes. Current implementation has no signer
 lifecycle or RPC APIs.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
+- [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
+  dependencies, status labels and progress views.
 - [Local development](guides/local-development.md): install, build and package checks.
 - [Testing](guides/testing.md): available commands and required feature evidence.
 - [Protocol sources](reference/protocol-sources.md): immutable Chain source baseline.

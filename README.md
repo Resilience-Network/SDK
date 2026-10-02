@@ -62,6 +62,9 @@ explains the boundary and the unresolved product choice.
 ## Start here
 
 - [Implementation plan](PLAN.md): scope, architecture, stages and acceptance gates.
+- [Delivery roadmap](https://github.com/Resilience-Network/sdk/issues/13) and
+  [tracking guide](docs/guides/project-tracking.md): milestone exit gates and
+  actionable tasks with dependencies.
 - [Documentation index](docs/README.md): development, sources and security.
 - [Contributing](CONTRIBUTING.md) and [agent instructions](AGENTS.md).
 - [Issues](https://github.com/Resilience-Network/sdk/issues): ownership and work status.

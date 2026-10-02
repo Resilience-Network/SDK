@@ -7,6 +7,9 @@ intended behavior; the [canonical API](docs/reference/canonical-api.md) document
 the available core/session subset. Neither establishes production qualification.
 
 Origin: [Chain#25 / FR-013](https://github.com/Resilience-Network/Chain/issues/25).
+The [GitHub delivery goal](https://github.com/Resilience-Network/sdk/issues/13)
+defines completion and owns the actionable hierarchy; the
+[tracking guide](docs/guides/project-tracking.md) explains milestones and progress views.
 The [source baseline](docs/reference/protocol-sources.md) pins the Chain revision.
 This initial scope adds no chain state, gas, activation, manifest or genesis rules.
 
@@ -208,6 +211,8 @@ identity/finality-context, policy decode/preview, fees, estimation/simulation,
 submission and receipt/transaction lookup. Treat HTTP errors, malformed JSON,
 JSON-RPC errors and cancellation separately. Use injectable fetch, timeout and
 bounded idempotent-read retries. Batch requests must honor server limits.
+Implement the deferred canonical receipt-counter-delta/decision models and typed
+hashes alongside receipt contracts, with independent native Go conformance.
 
 Acceptance: pinned-handler contract fixtures, malformed-response and rate-limit
 tests, identity mismatch rejection, deterministic timeout behavior and ambiguous
@@ -300,6 +305,25 @@ extension is a separate estimate and could require substantially more protocol
 work. Re-estimate after the vector inventory and trust-model decision. No fixed
 calendar promise or percentage-complete ledger is maintained here.
 
+### Release milestone mapping
+
+- `v0.1-session-foundation`: P0–P4 plus P6's native localnet harness, session-only
+  integration and consumer docs. Exit requires actual funded DIRECT activation,
+  grant/use/finalized revocation for both schemes and negative/concurrency/uncertain
+  submission evidence, rather than canonical construction alone.
+- `v0.2-webauthn-helpers`: P5 plus P6's browser/device/verifier and reviewed combined
+  example. Exit requires the approved RP/key model and evidence for every advertised
+  ceremony/platform claim; assertions remain separate from raw session signatures.
+- `v1.0-sdk-release`: P7 plus all preceding gates. Completion requires reviewed
+  merged scope, no required test skips or unresolved High/Critical findings, approved
+  licensing/registry/provenance and actual owner-authorized publication verified by
+  downstream consumers.
+
+The integration epic spans v0.1/v0.2, while its leaf tasks each have one milestone.
+Milestone descriptions on GitHub own current exit criteria. Implementation dates
+remain unset until owners and estimates are agreed. Scope changes require review;
+tracking setup does not authorize registry publication, custody or chain extensions.
+
 ## 7. Parent issue acceptance and change control
 
 Chain#25 originally requests a browser credential producing a valid P-256 session
@@ -337,7 +361,11 @@ not an npm package, network deployment or unreviewed merge.
 ## 9. GitHub work packages
 
 These links identify scoped deliverables; their live status and ownership are kept
-in GitHub, not duplicated here. Each remains separate from the bootstrap issue.
+in GitHub, not duplicated here. The RPC through release stage issues (#3–#9) are
+acceptance epics with native sub-issues containing reviewable scope, target files,
+tests and prerequisites.
+The pinned [delivery goal](https://github.com/Resilience-Network/sdk/issues/13)
+links the complete hierarchy, milestones and definition of complete.
 
 - [[FR-013:SessionAuth] Implement canonical codecs and independent hash conformance](https://github.com/Resilience-Network/sdk/issues/2) — P1.
 - [[API:RPC] Add typed HTTP transport and submission reconciliation](https://github.com/Resilience-Network/sdk/issues/3) — P2.
