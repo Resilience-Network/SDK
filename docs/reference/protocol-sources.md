@@ -33,6 +33,13 @@ token buckets, Merkle recipients and proofs have Go differential coverage rather
 than independent Python vectors. Other policy/action grammars and receipt-delta/
 decision codecs remain outside the initial scope; see [canonical API](canonical-api.md).
 
+The [typed RPC API](rpc.md) consumes this same pin. Its native fixture gate
+checks production handler projections and stateful simulation using owned
+in-memory state. Stored authority/grant projections follow state_codec.go and
+state_validate.go; simulation event framing follows receipt.go. These files are
+recorded as sources without changing the revision or codec-vector SHA-256.
+Full independent receipt hashes/event semantics remain a separate delivery gate.
+
 ## Integration rules
 
 The chain uses canonical Transaction V2 rather than standard Ethereum transaction

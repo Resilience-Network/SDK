@@ -76,11 +76,22 @@ assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReser
 assert.equal(sdk.policyCodec, session.policyCodec);
 assert.equal(sdk.CodecError, core.CodecError);
 assert.equal(sdk.HttpRpcClient, rpc.HttpRpcClient);
+assert.equal(sdk.ChainRpcClient, rpc.ChainRpcClient);
+assert.equal(sdk.AUTHORIZATION_CAPABILITY, "resilience/tx-auth/2");
 const client = new rpc.HttpRpcClient({ url: "https://rpc.example.invalid", fetch: async (_url, init) => {
   const request = JSON.parse(init.body);
   return new Response(JSON.stringify({ jsonrpc: "2.0", id: request.id, result: "0x1" }));
 } });
 assert.equal(await client.request("rsc_chainId"), "0x1");
+const typed = new rpc.ChainRpcClient({ url: "https://rpc.example.invalid", expected: {
+  chainId: 1337n, genesisHash: new Uint8Array(32), authorizationCapability: rpc.AUTHORIZATION_CAPABILITY,
+}, fetch: async (_url, init) => new Response(JSON.stringify(JSON.parse(init.body).map(request => ({
+  jsonrpc: "2.0", id: request.id, result: {
+    chainId: "0x539", genesisHash: "0x" + "00".repeat(32), authorizationCapability: rpc.AUTHORIZATION_CAPABILITY,
+    state: { blockHash: "0x" + "01".repeat(32), height: "0x1", stateRoot: "0x" + "02".repeat(32), finality: "finalized" },
+  },
+})))) });
+assert.equal((await typed.getAuthorizationFinalityStatus()).state.height, 1n);
 console.log("Installed root/core/session/rpc imports and API smoke checks OK; exports:", Object.keys(sdk).length);
 `;
   execFileSync(process.execPath, ["--input-type=module", "-e", smoke], {
@@ -93,7 +104,7 @@ console.log("Installed root/core/session/rpc imports and API smoke checks OK; ex
 import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
 import { setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
-import { HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome } from ${JSON.stringify(`${metadata.name}/rpc`)};
+import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
 const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
 const context: ChainContext = { chainId: 1n, genesisHash: new Uint8Array(32) };
 encodeUint256(reserve.securityReserve);
@@ -109,6 +120,15 @@ const kind: string = new RpcClientError("TIMEOUT", 1).kind;
 const clock: RpcClock = { now: () => 0, setTimeout: () => 1, clearTimeout: () => {} };
 // @ts-expect-error RPC quantities require an explicit JSON wire representation.
 client.request("rsc_chainId", [1n]);
+const expected: ExpectedChainIdentity = { ...context, authorizationCapability: AUTHORIZATION_CAPABILITY };
+const typed = new ChainRpcClient({ url: "https://rpc.example.invalid", expected });
+const snapshot: Promise<AuthorizationSnapshot> = typed.getAuthorizationSnapshot(new Uint8Array(20), new Uint8Array(32));
+const contractCode: string = new RpcContractError("INVALID_RESULT").code;
+const family: AuthorizationErrorFamily | undefined = new RpcClientError("NODE_ERROR").authorizationFamily;
+// @ts-expect-error Chain identity must be supplied by the application.
+new ChainRpcClient({ url: "https://rpc.example.invalid" });
+// @ts-expect-error Nonces and chain identity remain bigint, never number.
+new ChainRpcClient({ url: "https://rpc.example.invalid", expected: { ...expected, chainId: 1 } });
 `,
   );
   execFileSync(

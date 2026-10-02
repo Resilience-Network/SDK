@@ -7,8 +7,8 @@ types and `RETRYABLE_RPC_METHODS`. The root entry reexports them.
 [actual HTTP tests](../../tests/rpc-http.test.mjs) define the implemented contract.
 
 This is an envelope transport. Results have type `unknown`; validate a method's
-fields, quantities, canonical bytes and identity before use. Typed Chain methods,
-receipts and reconciliation follow in [SDK#15](https://github.com/Resilience-Network/sdk/issues/15),
+fields, quantities, canonical bytes and identity before use. [Typed Chain reads](rpc.md)
+implement method validation. Receipts and reconciliation follow in
 [SDK#16](https://github.com/Resilience-Network/sdk/issues/16) and
 [SDK#17](https://github.com/Resilience-Network/sdk/issues/17).
 
@@ -134,8 +134,10 @@ application must reconcile before deciding on another submission.
 `requestMayHaveReachedNode`, and optional `httpStatus`/`rpcCode`. Kinds separate
 input, limit, transport, HTTP, JSON parsing, protocol, node, cancellation and
 timeout failures. Diagnostics contain fixed messages and numeric metadata; they
-omit params, URLs, bodies, remote messages/data, Retry-After text, abort reasons
-and original exceptions/causes. There is no logging hook. Applications must also
+omit params, URLs, bodies, remote messages/arbitrary data, Retry-After text, abort reasons
+and original exceptions/causes. For node code -32000, `authorizationFamily` retains
+only the fixed known tokens listed in the [typed RPC reference](rpc.md); unknown
+tokens are discarded. There is no logging hook. Applications must also
 avoid logging their secrets.
 
 Endpoints are absolute HTTP(S) URLs without credentials, queries or fragments.
@@ -164,6 +166,7 @@ requires a reviewed baseline update before completing typed lookup/receipt contr
 
 Tests use injected fetch and actual Node fetch against owned loopback servers for
 truncation, gzip expansion, throttling, redirects, abort and deadlines. This is
-transport evidence. Browser engines, method schemas/identity, native acceptance,
-finality and independent security review remain separate gates in
+transport evidence. [Typed-method tests](rpc.md) provide schemas/identity and native
+handler fixtures. Browser engines, running-network acceptance/finality and
+independent security review remain separate gates in
 [the plan](../../PLAN.md).

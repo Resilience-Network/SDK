@@ -5,9 +5,9 @@ originating from [Chain issue #25 (FR-013)](https://github.com/Resilience-Networ
 
 The implementation provides canonical transaction/session codecs and typed
 hashes checked against pinned Chain and independent vectors, plus bounded HTTP
-JSON-RPC envelope transport. It is not a production wallet or a released npm
-package. Typed RPC methods, signer lifecycle and browser passkey APIs remain
-planned work.
+JSON-RPC transport and validated Chain authorization/fee/simulation reads. Signer
+lifecycle, submission/receipts, browser passkey APIs and release qualification
+remain planned work.
 
 ## Development
 
@@ -27,7 +27,7 @@ Hosted CI is manual while workflows are paused; local equivalents are mandatory.
 
 Use `@resilience-network/sdk/core` for bytes, checked integers and Keccak, and
 `@resilience-network/sdk/session` for transactions, authorization and grant codecs.
-The root entry reexports these and the RPC transport. Protocol integers are `bigint`; public keys use
+The root entry reexports these and the RPC clients. Protocol integers are `bigint`; public keys use
 wire widths of 32 bytes for Ed25519 and 64 bytes X||Y for P-256.
 
 ```ts
@@ -48,6 +48,9 @@ Successful decoding/hashing establishes a canonical representation, not valid
 signatures, live authority, inclusion or action success.
 
 ## Available HTTP transport
+
+Use `ChainRpcClient` for [typed methods and identity/context checks](docs/reference/rpc.md).
+It requires expected chain/genesis/capability from trusted application configuration.
 
 ```ts
 import { HttpRpcClient } from "@resilience-network/sdk/rpc";
