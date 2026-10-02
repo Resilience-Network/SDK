@@ -1,11 +1,13 @@
 # Protocol source baseline
 
-The SDK planning baseline is Chain revision
+The SDK codec baseline is Chain revision
 `773d20810e46a67e2cc68a3e58df7c08e5ac3784`. It was main when the bootstrap was
-prepared. This is source provenance, not SDK conformance or production approval.
+prepared. Supported codec/hash conformance is checked by independent and Go
+tests; this is not production authorization approval.
 [protocol-source.json](../../protocol-source.json) records the same immutable pin
-and the SHA-256 of the upstream vector file. This scaffold has not imported or
-executed those vectors; provenance is recorded for the P1 conformance work.
+and the SHA-256 of the upstream vector file. The identical fixture is checked in
+under [tests/vectors/chain-v1.json](../../tests/vectors/chain-v1.json); unit tests
+verify its hash before using it. No upstream golden value was regenerated.
 
 ## Governing implementation and documentation
 
@@ -20,9 +22,16 @@ executed those vectors; provenance is recorded for the P1 conformance work.
 - [Independent model and vectors](https://github.com/Resilience-Network/Chain/tree/773d20810e46a67e2cc68a3e58df7c08e5ac3784/reference/sessionauth).
 
 The independent model has deliberately incomplete coverage. Inventory current
-vectors against the pinned codecs before implementation; snapshot provenance and
+vectors against the pinned codecs before extending scope; record provenance and
 identify missing/stale scenarios instead of assuming all chain fields are covered.
 Any golden change requires semantic explanation and reviewed upstream evidence.
+
+P1 covers the existing independent transfer/root/session/sponsored vectors.
+Onboarding layout gaps (activation, revoke/replace, rotate, reserve, cleanup) are
+covered by native Go-generated field fixtures and differential tests. Transfer
+token buckets, Merkle recipients and proofs have Go differential coverage rather
+than independent Python vectors. Other policy/action grammars and receipt-delta/
+decision codecs remain outside the initial scope; see [canonical API](canonical-api.md).
 
 ## Integration rules
 

@@ -91,12 +91,12 @@ npm run check
 git diff --check
 ```
 
-`check` runs formatting, TypeScript, docs, a clean build and package import/types
-smoke checks. There are no SDK feature unit tests yet; this scaffold must not be
-described as cryptographic, browser or localnet validation. Feature PRs must add
-and execute meaningful unit/vector tests; add browser, differential, concurrency
-and localnet tests for the behavior they introduce. The testing guide defines
-those planned gates. Skipped or blocked required checks are not passing evidence.
+`check` runs formatting, TypeScript, docs, a clean build, unit/vector/mutation tests
+and package import/types smoke checks. Canonical protocol changes must also run
+`npm run test:differential` against the immutable Chain source pin. Feature PRs
+add meaningful unit/vector coverage and browser, concurrency/localnet checks for
+the behavior they introduce. The testing guide defines available commands and
+later gates. Skipped or blocked required checks are not passing evidence.
 
 Chain source changes must independently follow Chain's full pre-PR native Go,
 vet, determinism, race, storytests and fuzz requirements. Go/race checks are N/A

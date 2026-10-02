@@ -1,7 +1,7 @@
 # Local development
 
-Use this guide to verify the repository scaffold. It does not provision a chain,
-store a private key or implement a wallet.
+Use this guide to build and verify the canonical codec SDK. It does not provision
+a live chain, store a private key or implement a wallet.
 
 ## Prerequisites
 
@@ -30,13 +30,16 @@ as an incidental development step.
 - `npm run typecheck`: strict TypeScript without emitting files.
 - `npm run docs:check`: local Markdown file-link and source-pin checks.
 - `npm run build`: remove only this repository's `dist/` and emit ESM/declarations.
+- `npm test`: build and run unit, independent vector and deterministic mutation tests.
+- `npm run test:differential`: build and compare with the pinned Go oracle;
+  requires `RSC_CHAIN_DIR` and native Chain prerequisites (see [testing](testing.md)).
 - `npm run package:check`: pack to an owned temporary directory, install into a
   clean consumer, verify import and TypeScript resolution, then remove that temp directory.
-- `npm run check`: all scaffold checks in sequence.
+- `npm run check`: formatting, types, docs, unit/vector tests and packaging in sequence.
 
-No feature test suite exists yet. The emitted module exports no public functions;
-successful import verifies packaging only. Do not treat it as transaction signing
-evidence. See [testing](testing.md) for feature gates.
+The tests establish the supported codec/hash scope, not live authorization,
+transaction signing or browser behavior. Successful import establishes packaging
+only. See [testing](testing.md) for exact gates and coverage limits.
 
 ## Working with Chain
 

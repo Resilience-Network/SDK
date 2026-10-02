@@ -14,7 +14,7 @@
 
 <!-- Actual commands, revision, runtime, results and material limits. -->
 
-- Clean install and scaffold checks:
+- Clean install and SDK checks:
 - Unit/vector tests:
 - Browser/localnet coverage:
 - Documentation checks:
