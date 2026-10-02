@@ -1,0 +1,16 @@
+{
+  "repository": "https://github.com/Resilience-Network/Chain",
+  "revision": "773d20810e46a67e2cc68a3e58df7c08e5ac3784",
+  "status": "Planning baseline; SDK protocol conformance is not yet implemented",
+  "vectorPaths": ["reference/sessionauth/vectors/v1.json"],
+  "sourcePaths": [
+    "pkg/sessionauth/codec.go",
+    "pkg/sessionauth/hash.go",
+    "pkg/sessionauth/verify.go",
+    "pkg/sessionauth/constants.go",
+    "pkg/sessionauth/types.go",
+    "internal/rpc/authorization_api.go",
+    "internal/rpc/api.go"
+  ],
+  "vectorSha256": "b3465f575eafde50e9704184774f7e160eecd33d7010558af5e0d0836d3a85bb"
+}
