@@ -11,6 +11,7 @@ labels: type/security-gate
 
 - Finding/gate ID:
 - Reviewed revision and source report:
+- Delivery goal / parent epic and native prerequisites:
 
 ## Required Deliverables
 
@@ -20,4 +21,6 @@ labels: type/security-gate
 
 <!-- Actual evidence and responsible reviewer; no preclaimed outcomes. -->
 
-<!-- Add area, consensus, size and priority labels and an active milestone. -->
+<!-- Add area, consensus, size, priority, tracking/task and one status label, plus
+an active milestone. Link native parent and blocked-by relationships after creation.
+New work remains unassigned until claimed. See docs/guides/project-tracking.md. -->

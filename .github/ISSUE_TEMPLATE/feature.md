@@ -15,6 +15,8 @@ labels: type/feature
 - Consensus and protocol impact: none / soft / hard
 - Difficulty: S / M / L / XL
 - Dependencies:
+- Delivery goal / parent epic:
+- Milestone exit gate this deliverable satisfies:
 
 ## Target Files & Components
 
@@ -26,4 +28,6 @@ labels: type/feature
 
 ## References
 
-<!-- Add area, consensus, size and priority labels and an active milestone. -->
+<!-- Add area, consensus, size, priority, tracking/task and one status label, plus
+an active milestone. Link native parent and blocked-by relationships after creation.
+New work remains unassigned until claimed. See docs/guides/project-tracking.md. -->

@@ -56,11 +56,21 @@ SDK-only changes normally use `consensus/none`. A consensus-impacting proposal
 must link coordinated Chain work; this repository cannot change node rules.
 Estimates express effort, not promised calendar delivery dates.
 
+The [tracking guide](docs/guides/project-tracking.md) defines native parent/dependency
+links and supplemental `tracking/*` / `status/*` labels. Prefer ready leaf tasks;
+verify dependencies and ownership before claiming. Update status at verified claim,
+PR creation and reviewed merged delivery. New work stays unassigned until claimed.
+Epics are stage acceptance umbrellas, not competing implementation claims.
+
 Use one active milestone:
 
 1. `v0.1-session-foundation`: codecs, hashes, RPC, signers, sessions and display.
 2. `v0.2-webauthn-helpers`: authorization decision, ceremonies, browser/localnet examples.
 3. `v1.0-sdk-release`: independent review, stable API and release qualification.
+
+GitHub milestone descriptions define the exit gates, including native localnet
+evidence in v0.1 and actual browser/device/verifier evidence in v0.2. Issue/PR counts
+do not substitute for those gates. Keep dates unset until owners/estimates are agreed.
 
 ## Issue templates
 
