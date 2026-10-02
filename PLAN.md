@@ -225,6 +225,15 @@ fixed read-only allowlist; sends get one attempt. Investigate node/schema confli
 before adding convenience APIs. Correct omitted nil-success results upstream and
 review the protocol baseline before claiming interoperable null lookups/receipts.
 
+Typed reads require app-supplied identity on every logical operation, bracket
+methods with finality/identity reads and compare the complete finalized tuple.
+Context refreshes repeat whole bounded reads under one deadline; simulations and
+estimates remain single-attempt. Reconstruct stored root/grant bytes from validated
+views and compare derived IDs/hashes. Retained old-epoch grants after revoke-all
+remain readable but unusable. Fee queries have no method-reported state; document
+their bracketed identity and advisory provenance. See the [typed API](docs/reference/rpc.md)
+and native production-handler fixture gate in the testing guide.
+
 Acceptance: pinned-handler contract fixtures, malformed-response and rate-limit
 tests, identity mismatch rejection, deterministic timeout behavior and ambiguous
 send reconciliation. Do not auto-resign/reuse a nonce after an uncertain result.

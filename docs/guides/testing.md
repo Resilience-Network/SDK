@@ -47,6 +47,17 @@ Run `npm test` for the build and all Node unit suites. See the
 unsupported sections. The docs checker does not validate external links,
 Markdown heading anchors or prose semantics.
 
+Typed [Chain RPC tests](../reference/rpc.md) use production-handler fixtures for
+all 12 wire methods, both grant schemes and revoke-all stale records. They exercise
+905 missing/unknown-field cases, canonical view binding, integer boundaries,
+wrong identity/capability, inconsistent heads, bounded refreshes, overall deadlines
+and redacted node error families. Real Node fetch covers concurrent typed batches
+and independent response ownership. Run the affected suites after a build:
+
+```sh
+node --test tests/rpc-methods.test.mjs tests/rpc-methods-http.test.mjs
+```
+
 Hosted [SDK checks](../../.github/workflows/checks.yml) use manual dispatch while
 workflows are paused. Full applicable local equivalents are required before a
 PR; missing hosted runs are not PASS evidence.
@@ -88,6 +99,40 @@ This gate is required locally for canonical changes. The manual SDK workflow run
 checkout and its toolchains, and is not claimed by that hosted job. Neither check
 proves signature acceptance, stateful authorization, browser behavior or localnet
 finality. Those gates follow their feature implementations.
+
+## Native RPC contract fixture gate
+
+For RPC schema/canonical projection changes, run against an owned clean checkout
+at the immutable protocol revision:
+
+```sh
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:rpc-native
+```
+
+The [checker](../../scripts/check_rpc_contracts.mjs) rejects wrong HEAD, tracked
+changes and disabled CGO, runs `make build-crypto`, then installs an exclusively
+created, uniquely named SDK test file in the pinned `internal/rpc` package. This
+test uses production Handler/API/state with the pin's existing test-only mockChain
+and policy helper. It creates only in-memory databases and fixed test-only signing
+keys; no keys or private material are exported in fixtures. It verifies simulation
+does not change the backing state. The owned file is removed in `finally` only
+after its contents are checked; existing files are never replaced or removed.
+Native build outputs remain in the external checkout.
+
+The gate compares all 35 envelopes/parameters/identities byte-semantically against
+[retained fixtures](../../tests/fixtures/rpc-contracts.json). To intentionally
+regenerate after inspecting a source/projection change:
+
+```sh
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain node scripts/check_rpc_contracts.mjs --write
+```
+
+Record the semantic reason and rerun ordinary SDK tests and the comparison gate.
+No source pin or independent codec golden vectors change as part of generating
+these fixtures. This gate is local and is not included in the manual SDK-only
+workflow; it requires the private Chain checkout and native toolchains. It proves
+native handler/SDK contract agreement on the pin, not a running-network funded
+lifecycle, P-256 signer acceptance, browser qualification or release sign-off.
 
 ## Further feature gates
 

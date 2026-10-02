@@ -2,7 +2,7 @@
   "name": "@resilience-network/sdk",
   "version": "0.0.0",
   "private": true,
-  "description": "Canonical codecs, hashes and bounded HTTP RPC transport for Resilience Network",
+  "description": "Canonical codecs, hashes and validated Chain RPC clients for Resilience Network",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -45,7 +45,8 @@
     "package:check": "node scripts/check_package.mjs",
     "check": "npm run format:check && npm run typecheck && npm run docs:check && npm test && npm run package:check",
     "test": "npm run build && node --test tests/*.test.mjs",
-    "test:differential": "npm run build && node scripts/check_differential.mjs"
+    "test:differential": "npm run build && node scripts/check_differential.mjs",
+    "test:rpc-native": "node scripts/check_rpc_contracts.mjs"
   },
   "devDependencies": {
     "prettier": "3.9.9",

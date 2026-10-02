@@ -25,6 +25,39 @@ const definitions = {
 
 export type RpcErrorCode = keyof typeof definitions;
 
+export type AuthorizationErrorFamily =
+  | "AUTH_MALFORMED"
+  | "AUTH_UNKNOWN_CREDENTIAL"
+  | "AUTH_UNSUPPORTED_VERSION"
+  | "AUTH_LIMIT_EXCEEDED"
+  | "AUTH_ACTION_DENIED"
+  | "AUTH_BAD_SIGNATURE";
+
+/** Only fixed known family tokens survive; arbitrary node data is discarded. */
+export function authorizationErrorFamily(
+  data: unknown,
+): AuthorizationErrorFamily | undefined {
+  if (
+    data === null ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    !Object.hasOwn(data, "family")
+  )
+    return undefined;
+  const family = (data as Record<string, unknown>).family;
+  return typeof family === "string" &&
+    [
+      "AUTH_MALFORMED",
+      "AUTH_UNKNOWN_CREDENTIAL",
+      "AUTH_UNSUPPORTED_VERSION",
+      "AUTH_LIMIT_EXCEEDED",
+      "AUTH_ACTION_DENIED",
+      "AUTH_BAD_SIGNATURE",
+    ].includes(family)
+    ? (family as AuthorizationErrorFamily)
+    : undefined;
+}
+
 /** Diagnostics deliberately exclude endpoints, payloads, remote messages and causes. */
 export class RpcClientError extends Error {
   override readonly name = "RpcClientError";
@@ -36,6 +69,7 @@ export class RpcClientError extends Error {
     readonly attempts: number = 0,
     readonly httpStatus: number | undefined = undefined,
     readonly rpcCode: number | undefined = undefined,
+    readonly authorizationFamily: AuthorizationErrorFamily | undefined = undefined,
   ) {
     const [kind, message] = definitions[code];
     super(message);

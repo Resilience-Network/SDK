@@ -1,5 +1,5 @@
 import { Deadline, systemClock } from "./deadline.js";
-import { RpcClientError } from "./errors.js";
+import { RpcClientError, authorizationErrorFamily } from "./errors.js";
 import { encodeRequest, parseResponse } from "./json.js";
 import type {
   HttpRpcOptions,
@@ -167,7 +167,13 @@ function responses(
         throw invalid();
       found.set(item.id, {
         ok: false,
-        error: new RpcClientError("NODE_ERROR", attempts, undefined, error.code),
+        error: new RpcClientError(
+          "NODE_ERROR",
+          attempts,
+          undefined,
+          error.code,
+          error.code === -32000 ? authorizationErrorFamily(error.data) : undefined,
+        ),
       });
     }
   }
