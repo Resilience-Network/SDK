@@ -22,6 +22,24 @@ These repository-wide instructions adapt the relevant rules from Chain. Read
   CONTRIBUTING.md. Close only with satisfied or explicitly deferred criteria and
   an evidence-backed summary referencing the delivering PR and branch.
 
+## Investigate and report discovered issues
+
+- Proactively inspect newly discovered bugs, failing tests, implementation gaps
+  and code/specification conflicts, including findings outside the current task
+  or in an upstream repository. File an issue in the affected repository
+  immediately; do not wait for the current task to finish, a complete root-cause
+  analysis or additional permission to investigate and report.
+- Check existing reports first and update the matching issue instead of creating
+  a duplicate. Follow CONTRIBUTING.md for templates, labels, milestones and
+  post-creation checks.
+- Include observed versus expected behavior, source/revision, reproduction steps
+  or available evidence, impact and remaining unknowns. Clearly distinguish
+  suspected findings from confirmed defects; never invent evidence or PASS claims.
+- Link the finding to the current issue/PR and record blocking dependencies when
+  relevant. Leave new reports unassigned until claiming their implementation
+  through the normal ownership workflow. Reporting does not bypass another
+  agent's claim, topic branches, review or safety-state preservation.
+
 ## Context and protocol discipline
 
 - Read [PLAN.md](PLAN.md), the relevant decision and
