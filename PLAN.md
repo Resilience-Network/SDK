@@ -3,7 +3,8 @@
 This is the canonical design and delivery sequence for the standalone Resilience
 Network TypeScript SDK. GitHub issues own assignments, priority and current work
 status; PRs own implementation and verification evidence. This plan describes
-intended behavior, not shipped APIs or production qualification.
+intended behavior; the [canonical API](docs/reference/canonical-api.md) documents
+the available core/session subset. Neither establishes production qualification.
 
 Origin: [Chain#25 / FR-013](https://github.com/Resilience-Network/Chain/issues/25).
 The [source baseline](docs/reference/protocol-sources.md) pins the Chain revision.
@@ -54,12 +55,13 @@ Begin with one npm package and one repository. Split packages only after a
 demonstrated distribution or runtime boundary requires it. Proposed name:
 `@resilience-network/sdk`; registry ownership and availability are release gates.
 
-Planned source modules and exports:
+Source modules and export boundaries:
 
 - `src/core/`: byte codecs, checked integers, hashing, chain identity and errors;
-  planned entry `@resilience-network/sdk/core`.
+  entry `@resilience-network/sdk/core`.
 - `src/session/`: policy/grant codecs, witnesses, typed digests, lifecycle and
-  signer contracts; planned entry `@resilience-network/sdk/session`.
+  signer contracts; entry `@resilience-network/sdk/session`. Lifecycle and signer
+  APIs follow the implemented codecs/hashes in P3.
 - `src/rpc/`: injectable HTTP transport, validated method contracts, queries,
   simulation, submission and receipt tracking; planned entry `@resilience-network/sdk/rpc`.
 - `src/webauthn/`: browser ceremonies, credential serialization and supported
@@ -68,8 +70,8 @@ Planned source modules and exports:
 - `tests/`: unit/adversarial, versioned vectors, Go differential and browser suites.
 - `examples/`: a basic session lifecycle and a separate passkey ceremony example.
 
-These paths/exports are proposed; the scaffold currently has only `src/index.ts`
-and no public functions. Do not add placeholder functions that claim support.
+Core/session codecs and hashes are available; RPC, display, signers and WebAuthn
+remain planned. Do not add placeholder functions that claim support.
 
 Use ESM with emitted declarations, strict TypeScript, `Uint8Array` for binary
 values and checked `bigint` for amounts/nonces/heights. Never round a protocol
@@ -79,8 +81,9 @@ parsers. Inputs are validated before allocation; decoding has bounded resource u
 Core/session imports must be usable without `window`, `navigator`, DOM state or
 Node-only modules. The WebAuthn entry checks secure context and supported APIs at
 call time, not module import. A Node import must not trigger a browser ceremony.
-Runtime crypto dependencies must be reviewed, pinned and proven against vectors;
-the scaffold intentionally includes no runtime crypto dependency yet.
+Runtime crypto dependencies must be reviewed, pinned and proven against vectors.
+The core uses exact-pinned `@noble/hashes` and `@noble/curves` for Keccak and session
+point validation. Their use does not satisfy the independent SDK review in P7.
 
 ## 3. Authorization and signing flow
 
@@ -186,7 +189,10 @@ work instead of changing golden values to match the SDK.
 Implement checked bytes/u64/u256, canonical intents/envelopes/root/session
 witnesses, root configuration/activation, grant/revoke actions and transfer policy codecs.
 Account for fee and sponsor fields even when sponsorship is unavailable. Add
-Keccak known-answer tests (`empty`, `abc`) and all typed hashes.
+Keccak known-answer tests (`empty`, `abc`) and the typed hashes for these data:
+chain domain, intent/transaction IDs, authorization signing digests, root/policy
+hashes, key fingerprints, grant IDs, authorization storage keys and recipient
+tree hashes. Receipt-counter/decision hashes follow their receipt/state codecs.
 
 Acceptance: byte-for-byte encodings/digests/IDs agree with independent and Go
 references; malformed lengths, trailing bytes, duplicates/order, unknown
@@ -314,7 +320,8 @@ repository. SDK issue closures must account for each criterion and real evidence
 ## 8. Verification and operational gates
 
 See [testing](docs/guides/testing.md) for available commands and planned gates.
-The bootstrap runs `npm ci`, `npm run check` and `git diff --check`. Feature work
+Run `npm ci`, `npm run check` and `git diff --check`. Canonical changes also run
+the pinned native Go differential gate. Feature work
 must add actual unit/vector/browser/localnet commands to the shared check workflow
 or clearly documented integration gate. Do not install a no-op `npm test` command.
 

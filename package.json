@@ -2,7 +2,7 @@
   "name": "@resilience-network/sdk",
   "version": "0.0.0",
   "private": true,
-  "description": "Resilience Network TypeScript client SDK scaffold",
+  "description": "Canonical transaction and session authorization codecs for Resilience Network",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -16,6 +16,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./session": {
+      "types": "./dist/session/index.d.ts",
+      "import": "./dist/session/index.js"
     }
   },
   "types": "./dist/index.d.ts",
@@ -31,10 +39,16 @@
     "docs:check": "python3 scripts/check_docs.py",
     "build": "node scripts/clean.mjs && tsc",
     "package:check": "node scripts/check_package.mjs",
-    "check": "npm run format:check && npm run typecheck && npm run docs:check && npm run build && npm run package:check"
+    "check": "npm run format:check && npm run typecheck && npm run docs:check && npm test && npm run package:check",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "test:differential": "npm run build && node scripts/check_differential.mjs"
   },
   "devDependencies": {
     "prettier": "3.9.9",
     "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0"
   }
 }

@@ -3,9 +3,10 @@
 Standalone TypeScript client SDK for Resilience Network web wallets and dApps,
 originating from [Chain issue #25 (FR-013)](https://github.com/Resilience-Network/Chain/issues/25).
 
-This repository currently contains the build scaffold, contributor workflow and
-implementation plan. It exports no client functionality yet and is not a
-production wallet or a released npm package.
+The first implementation provides canonical transaction/session codecs and typed
+hashes checked against pinned Chain and independent vectors. It is not a
+production wallet or a released npm package. Signer lifecycle, RPC and browser
+passkey APIs remain planned work.
 
 ## Development
 
@@ -16,14 +17,37 @@ npm ci
 npm run check
 ```
 
-`check` verifies formatting, strict TypeScript, repository documentation, build
-output and the package import/types boundary. It does not claim browser,
-cryptographic or live-network coverage. Hosted CI is manual while workflows
-are paused; contributors must run the complete applicable suite locally.
+`check` verifies formatting, strict TypeScript, docs, unit/vector/mutation tests
+and the installed package import/types boundary. `npm run test:differential`
+additionally compares with the pinned native Go package (see [testing](docs/guides/testing.md)).
+Hosted CI is manual while workflows are paused; local equivalents are mandatory.
+
+## Available codecs and hashes
+
+Use `@resilience-network/sdk/core` for bytes, checked integers and Keccak, and
+`@resilience-network/sdk/session` for transactions, authorization and grant codecs.
+The root entry reexports both. Protocol integers are `bigint`; public keys use
+wire widths of 32 bytes for Ed25519 and 64 bytes X||Y for P-256.
+
+```ts
+import { hexToBytes, bytesToHex } from "@resilience-network/sdk/core";
+import { transactionCodec, transactionId } from "@resilience-network/sdk/session";
+
+const transaction = transactionCodec.decode(hexToBytes(canonicalTransactionHex));
+const id = transactionId(
+  expectedChainContext,
+  transaction.intent,
+  transaction.envelope,
+);
+console.log(bytesToHex(id));
+```
+
+See the [canonical API and supported scope](docs/reference/canonical-api.md).
+Successful decoding/hashing establishes a canonical representation, not valid
+signatures, live authority, inclusion or action success.
 
 ## Planned capabilities
 
-- Canonical Transaction V2 codecs, Keccak hashes and chain/genesis binding.
 - Ed25519 root/direct signer interfaces and Ed25519/P-256 session interfaces.
 - Bounded session grants, policy inspection, submission and revocation.
 - Typed RPC reads, simulations, receipts and ambiguous-submission handling.

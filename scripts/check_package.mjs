@@ -25,6 +25,10 @@ try {
   for (const path of [
     "dist/index.js",
     "dist/index.d.ts",
+    "dist/core/index.js",
+    "dist/core/index.d.ts",
+    "dist/session/index.js",
+    "dist/session/index.d.ts",
     "README.md",
     "package.json",
   ]) {
@@ -58,14 +62,36 @@ try {
   const metadata = JSON.parse(
     await readFile(new URL("../package.json", import.meta.url), "utf8"),
   );
-  const smoke = `import * as sdk from ${JSON.stringify(metadata.name)}; console.log("Package import OK; exports:", Object.keys(sdk).length);`;
+  const smoke = `
+import assert from "node:assert/strict";
+import * as sdk from ${JSON.stringify(metadata.name)};
+import * as core from ${JSON.stringify(`${metadata.name}/core`)};
+import * as session from ${JSON.stringify(`${metadata.name}/session`)};
+assert.equal(core.decodeUint64(core.encodeUint64((1n << 64n) - 1n)), (1n << 64n) - 1n);
+assert.equal(core.bytesToHex(core.keccak256(new Uint8Array())), "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470");
+assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReserveCodec.encode({ version: 1, securityReserve: 1n << 200n })), { version: 1, securityReserve: 1n << 200n });
+assert.equal(sdk.policyCodec, session.policyCodec);
+assert.equal(sdk.CodecError, core.CodecError);
+console.log("Installed root/core/session imports and canonical API smoke checks OK; exports:", Object.keys(sdk).length);
+`;
   execFileSync(process.execPath, ["--input-type=module", "-e", smoke], {
     cwd: temporary,
     stdio: "inherit",
   });
   await writeFile(
     join(temporary, "consumer.ts"),
-    `import * as sdk from ${JSON.stringify(metadata.name)}; void sdk;\n`,
+    `
+import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
+import { setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
+import { chainDomain } from ${JSON.stringify(metadata.name)};
+const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
+const context: ChainContext = { chainId: 1n, genesisHash: new Uint8Array(32) };
+encodeUint256(reserve.securityReserve);
+setSecurityReserveCodec.encode(reserve);
+chainDomain(context);
+// @ts-expect-error Protocol integers must remain bigint.
+encodeUint256(1);
+`,
   );
   execFileSync(
     process.execPath,
@@ -85,7 +111,7 @@ try {
     },
   );
   console.log(
-    "Package archive and downstream TypeScript resolution OK (scaffold only).",
+    "Package archive and downstream root/core/session TypeScript resolution OK.",
   );
 } finally {
   await rm(temporary, { recursive: true, force: true });
