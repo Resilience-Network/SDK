@@ -1,0 +1,40 @@
+{
+  "name": "@resilience-network/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Resilience Network TypeScript client SDK scaffold",
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Resilience-Network/sdk.git"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "docs:check": "python3 scripts/check_docs.py",
+    "build": "node scripts/clean.mjs && tsc",
+    "package:check": "node scripts/check_package.mjs",
+    "check": "npm run format:check && npm run typecheck && npm run docs:check && npm run build && npm run package:check"
+  },
+  "devDependencies": {
+    "prettier": "3.9.9",
+    "typescript": "7.0.2"
+  }
+}
