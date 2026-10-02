@@ -2,7 +2,7 @@
   "name": "@resilience-network/sdk",
   "version": "0.0.0",
   "private": true,
-  "description": "Canonical transaction and session authorization codecs for Resilience Network",
+  "description": "Canonical codecs, hashes and bounded HTTP RPC transport for Resilience Network",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -24,6 +24,10 @@
     "./session": {
       "types": "./dist/session/index.d.ts",
       "import": "./dist/session/index.js"
+    },
+    "./rpc": {
+      "types": "./dist/rpc/index.d.ts",
+      "import": "./dist/rpc/index.js"
     }
   },
   "types": "./dist/index.d.ts",

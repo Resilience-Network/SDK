@@ -1,8 +1,8 @@
 # SDK documentation
 
 This index separates intended SDK capabilities from the currently available
-implemented canonical codecs/hashes. Current implementation has no signer
-lifecycle or RPC APIs.
+implemented canonical codecs/hashes and HTTP envelope transport. Typed RPC methods,
+signer lifecycle and browser APIs remain planned.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
 - [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
@@ -11,6 +11,8 @@ lifecycle or RPC APIs.
 - [Testing](guides/testing.md): available commands and required feature evidence.
 - [Protocol sources](reference/protocol-sources.md): immutable Chain source baseline.
 - [Canonical API](reference/canonical-api.md): supported codecs/hashes and their limits.
+- [HTTP RPC API](reference/http-rpc.md): envelope transport, limits, cancellation,
+  errors, read retries and interoperability boundaries.
 - [Passkey authorization decision](decisions/0001-passkey-authorization-boundary.md).
 - [Security boundaries](security/threat-model.md).
 - [Documentation policy](documentation-policy.md).

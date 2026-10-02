@@ -4,7 +4,8 @@ This is the canonical design and delivery sequence for the standalone Resilience
 Network TypeScript SDK. GitHub issues own assignments, priority and current work
 status; PRs own implementation and verification evidence. This plan describes
 intended behavior; the [canonical API](docs/reference/canonical-api.md) documents
-the available core/session subset. Neither establishes production qualification.
+the available core/session subset; the [HTTP API](docs/reference/http-rpc.md)
+documents implemented envelope transport. Neither establishes production qualification.
 
 Origin: [Chain#25 / FR-013](https://github.com/Resilience-Network/Chain/issues/25).
 The [GitHub delivery goal](https://github.com/Resilience-Network/sdk/issues/13)
@@ -66,15 +67,17 @@ Source modules and export boundaries:
   signer contracts; entry `@resilience-network/sdk/session`. Lifecycle and signer
   APIs follow the implemented codecs/hashes in P3.
 - `src/rpc/`: injectable HTTP transport, validated method contracts, queries,
-  simulation, submission and receipt tracking; planned entry `@resilience-network/sdk/rpc`.
+  simulation, submission and receipt tracking; entry `@resilience-network/sdk/rpc`
+  currently implements bounded HTTP envelope transport.
 - `src/webauthn/`: browser ceremonies, credential serialization and supported
   ES256 response parsing; planned entry `@resilience-network/sdk/webauthn`.
 - `src/display/`: structured review data derived from decoded canonical bytes.
 - `tests/`: unit/adversarial, versioned vectors, Go differential and browser suites.
 - `examples/`: a basic session lifecycle and a separate passkey ceremony example.
 
-Core/session codecs and hashes are available; RPC, display, signers and WebAuthn
-remain planned. Do not add placeholder functions that claim support.
+Core/session codecs, hashes and HTTP envelope transport are available. Typed RPC
+methods, reconciliation, display, signers and WebAuthn remain planned. Do not add
+placeholder functions that claim support.
 
 Use ESM with emitted declarations, strict TypeScript, `Uint8Array` for binary
 values and checked `bigint` for amounts/nonces/heights. Never round a protocol
@@ -213,6 +216,14 @@ JSON-RPC errors and cancellation separately. Use injectable fetch, timeout and
 bounded idempotent-read retries. Batch requests must honor server limits.
 Implement the deferred canonical receipt-counter-delta/decision models and typed
 hashes alongside receipt contracts, with independent native Go conformance.
+
+Implement this stage in bounded steps: transport/error contracts and deterministic
+adversarial plus actual HTTP tests (#14), identity/read schemas (#15), submission/
+receipt models (#16), then reconciliation/polling (#17). Transport returns
+untrusted results and cannot substitute for method validation. Keep retries on a
+fixed read-only allowlist; sends get one attempt. Investigate node/schema conflicts
+before adding convenience APIs. Correct omitted nil-success results upstream and
+review the protocol baseline before claiming interoperable null lookups/receipts.
 
 Acceptance: pinned-handler contract fixtures, malformed-response and rate-limit
 tests, identity mismatch rejection, deterministic timeout behavior and ambiguous
