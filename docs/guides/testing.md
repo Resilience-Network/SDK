@@ -13,12 +13,34 @@ git diff --check
 
 The check script validates formatting, strict TypeScript, local documentation file
 links/source pin, a clean build, unit/vector/mutation suites and an installable
-package with root/core/session import and declaration checks. Tests cover checked
+package with root/core/session/rpc import and declaration checks. Tests cover checked
 integer boundaries, Keccak known answers, independent canonical/hash vectors,
 all supported actions, malformed and oversized inputs, ordering, point validation,
 sponsor/context binding, retained mutation seeds and decoded byte ownership
 (including Node Buffer inputs). Package smoke tests exercise installed APIs;
 they do not establish signature or authority verification.
+
+The [HTTP transport suite](../reference/http-rpc.md) also covers response IDs and
+partial batch errors, UTF-8/JSON/structural limits, generated parser cases with
+retained seed `0x14c0ffee`, JSON mutations/truncations with seed `0x14badbee`,
+request snapshots, diagnostic redaction, fake-clock
+deadlines/cancellation/retries, late promise cleanup and single-attempt submissions.
+Actual Node fetch tests start owned loopback servers on OS-selected ports and
+close their connections in teardown. They cover throttling, truncated bodies,
+gzip expansion, redirect prevention and cancellation isolation, with no node/
+wallet databases or claim of native acceptance/finality.
+
+Run the affected transport tests after a build:
+
+```sh
+npm run build
+node --test tests/rpc-contract.test.mjs tests/rpc-resilience.test.mjs tests/rpc-http.test.mjs
+```
+
+The suite checks Node behavior and imports without browser state/global fetch;
+it does not qualify browser engines. The pinned node's missing nil-success result
+is an upstream defect, not a reason to weaken envelope validation. Its separate
+correction/baseline gate is documented in the [HTTP API](../reference/http-rpc.md).
 
 Run `npm test` for the build and all Node unit suites. See the
 [canonical API](../reference/canonical-api.md) for exact implemented limits and

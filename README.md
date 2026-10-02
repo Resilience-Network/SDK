@@ -3,10 +3,11 @@
 Standalone TypeScript client SDK for Resilience Network web wallets and dApps,
 originating from [Chain issue #25 (FR-013)](https://github.com/Resilience-Network/Chain/issues/25).
 
-The first implementation provides canonical transaction/session codecs and typed
-hashes checked against pinned Chain and independent vectors. It is not a
-production wallet or a released npm package. Signer lifecycle, RPC and browser
-passkey APIs remain planned work.
+The implementation provides canonical transaction/session codecs and typed
+hashes checked against pinned Chain and independent vectors, plus bounded HTTP
+JSON-RPC envelope transport. It is not a production wallet or a released npm
+package. Typed RPC methods, signer lifecycle and browser passkey APIs remain
+planned work.
 
 ## Development
 
@@ -26,7 +27,7 @@ Hosted CI is manual while workflows are paused; local equivalents are mandatory.
 
 Use `@resilience-network/sdk/core` for bytes, checked integers and Keccak, and
 `@resilience-network/sdk/session` for transactions, authorization and grant codecs.
-The root entry reexports both. Protocol integers are `bigint`; public keys use
+The root entry reexports these and the RPC transport. Protocol integers are `bigint`; public keys use
 wire widths of 32 bytes for Ed25519 and 64 bytes X||Y for P-256.
 
 ```ts
@@ -45,6 +46,21 @@ console.log(bytesToHex(id));
 See the [canonical API and supported scope](docs/reference/canonical-api.md).
 Successful decoding/hashing establishes a canonical representation, not valid
 signatures, live authority, inclusion or action success.
+
+## Available HTTP transport
+
+```ts
+import { HttpRpcClient } from "@resilience-network/sdk/rpc";
+
+const client = new HttpRpcClient({ url: "http://127.0.0.1:8545" });
+const observation: unknown = await client.request("rsc_chainId");
+```
+
+Validate method results before use. The transport caps bytes, batches, deadlines
+and read retries, matches IDs and exposes sanitized typed errors. Submissions get
+one attempt; timeout is not proof of rejection. See the
+[HTTP API and exact limits](docs/reference/http-rpc.md), including the pinned
+node's omitted-null-result interoperability gap and separate qualification gates.
 
 ## Planned capabilities
 
