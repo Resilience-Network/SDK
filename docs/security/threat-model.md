@@ -69,3 +69,19 @@ creates no cryptographic passkey-to-Chain enforcement.
 The [normative case inventory](../../tests/webauthn/rp-contract-cases.json) is not
 execution evidence. Real verifier/parser/browser checks are #27/#26/#30; physical
 devices and independent review remain #31/#34. GitHub owns their actual results.
+
+## External native key model
+
+[ADR-0001](../decisions/0001-passkey-authorization-boundary.md) keeps application
+login, native key ownership and native authorization distinct. Explicit external
+Ed25519 root/raw session adapters own key generation, persistence, backups and
+unlock. No passkey-derived root, implicit custody or production key-storage
+provider is shipped. Fresh passkey login before signing is application policy;
+it cannot constrain a raw key available to compromised origin code.
+
+Logout and passkey recovery do not revoke grants or recover an Ed25519 root.
+Observe actual finalized ROOT revocation/epoch change or authoritative expiry;
+SESSION_CANCEL does not revoke. Preserve uncertain nonce records and all existing
+wallet/signing state. Memory coordination and test key closures are not durable
+wallet custody. Direct native WebAuthn enforcement remains separate
+[Chain#382](https://github.com/Resilience-Network/Chain/issues/382) design work.
