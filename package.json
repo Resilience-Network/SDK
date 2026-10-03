@@ -52,7 +52,9 @@
     "test:differential": "npm run build && node scripts/check_differential.mjs && node scripts/check_receipts.mjs",
     "test:rpc-native": "node scripts/check_rpc_contracts.mjs",
     "test:signatures-native": "npm run build && node scripts/check_signatures.mjs",
-    "test:receipts-native": "npm run build && node scripts/check_receipts.mjs"
+    "test:receipts-native": "npm run build && node scripts/check_receipts.mjs",
+    "test:localnet": "npm run build && node scripts/check_localnet.mjs",
+    "test:localnet-failures": "npm run build && node scripts/check_localnet_failures.mjs"
   },
   "devDependencies": {
     "prettier": "3.9.9",
