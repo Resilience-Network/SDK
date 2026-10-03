@@ -103,7 +103,10 @@ const publicKey = new Uint8Array(createPublicKey(privateKey).export({ format: "d
 const signer = { keyScheme: 1, publicKey, async sign({ digest }) { return { keyScheme: 1, publicKey, signature: signEd25519(null, digest, privateKey) }; } };
 const signingContext = { chainId: 1337n, genesisHash: new Uint8Array(32).fill(1) };
 const intent = { version: 2, chainId: 1337n, sender: core.keccak256(publicKey).slice(12), actionType: 0, flags: 0, destination: new Uint8Array(20).fill(2), value: 1n, gasLimit: 100000n, maxFeePerGas: 1n, maxPriorityFeePerGas: 0n, sponsor: new Uint8Array(20), data: new Uint8Array() };
-const direct = await session.signDirectTransaction({ context: signingContext, intent, nonce: 3n, signer });
+let reviewed;
+const direct = await session.signDirectTransaction({ context: signingContext, intent, nonce: 3n, signer, approve: ({ review }) => { reviewed = review; return true; } });
+assert.equal(reviewed.intent.binding.canonical, core.bytesToHex(session.txIntentCodec.encode(intent)));
+assert.equal(reviewed.signingDigest, core.bytesToHex(session.directDigest(signingContext, intent, 3n)));
 assert.equal(direct.envelope.witness.length, 96);
 const rooted = await session.signRootTransaction({ context: signingContext, intent, config: { version: 1, threshold: 1, keys: [{ keyScheme: 1, publicKey }] }, authEpoch: 1n, nonce: 4n, signers: [signer] });
 assert.equal(session.decodeRootWitness(rooted.envelope.witness, 1).length, 1);
@@ -126,7 +129,7 @@ console.log("Installed root/core/session/rpc/display imports and API smoke check
     `
 import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
 import { setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
-import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential } from ${JSON.stringify(`${metadata.name}/session`)};
+import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential, type SigningReview, type ReviewApproval, type ReviewApprovalRequest } from ${JSON.stringify(`${metadata.name}/session`)};
 import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type CanonicalReview, type ReviewBinding, type ReviewField } from ${JSON.stringify(`${metadata.name}/display`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
 import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
@@ -157,7 +160,16 @@ new ChainRpcClient({ url: "https://rpc.example.invalid", expected: { ...expected
 declare const intent: import(${JSON.stringify(`${metadata.name}/session`)}).TxIntent;
 const edSigner: RawSigner<1> = { keyScheme: 1, publicKey: new Uint8Array(32), async sign(request: SignerRequest): Promise<SignerResponse> { return { keyScheme: 1, publicKey: request.publicKey, signature: new Uint8Array(64) }; } };
 const pSigner: RawSigner<2> = { ...edSigner, keyScheme: 2, publicKey: new Uint8Array(64) };
-const direct = signDirectTransaction({ context, intent, nonce: 1n, signer: edSigner });
+const approval: ReviewApproval = async ({ review, signal }: ReviewApprovalRequest) => {
+  const data: SigningReview = review;
+  const hash: string = data.reviewHash;
+  // @ts-expect-error Approval review cannot be modified.
+  data.signingDigest = "0x00";
+  return !signal.aborted;
+};
+const direct = signDirectTransaction({ context, intent, nonce: 1n, signer: edSigner, approve: approval });
+// @ts-expect-error Review requires explicit boolean approval.
+signDirectTransaction({ context, intent, nonce: 1n, signer: edSigner, approve: () => "yes" });
 const root = signRootTransaction({ context, intent, nonce: 2n, authEpoch: 1n, config: { version: 1, threshold: 1, keys: [{ keyScheme: 1, publicKey: edSigner.publicKey }] }, signers: [edSigner] });
 const credential: SessionSigningCredential = { grantId: new Uint8Array(32), authEpoch: 1n, policyHash: new Uint8Array(32), nonce: 3n, keyScheme: 2, publicKey: pSigner.publicKey };
 const session = signSessionTransaction({ context, intent, credential, signer: pSigner, timeoutMs: 30000, signal: new AbortController().signal });

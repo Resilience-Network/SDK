@@ -62,6 +62,17 @@ try {
       },
     };
   };
+  const approve = ({ review }) => {
+    assert.equal(review.signaturePlaceholder, "64-zero-bytes");
+    assert.equal(
+      review.signingDigest,
+      review.transactionTemplate.fields.find(
+        (field) => field.path === "envelope.signingDigest",
+      ).value,
+    );
+    assert(Object.isFrozen(review.authority));
+    return true;
+  };
   const cases = [];
   const add = (name, tx, options) => {
     const c = options.credential;
@@ -87,7 +98,7 @@ try {
     cases.push({ name, request, tx, accepted: true });
   };
   for (const signer of [edSigner(), nativeSigner(1)]) {
-    const options = directOptions(signer);
+    const options = { ...directOptions(signer), approve };
     add(
       "DIRECT independent Ed25519",
       await sdk.signDirectTransaction(options),
@@ -95,21 +106,21 @@ try {
     );
   }
   for (let threshold = 1; threshold <= 8; threshold++) {
-    const options = rootInput(threshold, 8);
+    const options = { ...rootInput(threshold, 8), approve };
     options.signers = Array.from({ length: threshold }, (_, i) =>
       nativeSigner(1, i + 1),
     ).reverse();
     add(`ROOT threshold ${threshold}`, await sdk.signRootTransaction(options), options);
   }
   for (const signer of [edSigner(), p256Signer(), nativeSigner(1), nativeSigner(2)]) {
-    const options = sessionOptions(signer);
+    const options = { ...sessionOptions(signer), approve };
     add(
       `SESSION ${signer.keyScheme}`,
       await sdk.signSessionTransaction(options),
       options,
     );
   }
-  const high = sessionOptions(nativeSigner(2));
+  const high = { ...sessionOptions(nativeSigner(2)), approve };
   const nativeSign = high.signer.sign;
   high.signer.sign = async (request) => {
     const response = await nativeSign(request),

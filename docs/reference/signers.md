@@ -71,9 +71,69 @@ const canonicalBytes = transactionCodec.encode(transaction);
 ```
 
 The provider/context/nonce variables are application inputs, not bundled SDK
-services. Transaction review/signing binding and nonce coordination are separate
-delivery tasks. Applications must review canonical bytes rather than labels or
+services. Nonce coordination remains a separate delivery task. Applications must
+review canonical bytes rather than labels or
 untrusted node claims; see [threat model](../security/threat-model.md).
+
+## Canonical approval before signing
+
+All three signing functions accept optional `approve({ review, signal })`.
+Supplying it binds an explicit application-owned review to the signer's exact
+validated snapshots. The callback runs once before any external signer; only
+literal `true` approves. Omitting it deliberately uses the low-level signing API
+without an SDK review prompt. The SDK cannot prove that a UI was shown or that a
+human read it; the application owns that interaction.
+
+```ts
+const transaction = await signDirectTransaction({
+  context: trustedChainContext,
+  intent: intendedTransaction,
+  nonce: observedAndCoordinatedNonce,
+  signer,
+  approve: async ({ review, signal }) => {
+    // Show ALL canonical template fields AND public signing authority.
+    return showReviewAndAskForApproval(review, signal);
+  },
+});
+```
+
+`SigningReview` is a frozen tree of immutable primitives:
+
+- `intent`: the complete canonical intent review with expected network/genesis.
+- `transactionTemplate`: a complete envelope review with each 64-byte signature
+  replaced by zeros. Every credential/epoch/nonce/proof is present. Its hash is
+  a template hash, **not the final signed transaction ID**.
+- `authority`: DIRECT/SESSION scheme, exact public key and fingerprint; or ROOT
+  threshold, canonical config, every config key/ID and sorted selected signing IDs.
+  These are supplied signing inputs, not authenticated live authority.
+- `signingDigest`: the exact native domain digest sent to all selected signers.
+- `reviewHash`: an SDK-only binding covering the template and all public signing
+  authority inputs, including SESSION public keys absent from the envelope.
+  `reviewHashDomain` is `RESILIENCE_SDK_SIGNING_REVIEW_V1`; this hash is never used
+  as a Chain signature digest or advertised as a transaction/policy ID.
+
+The SDK review hash is Keccak256 of UTF-8 domain bytes, ChainDomain, canonical
+zero-signature TransactionV2, and metadata concatenated in that order. Metadata
+is `u16(1) || u8(mode) || u8(scheme)`, then DIRECT/SESSION wire-width public key,
+or ROOT `u32(configByteLength) || canonicalRootConfig || u8(selectedCount) ||`
+every sorted 32-byte selected key ID. Integers are big-endian. It changes with
+all public authority choices even when a chain digest intentionally binds an
+external grant/config by identity rather than containing its public keys.
+
+Approval shares the overall signing deadline and operation-owned abort signal.
+Changing intent, network, credential/config/nonces, proof, signer key/scheme/
+callback or approval callback while approval is pending fails the mutation guard
+before a signer is invoked. Rejection or reviewer failure also prevents signing.
+No state/nonce is reserved by approval; current authority/policy/budget and
+receipt checks remain necessary. Deliberately repeated application calls can
+request a new signature; no automatic resign, submission or nonce reuse occurs.
+
+[Review integration tests](../../tests/review-signing.test.mjs) cover every common
+field, authority/proof/grant-policy mutations, cancellation, exact precision and
+metadata limits. [Independent SDK review-hash goldens](../../tests/display/golden/signing-binding.json)
+use the pinned Python model's Keccak with separately assembled metadata/wire
+signature offsets. The native gate signs through approved callbacks and replays
+transactions through production Go verifiers.
 
 ## ROOT and SESSION inputs
 
@@ -110,7 +170,8 @@ complete history of edits that are restored before the next check. It is not
 isolation from hostile code running in the same JavaScript process.
 
 `timeoutMs` is an overall operation deadline of 1–300000 ms, default 30000 ms,
-including all ROOT signatures. A pre-aborted signal invokes no signer. Abort or
+including approval and all ROOT signatures. A pre-aborted signal invokes neither
+reviewer nor signer. Abort or
 timeout rejects promptly even if a provider ignores its signal, prevents further
 ROOT callbacks, and handles late promise failures. Operation signals are isolated;
 one signing cancellation does not abort another operation. Timers/listeners are
@@ -118,7 +179,8 @@ removed on settlement. Synchronous provider code can block the JavaScript event
 loop; the elapsed-time check rejects its eventual result but cannot preempt it.
 
 `SignerError.code` is `INVALID_SIGNATURE`, `SIGNER_MISMATCH`, `SIGNER_FAILED`,
-`MUTATED_INPUT`, `ABORTED` or `TIMEOUT`. Exceptions from providers and caller abort
+`MUTATED_INPUT`, `ABORTED`, `TIMEOUT`, `REVIEW_REJECTED` or `REVIEW_FAILED`.
+Exceptions from reviewers/providers and caller abort
 reasons are not copied into SDK diagnostics. The SDK does not log request/result
 bytes or retain private keys. It cannot guarantee erasure of JavaScript/GC memory,
 erase a provider's secrets, retract a signature a provider already produced, or

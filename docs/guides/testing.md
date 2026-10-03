@@ -222,3 +222,10 @@ independent vectors, not regenerated from display output. `npm run check` includ
 this suite and installed `/display` runtime/declaration consumers. Review changes
 that alter canonical hash use also run `npm run test:differential` against the
 immutable native pin. Review is structure-only, not signature/live-authority proof.
+
+`node --test tests/review-signing.test.mjs` verifies approval-to-signer binding
+for all modes/schemes, mutation before any key callback, finite precision and
+policy/authority/proof field coverage, rejected/failed approval, cancellation and
+shared deadlines. The SDK-only review hash uses independent Python Keccak
+goldens with explicit wire/metadata provenance. `test:signatures-native` also
+exercises approved callbacks before production Go acceptance/negative replay.

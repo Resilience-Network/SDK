@@ -12,3 +12,9 @@ export * from "./actions.js";
 export * from "./transaction.js";
 export * from "./hash.js";
 export * from "./signers.js";
+export type {
+  SigningAuthority,
+  SigningReview,
+  ReviewApprovalRequest,
+  ReviewApproval,
+} from "./signing-review.js";

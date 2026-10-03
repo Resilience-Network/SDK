@@ -209,7 +209,8 @@ Source modules and export boundaries:
 Core/session codecs, hashes, typed authorization RPC reads, HTTP transport and
 [raw signer contracts](docs/reference/signers.md) and
 [canonical review](docs/reference/display.md) are available. Grant lifecycle,
-nonce coordination, reconciliation, review-to-signing binding and WebAuthn remain planned. Do not
+nonce coordination, reconciliation and WebAuthn remain planned. Canonical signer
+approval binds review to the exact signing snapshot. Do not
 add placeholder functions that claim support.
 
 Use ESM with emitted declarations, strict TypeScript, `Uint8Array` for binary

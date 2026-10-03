@@ -20,6 +20,8 @@ import {
   rootConfigCodec,
   sessionWitnessCodec,
 } from "./root.js";
+import { buildSigningReview } from "./signing-review.js";
+import type { ReviewApproval, SigningReview } from "./signing-review.js";
 import { transactionCodec, txIntentCodec } from "./transaction.js";
 import type {
   AuthEnvelope,
@@ -38,7 +40,9 @@ export type SignerErrorCode =
   | "SIGNER_FAILED"
   | "MUTATED_INPUT"
   | "ABORTED"
-  | "TIMEOUT";
+  | "TIMEOUT"
+  | "REVIEW_REJECTED"
+  | "REVIEW_FAILED";
 
 /** Deliberately excludes adapter exceptions, keys and signature diagnostics. */
 export class SignerError extends Error {
@@ -72,6 +76,8 @@ export interface SigningOptions {
   context: ChainContext;
   intent: TxIntent;
   signal?: AbortSignal;
+  /** Optional explicit canonical review before any signer is invoked. */
+  approve?: ReviewApproval;
   /** Overall operation deadline, including all ROOT signatures: 1..300000 ms. */
   timeoutMs?: number;
 }
@@ -106,6 +112,10 @@ function describe(signer: RawSigner): Uint8Array[] {
   return [Uint8Array.of(signer.keyScheme), new Uint8Array(signer.publicKey)];
 }
 function common(options: SigningOptions): Uint8Array[] {
+  requireCondition(
+    options.approve === undefined || typeof options.approve === "function",
+    "Invalid approval callback",
+  );
   objectFields(options.context, ["chainId", "genesisHash"]);
   requireCondition(
     isZero(options.intent.sponsor),
@@ -123,7 +133,7 @@ function snapshotContext(context: ChainContext): ChainContext {
 }
 function watch(
   read: () => Uint8Array[],
-  callbacks: () => readonly RawSigner["sign"][],
+  callbacks: () => readonly unknown[],
 ): () => void {
   const bytes = read().map((part) => new Uint8Array(part));
   const functions = [...callbacks()];
@@ -298,6 +308,27 @@ async function bounded(
   }
 }
 
+async function approve(
+  callback: ReviewApproval | undefined,
+  review: () => SigningReview,
+  signal: AbortSignal,
+  guard: () => void,
+): Promise<void> {
+  if (!callback) return;
+  guard();
+  const request = Object.freeze({ review: review(), signal });
+  guard();
+  let accepted: boolean;
+  try {
+    accepted = await callback(request);
+  } catch {
+    guard();
+    throw new SignerError("REVIEW_FAILED");
+  }
+  guard();
+  if (accepted !== true) throw new SignerError("REVIEW_REJECTED");
+}
+
 function envelope(
   mode: 0 | 1 | 2,
   scheme: Scheme,
@@ -331,6 +362,7 @@ export async function signDirectTransaction(
     "signer",
     "signal",
     "timeoutMs",
+    "approve",
   ]);
   requireCondition(
     options.signer.keyScheme === 1,
@@ -343,7 +375,7 @@ export async function signDirectTransaction(
       encodeUint64(options.nonce),
       ...describe(options.signer),
     ],
-    () => [options.signer.sign],
+    () => [options.signer.sign, options.approve],
   );
   const context = snapshotContext(options.context),
     intent = txIntentCodec.decode(txIntentCodec.encode(options.intent));
@@ -356,6 +388,32 @@ export async function signDirectTransaction(
   );
   const digest = directDigest(context, intent, nonce);
   return bounded(options, unchanged, async (signal, guard) => {
+    await approve(
+      options.approve,
+      () => {
+        const placeholder = new Uint8Array(96);
+        placeholder.set(key);
+        return buildSigningReview(
+          context,
+          {
+            intent,
+            envelope: envelope(
+              0,
+              1,
+              new Uint8Array(32),
+              0n,
+              new Uint8Array(32),
+              nonce,
+              placeholder,
+            ),
+          },
+          digest,
+          key,
+        );
+      },
+      signal,
+      guard,
+    );
     const signature = await collect(options.signer, 0, digest, signal, guard);
     const witness = new Uint8Array(96);
     witness.set(key);
@@ -387,6 +445,7 @@ export async function signRootTransaction(
     "signers",
     "signal",
     "timeoutMs",
+    "approve",
   ]);
   boundedArray(options.signers, 1, 8);
   const unchanged = watch(
@@ -397,7 +456,7 @@ export async function signRootTransaction(
       encodeUint64(options.nonce),
       ...options.signers.flatMap(describe),
     ],
-    () => options.signers.map((signer) => signer.sign),
+    () => [...options.signers.map((signer) => signer.sign), options.approve],
   );
   const config = rootConfigCodec.decode(rootConfigCodec.encode(options.config));
   for (const key of config.keys) validateSessionPublicKey(1, key.publicKey);
@@ -435,6 +494,37 @@ export async function signRootTransaction(
     nonce = options.nonce;
   const digest = rootDigest(context, intent, hash, epoch, nonce);
   return bounded(options, unchanged, async (signal, guard) => {
+    await approve(
+      options.approve,
+      () =>
+        buildSigningReview(
+          context,
+          {
+            intent,
+            envelope: envelope(
+              1,
+              1,
+              hash,
+              epoch,
+              new Uint8Array(32),
+              nonce,
+              encodeRootWitness(
+                selected.map(({ id }) => ({
+                  rootKeyId: id,
+                  signature: new Uint8Array(64),
+                })),
+                config.threshold,
+              ),
+            ),
+          },
+          digest,
+          undefined,
+          config,
+          selected.map(({ id }) => id),
+        ),
+      signal,
+      guard,
+    );
     const entries = [];
     for (const { signer, id } of selected)
       entries.push({
@@ -467,6 +557,7 @@ export async function signSessionTransaction(
     "recipientProof",
     "signal",
     "timeoutMs",
+    "approve",
   ]);
   const credentialParts = () => {
     const c = options.credential;
@@ -497,7 +588,7 @@ export async function signSessionTransaction(
         ? new Uint8Array()
         : recipientProofCodec.encode(options.recipientProof),
     ],
-    () => [options.signer.sign],
+    () => [options.signer.sign, options.approve],
   );
   const c = options.credential;
   requireCondition(
@@ -525,6 +616,33 @@ export async function signSessionTransaction(
     intent = txIntentCodec.decode(txIntentCodec.encode(options.intent));
   const digest = sessionDigest(context, intent, credential);
   return bounded(options, unchanged, async (signal, guard) => {
+    await approve(
+      options.approve,
+      () =>
+        buildSigningReview(
+          context,
+          {
+            intent,
+            envelope: envelope(
+              2,
+              scheme,
+              credential.grantId,
+              credential.authEpoch,
+              credential.policyHash,
+              credential.nonce,
+              sessionWitnessCodec.encode(
+                proof === undefined
+                  ? { signature: new Uint8Array(64) }
+                  : { signature: new Uint8Array(64), recipientProof: proof },
+              ),
+            ),
+          },
+          digest,
+          options.credential.publicKey,
+        ),
+      signal,
+      guard,
+    );
     const signature = await collect(options.signer, 2, digest, signal, guard);
     const witness = sessionWitnessCodec.encode(
       proof === undefined ? { signature } : { signature, recipientProof: proof },
