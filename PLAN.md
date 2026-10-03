@@ -86,6 +86,10 @@ assertion helpers), and #27 (verifier integration, replay and negative domains).
 The locally implementable reference model keeps native keys externally owned and
 uses WebAuthn for separately verified off-chain authentication. It introduces no
 custody, key persistence, passkey-derived root or on-chain assertion extension.
+The [key-ownership decision](docs/decisions/0001-passkey-authorization-boundary.md)
+defines generation/unlock/recovery/XSS limits and maps every original Chain#25
+criterion. Direct native passkey enforcement is separate proposed Chain#382 work;
+it is not implied by the consensus-free SDK target.
 Application RP/challenge/account policy is explicit and injected, not inferred.
 The [authoritative RP contract](docs/decisions/0002-authoritative-webauthn-rp.md)
 selects account-bound ES256/same-origin/UV-required/none-attestation ceremonies,
@@ -144,6 +148,8 @@ independent security sign-off. Keep registry publishing disabled until its gates
 - Chain#25's original direct-passkey-native-signature wording remains separately
   accounted for under the reviewed authority boundary; no SDK implementation can
   satisfy it by DER conversion or silently adding a Chain extension.
+  [Chain#382](https://github.com/Resilience-Network/Chain/issues/382) tracks that
+  distinct future design; it is outside the existing raw-signer SDK scope.
 
 Milestone/parent issues remain open when these gates remain. Continue independent
 implementation when an external gate is unavailable. Report completion of the
