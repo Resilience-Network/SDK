@@ -20,6 +20,8 @@ browser APIs remain planned.
   observations, execution/consumption semantics and node trust boundaries.
 - [Submission API](reference/submission.md): one send, typed uncertainty and bounded
   same-ID reconciliation with node-reported finality/consumption.
+- [Nonce coordination](reference/coordinator.md): explicit reservations, async authority
+  binding, uncertain-send retention and durable adapter/recovery requirements.
 - [Raw signer API](reference/signers.md): external key ownership, exact digest
   semantics, canonical witnesses, mutation guards and bounded cancellation.
 - [Canonical review API](reference/display.md): frozen bytes/hash-bound policy,

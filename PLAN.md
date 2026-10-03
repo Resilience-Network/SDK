@@ -65,12 +65,12 @@ Tasks in dependency order:
 3. #17 implements explicit one-attempt submission, exact transaction-ID binding,
    bounded finalized receipt tracking and ambiguous-send reconciliation. Null
    historical lookup never proves non-inclusion or authorizes nonce reuse.
-4. #19 implements explicit activation, create/use/replace/revoke/revoke-all,
+4. #20 coordinates account/root/grant nonces and freezes asynchronous authority
+   snapshots before higher-level lifecycle work. Define serialization, conflicts,
+   consumed failure, uncertain-send retention and app-injected durable coordination.
+5. #19 implements explicit activation, create/use/replace/revoke/revoke-all,
    rotation/reserve/cleanup construction and bounded authority checks for the
-   initial supported transfer-grant scope.
-5. #20 coordinates account/root/grant nonces and freezes asynchronous authority
-   snapshots. Define serialization, conflicts, consumed failure, uncertain-send
-   retention and caller-injected coordination/storage boundaries.
+   initial supported transfer-grant scope, using #20's reservation contracts.
 
 Exit: independent canonical/native receipt fixtures and hashes; malformed/large/
 wrong-context/error/timeout cases; exact deadlines and cancellation; concurrency
