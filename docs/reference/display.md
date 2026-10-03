@@ -46,9 +46,10 @@ reviewed but is unsupported by the current raw signer helpers.
 
 Both the object tree and fields are frozen, contain only immutable primitives
 and retain no caller byte-array references. Later input/context mutation cannot
-alter a previously returned review. The review API alone does not require a
-signer to use those reviewed bytes; explicit review-to-signing binding is a
-separate tracked requirement (#22).
+alter a previously returned review. The standalone review API does not require a
+signer to use those reviewed bytes. The [signer approval callback](signers.md)
+adds binding to its exact signing snapshot before any external key callback;
+its zero-signature template hash must never be shown as a final transaction ID.
 
 ## Supported field mapping
 

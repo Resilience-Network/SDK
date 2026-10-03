@@ -71,7 +71,8 @@ node's omitted-null-result interoperability gap and separate qualification gates
 `signDirectTransaction` and `signRootTransaction` use explicitly owned external
 Ed25519 adapters; `signSessionTransaction` additionally supports raw prehashed
 P-256. They validate signatures, collect exactly the ROOT threshold and guard
-async mutations/cancellation. See [the signer API](docs/reference/signers.md)
+async mutations/cancellation. An optional canonical approval callback binds
+review to the exact public signing inputs before any key callback. See [the signer API](docs/reference/signers.md)
 for exact digest contracts, ownership, examples and limits. They do not establish
 current authority, coordinate nonces or submit transactions.
 
