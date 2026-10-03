@@ -87,6 +87,11 @@ The locally implementable reference model keeps native keys externally owned and
 uses WebAuthn for separately verified off-chain authentication. It introduces no
 custody, key persistence, passkey-derived root or on-chain assertion extension.
 Application RP/challenge/account policy is explicit and injected, not inferred.
+The [authoritative RP contract](docs/decisions/0002-authoritative-webauthn-rp.md)
+selects account-bound ES256/same-origin/UV-required/none-attestation ceremonies,
+terminal challenge takes, credential version checks and separate backup/counter
+policies. Its normative inventory is a design input; #27 must verify real signed
+responses and store races before any combined example is qualified.
 
 Exit: reviewed contracts/decision, exact bounded bytes, secure-context/API checks,
 abort behavior, authoritative origin/RP/type/challenge/UP/UV/signature verification,

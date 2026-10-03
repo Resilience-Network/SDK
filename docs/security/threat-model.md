@@ -40,3 +40,32 @@ controls in market-sensitive applications.
 Independent signing/parsing review, negative tests and end-to-end evidence are
 release gates in [PLAN.md](../../PLAN.md). Any direct passkey authorization design
 requires its own enforcement-boundary review and coordinated chain/contract scope.
+
+## Selected relying-party design
+
+[ADR-0002](../decisions/0002-authoritative-webauthn-rp.md) assigns challenge,
+credential and authentication decisions to an application-owned RP. Browser
+parsing and client-provided verification booleans grant no authority. Its initial
+ES256 profile requires same-origin UP/UV, rejects unsupported extensions and
+attestation formats, and does not infer biometric/hardware provenance from flags,
+attachment, transports or an AAGUID. A `none` registration awaits a fresh verified
+assertion before enrollment/session grant; registration alone proves no key possession.
+
+Replay prevention requires durable linearizable terminal challenge takes with
+account/session/expiry binding. Crashes, invalid attempts, lost results and commit
+failures cannot revive a taken challenge. Registration uniqueness and conditional
+credential updates prevent overwriting another account's key or granting sessions
+after concurrent revocation. A per-worker map cannot establish these guarantees
+for a deployed service. Rate limits and authenticated enrollment/recovery remain
+application responsibilities.
+
+Synced credentials may have nonincreasing counters. The selected profile uses
+one-use challenges and explicit backup/counter policy, retaining the maximum
+observed counter rather than labeling every synced credential as cloned. Zero
+counters do not prove clone detection. A compromised RP/browser origin can bypass
+application login or misuse its externally owned native signer; this design
+creates no cryptographic passkey-to-Chain enforcement.
+
+The [normative case inventory](../../tests/webauthn/rp-contract-cases.json) is not
+execution evidence. Real verifier/parser/browser checks are #27/#26/#30; physical
+devices and independent review remain #31/#34. GitHub owns their actual results.
