@@ -1,0 +1,49 @@
+{
+  "provenance": {
+    "chainRevision": "773d20810e46a67e2cc68a3e58df7c08e5ac3784",
+    "source": "tests/vectors/chain-v1.json (pinned independent Python model), policy field literals and explicitly authored control cases; not generated from the review implementation"
+  },
+  "policy": {
+    "policy.version": "1",
+    "policy.actionMask": "1",
+    "policy.maxAttempts": "100",
+    "policy.fee.maxGasLimit": "100000",
+    "policy.fee.maxGasPrice": "2000000000",
+    "policy.fee.maxFeePerTransaction": "500000000000000",
+    "policy.fee.lifetimeFeeLimit": "5000000000000000",
+    "policy.fee.feeTokenBucket.enabled": false,
+    "policy.transfer.recipients.kind": "inline-allowlist",
+    "policy.transfer.recipients.count": "2",
+    "policy.transfer.recipients[0]": "0x6eed55ab520bb7c3ec1c67514f1e5844cd375210",
+    "policy.transfer.recipients[1]": "0xee90a735e3c4192626e2501003e8f19056158fdf",
+    "policy.transfer.limits.maxPerTransaction": "5000000000000000000",
+    "policy.transfer.limits.lifetimeLimit": "25000000000000000000",
+    "policy.transfer.limits.valueTokenBucket.enabled": false,
+    "policy.transfer.allowZeroValue": false,
+    "policy.transfer.allowSelfTransfer": false,
+    "policy.contractCall.enabled": false,
+    "policy.contractCreate.enabled": false,
+    "policy.stake.enabled": false,
+    "policy.unstake.enabled": false,
+    "policy.claimRewards.enabled": false,
+    "policy.delegate.enabled": false
+  },
+  "grant": {
+    "createGrant": {
+      "keyScheme": "Ed25519",
+      "publicKey": "0x2543b92ff1095511476adc8369db6ddc933665a11978dda1404ee1066ca9559d",
+      "validAfterHeight": "101",
+      "validUntilHeight": "10101",
+      "storageDeposit": "1000000000000000000",
+      "policyHash": "0xb2d487c5bc1c8c2d67fa6f2189e54231a09cde217803f5ab16679c0acea2e56b"
+    },
+    "p256CreateGrant": {
+      "keyScheme": "P-256-raw",
+      "publicKey": "0x3fbea198eb0a5b6e1b3a46399952b62936f6a7bb831469d7761e9b990d7eb3cfd08818b7fbd6afb47b0e786995dd2dfbac9f37ca68db4859719427b0864755c0",
+      "validAfterHeight": "201",
+      "validUntilHeight": "10201",
+      "storageDeposit": "1000000000000000000",
+      "policyHash": "0xb2d487c5bc1c8c2d67fa6f2189e54231a09cde217803f5ab16679c0acea2e56b"
+    }
+  }
+}

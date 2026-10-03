@@ -211,3 +211,14 @@ result, meaningful limits and retained artifacts. Describe a required skip or
 blocked test explicitly. Historical PASS claims are revision-bound and cannot
 be copied as new evidence. An independent security review is a separate gate
 from implementer tests or these implementation checks.
+
+## Canonical review checks
+
+After building, `node --test tests/display.test.mjs` checks the field goldens,
+all supported actions and digest modes, zeros/disabled limits, maximum recipient/
+proof shapes, exact u256 formatting, frozen snapshots and bounded deterministic
+mutations. Goldens in `tests/display/golden/fields.json` are authored from pinned
+independent vectors, not regenerated from display output. `npm run check` includes
+this suite and installed `/display` runtime/declaration consumers. Review changes
+that alter canonical hash use also run `npm run test:differential` against the
+immutable native pin. Review is structure-only, not signature/live-authority proof.
