@@ -1,7 +1,7 @@
 {
   "repository": "https://github.com/Resilience-Network/Chain",
-  "revision": "773d20810e46a67e2cc68a3e58df7c08e5ac3784",
-  "status": "P1 supported codec/hash and P2 transport/typed-read baseline; signer, receipts and browser authority remain unqualified",
+  "revision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d",
+  "status": "Supported canonical codec/hash, raw signer, signing review and typed-read/RPC-envelope baseline; receipts, browser and running-network authority remain separate gates",
   "vectorPaths": ["reference/sessionauth/vectors/v1.json"],
   "sourcePaths": [
     "pkg/sessionauth/codec.go",
@@ -18,7 +18,9 @@
     "pkg/sessionauth/recovery.go",
     "pkg/sessionauth/state_codec.go",
     "pkg/sessionauth/state_validate.go",
-    "pkg/sessionauth/receipt.go"
+    "pkg/sessionauth/receipt.go",
+    "internal/rpc/types.go",
+    "internal/rpc/handler.go"
   ],
   "vectorSha256": "b3465f575eafde50e9704184774f7e160eecd33d7010558af5e0d0836d3a85bb"
 }

@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"math/big"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -26,6 +27,67 @@ type sdkRPCFixture struct {
 	Params   any             `json:"params"`
 	Response json.RawMessage `json:"response"`
 	Identity json.RawMessage `json:"identity"`
+}
+
+type sdkRPCEnvelopeFixture struct {
+	Scenario string          `json:"scenario"`
+	Source   string          `json:"source"`
+	Request  json.RawMessage `json:"request"`
+	Response json.RawMessage `json:"response"`
+}
+
+func sdkEnvelopeFixtures(t *testing.T, handler *Handler) []sdkRPCEnvelopeFixture {
+	t.Helper()
+	var fixtures []sdkRPCEnvelopeFixture
+	capture := func(scenario, source string, request any) {
+		t.Helper()
+		wire, err := json.Marshal(request)
+		if err != nil {
+			t.Fatal(err)
+		}
+		response := handler.Handle(wire)
+		if !json.Valid(response) {
+			t.Fatalf("invalid response: %s", scenario)
+		}
+		fixtures = append(fixtures, sdkRPCEnvelopeFixture{scenario, source, wire, response})
+	}
+	request := func(id int, method string, args ...any) map[string]any {
+		if args == nil {
+			args = []any{}
+		}
+		return map[string]any{"jsonrpc": "2.0", "id": id, "method": method, "params": args}
+	}
+	missing := (types.Hash{31: 0xff}).Hex()
+	for _, method := range []string{"rsc_getTransactionByHash", "eth_getTransactionByHash", "rsc_getTransactionReceipt", "eth_getTransactionReceipt", "rsc_getBlockByHash", "eth_getBlockByHash"} {
+		args := []any{missing}
+		if method == "rsc_getBlockByHash" || method == "eth_getBlockByHash" {
+			args = append(args, false)
+		}
+		capture(method+"-absent", "public-api", request(17, method, args...))
+	}
+	capture("invalid-params", "public-api", request(31, "rsc_getTransactionReceipt"))
+	capture("unknown-method", "production-dispatch", request(9, "sdk_missing_method"))
+	var pointer *int
+	var slice []int
+	var object map[string]int
+	probes := []struct {
+		name  string
+		value any
+	}{
+		{"nil", nil}, {"typed-pointer", pointer}, {"typed-slice", slice}, {"typed-map", object},
+		{"false", false}, {"zero", 0}, {"empty-string", ""}, {"empty-list", []int{}}, {"empty-map", map[string]int{}},
+	}
+	for _, probe := range probes {
+		handler.Register("sdk_probe_"+strings.ReplaceAll(probe.name, "-", "_"), func(json.RawMessage) (any, *RPCError) { return probe.value, nil })
+		capture(probe.name, "production-handler-test-probe", request(42, "sdk_probe_"+strings.ReplaceAll(probe.name, "-", "_")))
+	}
+	capture("mixed-public-batch", "public-api", []any{
+		request(19, "rsc_getTransactionReceipt", missing), request(3, "rsc_getTransactionReceipt"), request(11, "rsc_gasPrice"),
+	})
+	capture("mixed-probe-batch", "production-handler-test-probe", []any{
+		request(7, "sdk_probe_false"), request(1, "sdk_missing_method"), request(25, "sdk_probe_nil"), request(13, "sdk_probe_zero"), request(29, "sdk_probe_empty_string"),
+	})
+	return fixtures
 }
 
 func TestSDKPinnedRPCContracts(t *testing.T) {
@@ -213,6 +275,17 @@ func TestSDKPinnedRPCContracts(t *testing.T) {
 		t.Fatal("RSC_RPC_FIXTURE_OUTPUT required")
 	}
 	if err := os.WriteFile(path, append(output, '\n'), 0600); err != nil {
+		t.Fatal(err)
+	}
+	envelopes, err := json.MarshalIndent(sdkEnvelopeFixtures(t, h), "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	envelopePath := os.Getenv("RSC_RPC_ENVELOPE_OUTPUT")
+	if envelopePath == "" {
+		t.Fatal("RSC_RPC_ENVELOPE_OUTPUT required")
+	}
+	if err := os.WriteFile(envelopePath, append(envelopes, '\n'), 0600); err != nil {
 		t.Fatal(err)
 	}
 }

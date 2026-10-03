@@ -157,12 +157,14 @@ retries or redirect behavior.
 
 ## Interoperability and qualification
 
-The [pinned node](protocol-sources.md) omits `result` for some nil-success handlers,
-including absent transaction/receipt lookup. This conflicts with JSON-RPC and the
-node's documented null results. The SDK rejects it as `INVALID_RESPONSE` and does
-not coerce omission to null. [Chain#375](https://github.com/Resilience-Network/Chain/issues/375)
-tracks the node correction; [SDK#40](https://github.com/Resilience-Network/sdk/issues/40)
-requires a reviewed baseline update before completing typed lookup/receipt contracts.
+The [pinned node](protocol-sources.md) emits explicit `result:null` for successful
+absent transaction/receipt lookups, preserves false/zero/empty values and emits
+error-only envelopes. Native production-handler fixtures are exercised through
+actual Node fetch, including mixed batches. The SDK still rejects omitted results
+and ambiguous envelopes as `INVALID_RESPONSE`; it applies no compatibility
+coercion. Null lookup is a bounded node observation, not proof of nonexistence or
+rejection. Typed receipt semantics remain the separate
+[SDK#16](https://github.com/Resilience-Network/sdk/issues/16) delivery gate.
 
 Tests use injected fetch and actual Node fetch against owned loopback servers for
 truncation, gzip expansion, throttling, redirects, abort and deadlines. This is
