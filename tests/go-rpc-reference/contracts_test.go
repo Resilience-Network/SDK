@@ -91,6 +91,7 @@ func sdkEnvelopeFixtures(t *testing.T, handler *Handler) []sdkRPCEnvelopeFixture
 }
 
 func TestSDKPinnedRPCContracts(t *testing.T) {
+	sdkWriteReceiptFixtures(t)
 	var fixtures []sdkRPCFixture
 	context := sessionauth.ChainContext{ChainID: 1337, GenesisHash: types.Hash{31: 0xaa}}
 	params := config.DefaultChainParams()

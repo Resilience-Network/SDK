@@ -229,3 +229,32 @@ policy/authority/proof field coverage, rejected/failed approval, cancellation an
 shared deadlines. The SDK-only review hash uses independent Python Keccak
 goldens with explicit wire/metadata provenance. `test:signatures-native` also
 exercises approved callbacks before production Go acceptance/negative replay.
+
+## Receipt commitment and observation checks
+
+`node --test tests/receipts.test.mjs` checks independent field/hash fixtures, every
+truncated length, exact consumption semantics for constructed native projections,
+required-field deletion/unknown fields, numeric/context/nonce/fee/event mutations,
+unknown/pending lookups, copied canonical input, moving head refresh and bounded
+abort/deadline behavior. Actual Node HTTP runs concurrent native receipt batches
+with independent output ownership. These are projection/transport checks, not
+funded execution or independent finality verification. See [receipt API](../reference/receipts.md).
+
+```sh
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:receipts-native
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:rpc-native
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:differential
+```
+
+The receipt native gate requires clean exact pinned HEAD and CGO, builds crypto,
+and exclusively installs a temporary owned test in native sessionauth. Production
+counter/event codecs and internal decision seal/shape rules produce independent
+fixtures. The test-only decision decoder is a commitment oracle, never an exported
+node protocol decoder or policy evaluator. Exact bytes/hashes and acceptance are
+compared for every truncated length and 48 seeded bit mutations per fixture
+(seed `0x16ce1a`). Owned tests/temporary data are removed only after content
+ownership verification; native build outputs are retained. The full differential
+command includes this gate alongside the original canonical suite. Native RPC
+regeneration also checks constructed receipt/transaction projections against the
+production Handler/API; cancellation's structural test signature is explicitly
+identified. Funded/native lifecycle and browser/security gates remain separate.

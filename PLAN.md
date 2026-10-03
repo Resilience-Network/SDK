@@ -348,8 +348,10 @@ identity/finality-context, policy decode/preview, fees, estimation/simulation,
 submission and receipt/transaction lookup. Treat HTTP errors, malformed JSON,
 JSON-RPC errors and cancellation separately. Use injectable fetch, timeout and
 bounded idempotent-read retries. Batch requests must honor server limits.
-Implement the deferred canonical receipt-counter-delta/decision models and typed
-hashes alongside receipt contracts, with independent native Go conformance.
+Use canonical receipt-counter-delta/event models and the internal decision seal
+commitment format/hash alongside receipt contracts, with independent native Go
+conformance. Chain exposes no public decision wire decoder/RPC projection;
+commitment inspection must never imply policy evaluation or node authority.
 
 Implement this stage in bounded steps: transport/error contracts and deterministic
 adversarial plus actual HTTP tests (#14), identity/read schemas (#15), submission/

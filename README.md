@@ -6,7 +6,8 @@ originating from [Chain issue #25 (FR-013)](https://github.com/Resilience-Networ
 The implementation provides canonical transaction/session codecs and typed
 hashes checked against pinned Chain and independent vectors, plus bounded HTTP
 JSON-RPC transport, validated Chain authorization/fee/simulation reads and raw
-Ed25519/P-256 transaction signers and canonical review data. Grant lifecycle, submission/receipts, browser
+Ed25519/P-256 transaction signers and canonical review data. Typed transaction/receipt observations and receipt commitments are implemented.
+Grant lifecycle, submission, browser
 passkey APIs and release qualification
 remain planned work.
 
@@ -64,7 +65,9 @@ Validate method results before use. The transport caps bytes, batches, deadlines
 and read retries, matches IDs and exposes sanitized typed errors. Submissions get
 one attempt; timeout is not proof of rejection. See the
 [HTTP API and exact limits](docs/reference/http-rpc.md), including the pinned
-node envelope conformance and separate receipt/network qualification gates.
+node envelope conformance. [Receipt reads](docs/reference/receipts.md) retain
+failed-included consumption and explicit unknown lookup results; funded network
+qualification remains a separate gate.
 
 ## Available raw signers
 

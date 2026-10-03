@@ -21,6 +21,16 @@ import type {
 } from "./contracts.js";
 import { Deadline, systemClock } from "./deadline.js";
 import { HttpRpcClient } from "./http.js";
+import {
+  canonicalLookup,
+  receiptProjection,
+  transactionProjection,
+} from "./receipts.js";
+import type {
+  LookupOptions,
+  ReceiptObservation,
+  TransactionObservation,
+} from "./receipts.js";
 import type { RpcCall, RpcClock, RpcRequestOptions } from "./types.js";
 import {
   amount,
@@ -171,6 +181,108 @@ export class ChainRpcClient {
     options: RpcRequestOptions = {},
   ): Promise<AuthorizationFinalityStatus> {
     return (await this.#read([], false, options)).identity;
+  }
+  async getTransactionByHash(
+    transactionHash: Uint8Array,
+    options: LookupOptions = {},
+  ): Promise<TransactionObservation> {
+    const id = inputGuard(() => fixedInput(transactionHash, 32, true));
+    const canonical = inputGuard(() =>
+      canonicalLookup(options.canonicalTransaction, id, this.#expected),
+    );
+    const read = await this.#read(
+      [{ method: "rsc_getTransactionByHash", params: [bytesToHex(id)] }],
+      false,
+      options,
+      true,
+      (r) => {
+        transactionProjection(r.results[0], id, r.identity, canonical, false);
+      },
+    );
+    return resultGuard(() => {
+      const transaction = transactionProjection(
+        read.results[0],
+        id,
+        read.identity,
+        canonical,
+      );
+      return transaction === null
+        ? {
+            identity: read.identity,
+            transactionHash: id,
+            verification: "node-observation",
+            status: "unknown",
+            transaction: null,
+          }
+        : {
+            identity: read.identity,
+            transactionHash: id,
+            verification: "node-observation",
+            status:
+              transaction.location === null ? "reported-pending" : "reported-included",
+            transaction,
+          };
+    });
+  }
+  async getTransactionReceipt(
+    transactionHash: Uint8Array,
+    options: LookupOptions = {},
+  ): Promise<ReceiptObservation> {
+    const id = inputGuard(() => fixedInput(transactionHash, 32, true));
+    const canonical = inputGuard(() =>
+      canonicalLookup(options.canonicalTransaction, id, this.#expected),
+    );
+    const parse = (r: ReadResult, checkObservedHead = true) => {
+      const transaction = transactionProjection(
+        r.results[1],
+        id,
+        r.identity,
+        canonical,
+        checkObservedHead,
+      );
+      const receipt = receiptProjection(
+        r.results[0],
+        id,
+        r.identity,
+        transaction,
+        canonical,
+        checkObservedHead,
+      );
+      return { transaction, receipt };
+    };
+    const read = await this.#read(
+      [
+        { method: "rsc_getTransactionReceipt", params: [bytesToHex(id)] },
+        { method: "rsc_getTransactionByHash", params: [bytesToHex(id)] },
+      ],
+      false,
+      options,
+      true,
+      (r) => {
+        parse(r, false);
+      },
+    );
+    return resultGuard(() => {
+      const { transaction, receipt } = parse(read);
+      if (receipt === null)
+        return {
+          identity: read.identity,
+          transactionHash: id,
+          verification: "node-observation",
+          status: "unknown",
+          receipt: null,
+          transaction,
+        };
+      requireResult(transaction !== null);
+      return {
+        identity: read.identity,
+        transactionHash: id,
+        verification: "node-observation",
+        status: "reported-included",
+        receipt,
+        transaction,
+      };
+    });
   }
   async getRootAuthority(
     owner: Uint8Array,

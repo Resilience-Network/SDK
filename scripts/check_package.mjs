@@ -78,6 +78,11 @@ assert.equal(core.decodeUint64(core.encodeUint64((1n << 64n) - 1n)), (1n << 64n)
 assert.equal(core.bytesToHex(core.keccak256(new Uint8Array())), "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470");
 assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReserveCodec.encode({ version: 1, securityReserve: 1n << 200n })), { version: 1, securityReserve: 1n << 200n });
 assert.equal(sdk.policyCodec, session.policyCodec);
+const receiptDelta={version:1,mode:0,actionType:0,nonceDelta:1,attemptsDelta:0,successesDelta:0,claimsDelta:0,valueCategory:0,valueDelta:0n,feeDelta:1n<<200n,succeeded:false};
+assert.deepEqual(session.receiptCounterDeltaCodec.decode(session.receiptCounterDeltaCodec.encode(receiptDelta)),receiptDelta);
+assert.equal(session.receiptCounterDeltaHash(receiptDelta).length,32);
+assert.equal(typeof rpc.ChainRpcClient.prototype.getTransactionReceipt,"function");
+assert.equal(typeof rpc.ChainRpcClient.prototype.getTransactionByHash,"function");
 assert.equal(sdk.CodecError, core.CodecError);
 assert.equal(sdk.HttpRpcClient, rpc.HttpRpcClient);
 assert.equal(sdk.ChainRpcClient, rpc.ChainRpcClient);
@@ -128,11 +133,11 @@ console.log("Installed root/core/session/rpc/display imports and API smoke check
     join(temporary, "consumer.ts"),
     `
 import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
-import { setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
+import { receiptCounterDeltaCodec, sessionDecisionCommitmentHash, type ReceiptCounterDelta, type SessionDecisionCommitment, setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
 import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential, type SigningReview, type ReviewApproval, type ReviewApprovalRequest } from ${JSON.stringify(`${metadata.name}/session`)};
 import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type CanonicalReview, type ReviewBinding, type ReviewField } from ${JSON.stringify(`${metadata.name}/display`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
-import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
+import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type ReceiptObservation, type TransactionObservation, type LookupOptions, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
 const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
 const context: ChainContext = { chainId: 1n, genesisHash: new Uint8Array(32) };
 encodeUint256(reserve.securityReserve);

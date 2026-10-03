@@ -1,0 +1,1002 @@
+{
+  "revision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d",
+  "provenance": "Independent native counter/event encoders and production internal decision seal/shape validation. Decision test decoder is a commitment oracle, not a public Chain decoder or policy evaluator.",
+  "fixtures": [
+    {
+      "kind": "counter",
+      "name": "mode-0-action-00-success-false",
+      "hex": "0x0001000001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x1b96a71e70a65aff74a219949a49c95b92ce57ffd91e0753fa02f9ab55f31c92"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-00-success-true",
+      "hex": "0x0001000001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x3dbec81bf563b486daf5817ceb57541fa6310f859ee42419336b968d31fcfde7"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-01-success-false",
+      "hex": "0x0001000101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x0354d91eec9e7a2a4784f0a20284bb1205053fefee1ee0eb2d918de234f9cb23"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-01-success-true",
+      "hex": "0x0001000101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x7465193e7a86fa415224aae42366018ae7a30b2c72c5155015d82d2480ebb7fd"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-02-success-false",
+      "hex": "0x0001000201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x1d7fc4a195e6f602dea8ab42ab92427f690f0e3ea89f8e46fd963bf7d51fb57a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-02-success-true",
+      "hex": "0x0001000201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x857ca10ffe1646e2000b0d66c316bc97d9da27f74aa08a3a7746565cfb7021b2"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-03-success-false",
+      "hex": "0x0001000301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x49a07ebe18647a64c666e3d95f7817d618a324955da065e3630e85c0f4750cc6"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-03-success-true",
+      "hex": "0x0001000301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x9164f0593207a0ef424d7adea025ab8eae10d655556e769b30b5125b89a30ea2"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-04-success-false",
+      "hex": "0x0001000401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x4d0ed95f27e34282f5863026a988dcf8f115c5ffff166dc33519cfb013c09d17"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-04-success-true",
+      "hex": "0x0001000401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x8d9b3b15ee49b412c7ae7e707514a7480c61c79a7f5a3251790db2a30b8a5a2e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-05-success-false",
+      "hex": "0x0001000501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xb81c1de47d2527c947e609e39719b6508cfad74c8bc768a572e091d14b69ff50"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-05-success-true",
+      "hex": "0x0001000501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x9e4a048164a713962801d01e87df43aae64e04404de33b5ca46e3412a385d364"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-06-success-false",
+      "hex": "0x0001000601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x5bf6a0dbbb6de2c10968c51a5f9f54fd16844f783ba2545dfa85874a6577ea10"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-06-success-true",
+      "hex": "0x0001000601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x3d8ccf6e4a38240c91fc9a953f47de768042f5937868bf7e895656bab3801ce5"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-07-success-false",
+      "hex": "0x0001000701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xaf2e4fd9e07e6a9f7425de3d7cb85d361e6cd0295c1900247e4d518026b37a8e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-07-success-true",
+      "hex": "0x0001000701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x53423f8158760fb29f9e378adf2ead79f63362d70877c821ee75193c48dee678"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-08-success-false",
+      "hex": "0x0001000801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x2bfc7b1d077b3c8b406fae2c59b3f3a0d3a2abb1daceb6bbc88ac37f6fc72c6d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-08-success-true",
+      "hex": "0x0001000801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xde32fd69bdf434700cfda88de2346e7bba6f6783086756b92ecc8ab2d243fb48"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-09-success-false",
+      "hex": "0x0001000901000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x13170639bec3922883f8f4fe51b0435ee6fed937caeea5c85f3413bbd83413f3"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-09-success-true",
+      "hex": "0x0001000901000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x434aa7b839359e681eb435ed63846245525b88cc0b94ad17721630a21b54e8e7"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0a-success-false",
+      "hex": "0x0001000a01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x1798d2e085ef0e23337fae91a989025c7c05cf274bcfa8cb49fcb9826510ed03"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0a-success-true",
+      "hex": "0x0001000a01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xf1a6cc1c8390b2474372224e940b6c2a1fd71e8611707535df5caa516488e81d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0b-success-false",
+      "hex": "0x0001000b01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x25e6c72fbf995c10f5e3f8d814030570112320d9090b50499021562a4457daf2"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0b-success-true",
+      "hex": "0x0001000b01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x051220068a5f5f3a440125eae921ca68e245ca446c102be80fd13d43c5294fd7"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0c-success-false",
+      "hex": "0x0001000c01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xdc075295e22ae63e147067ce36ef1e33643eeb1ecb75502be5eff557da115300"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0c-success-true",
+      "hex": "0x0001000c01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xe4853909e0226ca07a8255ec1eebb6631fdbe3e2ad5b8d917c9946e14cd09815"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0d-success-false",
+      "hex": "0x0001000d01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x7f277a6d9ee7df611980f281d1fbd5a3c45a3ea1516a62dd22bbb2dd98151d1a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0d-success-true",
+      "hex": "0x0001000d01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xbb2ce09b5183958a6bb4b9d89de134b659d5004d6935d2ee3493cc1ed9d90edd"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0e-success-false",
+      "hex": "0x0001000e01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xf8308aa65d07808d10146e4e8863b1c7d9e9a3f570a98cd444896e48364631f0"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0e-success-true",
+      "hex": "0x0001000e01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x8b3b9dd053594afdebcef9aad364dc0280d2973674869a116fcd82218052b9c9"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0f-success-false",
+      "hex": "0x0001000f01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x2408a9f3b28e84cc0a6f790ac7a98e88d957b93b369b2dac080a9f4eaef38ddb"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-0f-success-true",
+      "hex": "0x0001000f01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x92b252589845ae6a3a24858a01ae36e0e4b06fe508d5bc760c8e829aec06efb9"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-10-success-false",
+      "hex": "0x0001001001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x035eec1618f2865ea1e1c31ea4f86043bb077dca3a1bd28cff9b6c976558e39f"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-10-success-true",
+      "hex": "0x0001001001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x98d1b89d09bd51cfc58f618e5bded9a908b57e68f6a17ee4015651ddc9b09d2a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-11-success-false",
+      "hex": "0x0001001101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xd4b5088ada58ef28aaa756a17475a21001e175bde391cfaa74d8db2f2f485dbc"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-11-success-true",
+      "hex": "0x0001001101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x91e635678cf32a3596db96aa5603662ea2b0e31d788dae9ac372e59b064089de"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-80-success-false",
+      "hex": "0x0001008001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xd8e17274f08051c60ab4b7e8aaa896dc6949895926eb692ec117e265630b756c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-80-success-true",
+      "hex": "0x0001008001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x018f80a12be688f2007ec3eaefc8e723f6d4f60d7189f90a795df9be65ca088c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-81-success-false",
+      "hex": "0x0001008101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xc4d3cc50c60ce45b8a4f9f9b64e24f82e56799cd65839aa45a019bef1f90a290"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-81-success-true",
+      "hex": "0x0001008101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x0596ae3edbe090d0a2c0c56d98374f3fb71397ccbb6532d65584b5cb602573e6"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-82-success-false",
+      "hex": "0x0001008201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x8726b925bc8974f66b7af5793c1f95aa8a431b5909ca3057245d9b390a008fbb"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-82-success-true",
+      "hex": "0x0001008201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xce47fec89624aa7c65632a270b87cd95456168a491a83fe7b62c89f0fe047d47"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-83-success-false",
+      "hex": "0x0001008301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xf3b52a7280f2ca19930153cbfe668e5d74dd0462b67a27238a3c99867c3a4156"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-83-success-true",
+      "hex": "0x0001008301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xe6d1e93ad0997a57431f9387ece5ca71b6e349849e23de4df730aaffd038a3c9"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-84-success-false",
+      "hex": "0x0001008401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x175bc732a477cb7070cf01d3ded4b8cf2f1da8515219feb2f9aa1847c4e20702"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-84-success-true",
+      "hex": "0x0001008401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xb1d755295efc48f6935b221a7d082cdeb41e56d4ca53bca2d571554e350cbefe"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-85-success-false",
+      "hex": "0x0001008501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x00d5de5236cb089bda6a2025988445edbc7f16bf063c6d727d50c336d95c143c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-85-success-true",
+      "hex": "0x0001008501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x6e542e23d12abc08de95c7737ccb04c27d8656f580693c249eceed83285f96b4"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-86-success-false",
+      "hex": "0x0001008601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x4670e0970c8b36020384ac27073586d9908ec987f491bdc77e1caa61c1c65459"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-86-success-true",
+      "hex": "0x0001008601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xaa7449ffe345ed08fddad2f2405d75bb5e4d9a4f6b08f78532512fe1ab3f391d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-87-success-false",
+      "hex": "0x0001008701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x453c5213e032bdcb8c271b5a493ffbbbb3a2e2e93ab9d30d27133a66772fa63c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-87-success-true",
+      "hex": "0x0001008701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xb32685048c759a792c6a03fae0324cf2786a4e06c04840356bfcae888e8f5a84"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-88-success-false",
+      "hex": "0x0001008801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xf92ea0a7956cf7981b580976976be6602999bdaaab742f8bede5d50f9fe47a0e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-0-action-88-success-true",
+      "hex": "0x0001008801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xfdde450cc2001a54b17b9267d31c72b66edfd61ddbf43985854c417231554680"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-00-success-false",
+      "hex": "0x0001010001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xd3519833b6bfd950aa05572a552e8d1f946f84a8621a0f5b3f79f6f0ac839a6e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-00-success-true",
+      "hex": "0x0001010001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x7c430b874420242fe4d11a72a526a1d928f601928beac38eaf47ea92a693bbf2"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-01-success-false",
+      "hex": "0x0001010101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x4769b5f00d7c6eee114caf202c0c89ae21e20be89913814217390dd0641457c6"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-01-success-true",
+      "hex": "0x0001010101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xf4a3ecf9351494d8ed4dc5a1d7d2bb68ae39f166edfd031884b62adc10084275"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-02-success-false",
+      "hex": "0x0001010201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xefc1c3817a61123dc970bd0189317a979b95993b8e67719a7b2633b954295e7d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-02-success-true",
+      "hex": "0x0001010201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x42b9973ed3af245917a8035e5b4cca9e522121f0ccc36c720c95769e41cacafa"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-03-success-false",
+      "hex": "0x0001010301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x3d757e996d8b76cbf941a318d95c0d2fe111ff34b15c32a9a04b499ac68116d4"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-03-success-true",
+      "hex": "0x0001010301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xe2191f3cb2c3179f7a2e61d39a414ed4dceac47e2ca780fb38b82d3acb52723c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-04-success-false",
+      "hex": "0x0001010401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x10824a543982b63f9493deddc95add5b237c157e80935f1a404910ede8663c42"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-04-success-true",
+      "hex": "0x0001010401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xfca3256d9b1b240b8ef279355900f6b03749065138f0387d53d14bc31c17fe9c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-05-success-false",
+      "hex": "0x0001010501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xbd05e7b1ae5773d00284b59a9052cce04b183a53ca7b530124a8a5b3c36460ad"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-05-success-true",
+      "hex": "0x0001010501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xb938c372e949aee3d449c2b6fd896d63e4c196d44f234baa160c1688048db4b3"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-06-success-false",
+      "hex": "0x0001010601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x7258469019aee69910ac01722b58f42e7712334d229d37701f3a9b43c827ddd7"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-06-success-true",
+      "hex": "0x0001010601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xa1609bea38b92f57b809e375addb6af1b220f77cf1b796faf1df082ae72f9e7f"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-07-success-false",
+      "hex": "0x0001010701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x74c05d3aab001033a065663e55b2c1d02921ec4ebe03659e5da1866a9ef252a9"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-07-success-true",
+      "hex": "0x0001010701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x2c70a5ce695819fa14d9304e83409beb0deccc5463b8765492f007835ac03d5a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-08-success-false",
+      "hex": "0x0001010801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x7cedce7196c6fa156a5ff3db033db38cb5368e9a8d361009297cbac53e849dde"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-08-success-true",
+      "hex": "0x0001010801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x660dceeefe30b4514f22c13a6470b5f262d77fb65cde385f3eaac568cdd2e266"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-09-success-false",
+      "hex": "0x0001010901000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x27f41b9ae0b4cba36b57178971fb9fc6d1dc02029953dcad6118831f3449f67b"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-09-success-true",
+      "hex": "0x0001010901000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x2ea6e01507455459d1de1e09003384546cc2d1d73445bc512f1da981d2252896"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0a-success-false",
+      "hex": "0x0001010a01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xfbc865afb41e110b9e56550ee106fbb0016dc13b469bbbce3341378f460c18e1"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0a-success-true",
+      "hex": "0x0001010a01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x60d4a65500e76bdfd60af0d3830633baeeb4ac68ab430966a3b90bcba4f08f36"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0b-success-false",
+      "hex": "0x0001010b01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x4571e4ed9b81f083d742fe9b64e976af0febd955fa85042654c82ce54e975eb5"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0b-success-true",
+      "hex": "0x0001010b01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x18ae4b36ecf84e1ab0d440f1b7c39a2a5aca4ca1d76c265e395c1e15ecab35f6"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0c-success-false",
+      "hex": "0x0001010c01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x45faa2fcec75d597a15ac5ad319fbeceb78aba162d3ba8a415d51e960d57b416"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0c-success-true",
+      "hex": "0x0001010c01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xb88c7f5be210a17dd8133e8e226f7e2c2b82170d1822fd956e5ca469578afa61"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0d-success-false",
+      "hex": "0x0001010d01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x2b8af513e28c3005a5c0303ff1868f8afb81ddc3e66f021bf93441e517808033"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0d-success-true",
+      "hex": "0x0001010d01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xd27756c6e279eb01d7aea3d5fc7e90b670102a55fde6e515c37f8086bf6a61ef"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0e-success-false",
+      "hex": "0x0001010e01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xbda67e86e5df75dd5d5e579be0143cadb85be1b83352b1c75342c803b76ff617"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0e-success-true",
+      "hex": "0x0001010e01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xed8385b51f9a437c3eed13a867533951f99710bdc72525db4c98eabd066fffc3"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0f-success-false",
+      "hex": "0x0001010f01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x83508ae7b4a24e8a708b76bde8a4059ae973ed1847c980d4934393a5df2ee8a4"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-0f-success-true",
+      "hex": "0x0001010f01000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x635c047d7ad141e61a5542677cfa6e7558c0194cb40f02037ab9c5de37c836a8"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-10-success-false",
+      "hex": "0x0001011001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x8ebd12a9832e819c39bb1fc6c2aaf838e5ff5682dded145b538b34b96c9827a7"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-10-success-true",
+      "hex": "0x0001011001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x2e69b62bf585edcaf24d87894b55278bca5a87b82b786584b88c903c16ca86c1"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-11-success-false",
+      "hex": "0x0001011101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xf68b6ac1cbbd7f37636b3e75c75ab063f08ada17d87f2c2bf9cca0ae13d999f4"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-11-success-true",
+      "hex": "0x0001011101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x6692e235582c899df2d21a9bd8ddbd8d7610b2a6e5e4b34a01c0515f336d2ace"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-80-success-false",
+      "hex": "0x0001018001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x121d4f88e166fc961569f70e3c92c22ac834288358c3c0bc1a9e2280c827b459"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-80-success-true",
+      "hex": "0x0001018001000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x6d3674f3092a0695df97493c30ae595bcd551838b61c96116642b62eb4719c1c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-81-success-false",
+      "hex": "0x0001018101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x6bc391e386ed0733b108aba22534b7be0bb7f2d1d980822955b3021024a52977"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-81-success-true",
+      "hex": "0x0001018101000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xcfe6046b5a8d987d0744d8e4a1454ccc3291ca78307328650c85c71890724a74"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-82-success-false",
+      "hex": "0x0001018201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x3c20ac27dadb5e5385facfa7d7f3da4660eca12eb162476321b4c301a717da66"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-82-success-true",
+      "hex": "0x0001018201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x95863530007850453846291396e29fd86578f9addf65aa63f5d71175099a8eae"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-83-success-false",
+      "hex": "0x0001018301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xe501a3f3f8480ddc072a89071dfa12f25cf091136adb0e4a4a5399296167fc81"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-83-success-true",
+      "hex": "0x0001018301000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x37e565dadf5beea65a44c9c167435cfb06cbc5164045aab6d44111d3d405218a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-84-success-false",
+      "hex": "0x0001018401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xa04d760c81548d8160d8a160148ae3857a0d1a79a047a3e228fb7b091ffe3a4e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-84-success-true",
+      "hex": "0x0001018401000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x2f87eba5da1333c3d047fb6783905ae4d22b2ec3a4fc6e35ed15949c808afb13"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-85-success-false",
+      "hex": "0x0001018501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xbb1090e5c51f08619c0653669d4ad0896ad00fddd30e3b9370ae944f6dceb9db"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-85-success-true",
+      "hex": "0x0001018501000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xaabcd50489e331d44b49f65f01ad12205cfc5ac03f4c5307d15f0adbb7d3ad2d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-86-success-false",
+      "hex": "0x0001018601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x3f73b69340f71dbaf9cc48552977248fdb8488e926435e402a6e4c29a2d04462"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-86-success-true",
+      "hex": "0x0001018601000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xf6fa8f03cbc527ea1508ecab4b9bbc431e9546d08b7286e4d81349fc46ad694d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-87-success-false",
+      "hex": "0x0001018701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xee1be19dce98952ce63087543ac71f2efe970c5d5d9e174ae694b260c67c88dd"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-87-success-true",
+      "hex": "0x0001018701000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xef77bbcfaf9ecd4abfa63f071946b896603a5fea9e57958ca6d6db79712c734a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-88-success-false",
+      "hex": "0x0001018801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xbef4fcb767c572b7ac3016c484eec997edf7744d4b52cac031e0540fcf506f25"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-1-action-88-success-true",
+      "hex": "0x0001018801000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x1ce1cb370990d886c91d5c5adb411859621f75b506d86bbdaf1ff0a8ea8bc14d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-00-success-false",
+      "hex": "0x0001020001010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xd035af70e881a4924c388d0b3470bb7f70643d4f6feaff1cb2a330b0092d33b0"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-00-success-true",
+      "hex": "0x000102000101010001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x429dd63b65ed46faa0028c91d373f63ee582e58fc06e3f3c770c6dea3d1b9dbd"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-01-success-false",
+      "hex": "0x0001020101010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xa69a6c3f498ae5bc99b45b24f26c8acaa1470fd5b011707010a40d757cc9e265"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-01-success-true",
+      "hex": "0x000102010101010001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x060741ddcf6a84314e2c34b98a571598aeefad833ec88d5127374969d360ea23"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-02-success-false",
+      "hex": "0x0001020201010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xb26a19a604abb9efe1a0e00ae5f3f46429b65c28256b6c21c38ae936a361591d"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-02-success-true",
+      "hex": "0x000102020101010001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xc58e54f4325c7f8f44e193b306b180d10465478142021054ebae30994f1133b4"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-03-success-false",
+      "hex": "0x0001020301010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xda86b39a363af9baf65586e9aea29e4d8444cc8026f685049b5cf91e222a7611"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-03-success-true",
+      "hex": "0x000102030101010002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x0aa8d9b9224320a74b6bb9a4ee2aea3c93a26e5eb10ce3141259fb804f2132ce"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-04-success-false",
+      "hex": "0x0001020401010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xdf476d444c8d0ad6604a3de28056728beb362dd8bc1cd533b89ea942bc24d4a2"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-04-success-true",
+      "hex": "0x000102040101010004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x8236386d78842c776a5e93af193fbb4d068d4627b2851a34336ccc7550d6d339"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-05-success-false",
+      "hex": "0x0001020501010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xe6241f39c1a9d3747678e96dd3a05a275689ae0465a0cb7f41ec429dc532f8be"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-05-success-true",
+      "hex": "0x000102050101010003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x313a19c3bdd17504d157fa074859c208986e1c12cc9d3e9ae5cae4698eedabf7"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-06-success-false",
+      "hex": "0x0001020601010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xa4b12d0d98b5a044a24bf7ada740def3da780641ea3724c8e5650dc146df8d25"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-06-success-true",
+      "hex": "0x000102060101010105ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0xb3830b544c36634c07a0fd9656eb29e2568802fc2f58115c3bb557846e91d62e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-07-success-false",
+      "hex": "0x0001020701010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x74c90591c301f935ec587e529dd1634cfae68059d1070902d8e1d839fcb07a56"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-07-success-true",
+      "hex": "0x0001020701010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01",
+      "hash": "0x28fcf77f1bb2cdb4f6c3cacd4d91b2ebb449b7ff9b11134b30d2e859cae9c9f5"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-08-success-false",
+      "hex": "0x0001020801010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x65a7233c9d56185d2151570a9e9950fe539bc60fb40279e764bcdd03e68e5ddb"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-09-success-false",
+      "hex": "0x0001020901010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xe57d8779c38d32acbb4d4c4ae6bd9adebe61034d6e459197f935f711dcdcf620"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-0a-success-false",
+      "hex": "0x0001020a01010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x0788b39a256dc5c853ef76f73c1bb93f0fa19abe942324f570f9b01c2dbd201a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-0b-success-false",
+      "hex": "0x0001020b01010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x89848b82ced178ba02287ee8e8f623e09bba53f54a9e5e6cbc21acb457c6700e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-0c-success-false",
+      "hex": "0x0001020c01010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x9f35b72b430537bc2469e24b761a04884758ed800e83162478a6ac9304d40a59"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-0d-success-false",
+      "hex": "0x0001020d01010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xc46e5f976e6b09677cfabff1438e1857bdadda59dda0f8ff18dec23f4818fd37"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-0e-success-false",
+      "hex": "0x0001020e01010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xce69d871e403552753f8561bd0cbc3e6e3e61034096f9a86362486a129c62c97"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-0f-success-false",
+      "hex": "0x0001020f01010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x1c2d87fe68518268421433fe90be9141d0ef506169b23cc3c4c44eba1b62c36a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-10-success-false",
+      "hex": "0x0001021001010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x7faa0bb16f92fc6e52ff67c040e6b37bf93a8c436895e3aa4c04aa9cccb7d04a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-11-success-false",
+      "hex": "0x0001021101010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xe67ffeaacf29d4356cd12a7968f515e3c4d9dcca35f31960d0d72bca4c75d4d1"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-80-success-false",
+      "hex": "0x0001028001010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xa5e1d6b5601dae47fe36010844b4e2cb61f77d289ddcb78182e83e647698430c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-81-success-false",
+      "hex": "0x0001028101010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xf914e5e5d6aeffc87e6b81d9bfe440f91df3209f345ed0aba7b1fe5838b78365"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-82-success-false",
+      "hex": "0x0001028201010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xc884bbdfc7492a7942dfca4962b47fb03861fb4833c4bd88ea11b1390a5a980f"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-83-success-false",
+      "hex": "0x0001028301010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x6a947d5698545341bc1558c3ffcf4902abe0c87b0475a4677f2ea1d09028c4f4"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-84-success-false",
+      "hex": "0x0001028401010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x46d4b896985db4e4b3f2f4aeeb13cc38e05a438375cfe80c5cd4b5c8b1dccc3c"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-85-success-false",
+      "hex": "0x0001028501010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xe0caf25bece566f795d71d0afd5f64931e96a86fe554acae3da687b04f8345e8"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-86-success-false",
+      "hex": "0x0001028601010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0xc5730f00da804cd9acfd1c2e88bfe7fa603fa2345ca15110adac7d5301de5a8a"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-87-success-false",
+      "hex": "0x0001028701010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x99bd6e1068741969c8b1e3d3e16660ea33d9e768d3d681514badfe983677846e"
+    },
+    {
+      "kind": "counter",
+      "name": "mode-2-action-88-success-false",
+      "hex": "0x0001028801010000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00",
+      "hash": "0x611b0136e5d764fb9ac00cd160a6e958fd09c07f33528b89634a56052a010c47"
+    },
+    {
+      "kind": "counter",
+      "name": "sponsored",
+      "hex": "0x0001000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001101",
+      "hash": "0xe11305baac9024c2002fa603c2296c664a84813a6aadb4e13920b5e483080e39"
+    },
+    {
+      "kind": "event",
+      "name": "event-0100",
+      "hex": "0x00010100000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xea4791d7d6af42deb5db9083d92bdf105e8733bf21a3a11b85fa651f4f0e33b4"
+    },
+    {
+      "kind": "event",
+      "name": "event-0101",
+      "hex": "0x00010101000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xefc5281afa71837b9f3aca51655470c5d78f390848119a2a02cc1b7fb551d674"
+    },
+    {
+      "kind": "event",
+      "name": "event-0102",
+      "hex": "0x00010102000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xa2fd56ca00c08c697b8b26b93ac35b41d93599fde2542f3261052884726e022e"
+    },
+    {
+      "kind": "event",
+      "name": "event-0103",
+      "hex": "0x00010103000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x7d1eb3c505e82b7e60a50ad7d9a94e547c335b48d7dd9a72dfee1e98c764eec2"
+    },
+    {
+      "kind": "event",
+      "name": "event-0104",
+      "hex": "0x00010104000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xc097eaa510a30017e386e6ab654aea7685c7aad870405fd51167f8cf945c9bbf"
+    },
+    {
+      "kind": "event",
+      "name": "event-0105",
+      "hex": "0x00010105000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xd3eaa08e3be54d842ae5c866fdb20aaa167fb3d50561503c818b8556bc018466"
+    },
+    {
+      "kind": "event",
+      "name": "event-0106",
+      "hex": "0x00010106000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x35e9fde7f9a9b78605653152a0b3fd58b2c8b4fe59c328f313ef04f301139974"
+    },
+    {
+      "kind": "event",
+      "name": "event-0107",
+      "hex": "0x00010107000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x156027ab5632cbaef93b8de449e61d59c0d01a914a71610cf7ad46e2351353d7"
+    },
+    {
+      "kind": "event",
+      "name": "event-0108",
+      "hex": "0x00010108000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x9ce2f596c080ff847111e04c6e11d4d917654fb268517f76b5d9c8b4d8197767"
+    },
+    {
+      "kind": "event",
+      "name": "event-0109",
+      "hex": "0x00010109000000000000000000000000000000000000000100000000000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x489a3915872d80717cd371b64eee885e6b9ff384651bbaa30c502a2d3a40b1b7"
+    },
+    {
+      "kind": "event",
+      "name": "event-010a",
+      "hex": "0x0001010a000000000000000000000000000000000000000100000000000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x123e2f1334dea8ff9960e9f93897ac72c421a5b18114d71ae6e75ea470ea75f1"
+    },
+    {
+      "kind": "event",
+      "name": "event-010b",
+      "hex": "0x0001010b000000000000000000000000000000000000000100000000000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0x8d4eac458d2c4747fe84e8dbd6055ff08d9439c2294cb5163862aa16291c535c"
+    },
+    {
+      "kind": "event",
+      "name": "event-010c",
+      "hex": "0x0001010c000000000000000000000000000000000000000100000000000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xbbf65d76ed0c4e295f363534fb336501a8406d0e1a292a61e90fed5d747e443c"
+    },
+    {
+      "kind": "event",
+      "name": "event-010d",
+      "hex": "0x0001010d000000000000000000000000000000000000000100000000000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000005ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff010000",
+      "hash": "0xa4491044a26a3a2dc40c20e5c7037982f522a9df1af29b3f199d4b3d1b1e9edd"
+    },
+    {
+      "kind": "decision",
+      "name": "action-00",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000400ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0101ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000ff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0x66d31392d5c33e7cc230ad794c23d94d90053a5d120e8618872bca3c69b92641"
+    },
+    {
+      "kind": "decision",
+      "name": "action-01",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000401ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0101ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffff00000000ffffffffffff000100000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000006ffffffffffffffff",
+      "hash": "0x0b4a3338726f60f31b7b6bd8ff348a0ce7c3d657fbb42da63d30c8c272b131df"
+    },
+    {
+      "kind": "decision",
+      "name": "action-02",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000402ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0101ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0xbc6dbff82261fcbcee7a439cd4bd929e971b5bd6b4fe8b8b7536551d53c0bb0a"
+    },
+    {
+      "kind": "decision",
+      "name": "action-03",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000403ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0201ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0x5268dc2e123efab4e26a9b32d9d23e62e9130411dbcb4ca7ba5d265554cc07c9"
+    },
+    {
+      "kind": "decision",
+      "name": "action-04",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000404ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0401ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0x79701c4c619107a5e7ea7f2ff24423f29d22fde53aafbdaf86378035e6591b61"
+    },
+    {
+      "kind": "decision",
+      "name": "action-05",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000405ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0301ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000ff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0x5d3f2600f666cdff9f1bacc41840bd08e296258b611c97ac534dbd58174421a5"
+    },
+    {
+      "kind": "decision",
+      "name": "action-06",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000406ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0501ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0x1e0dd3b024369ad755a93e4d14f55f121ef6861cd7994aeda2e126357a7ea27b"
+    },
+    {
+      "kind": "decision",
+      "name": "action-07",
+      "hex": "0x000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003ffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff",
+      "hash": "0x83d6f8cbc2f514ca564e0f22fe0669f503db796b797c84f5248bf071d6c1a2f3"
+    }
+  ]
+}
