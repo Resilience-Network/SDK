@@ -356,8 +356,8 @@ adversarial plus actual HTTP tests (#14), identity/read schemas (#15), submissio
 receipt models (#16), then reconciliation/polling (#17). Transport returns
 untrusted results and cannot substitute for method validation. Keep retries on a
 fixed read-only allowlist; sends get one attempt. Investigate node/schema conflicts
-before adding convenience APIs. Correct omitted nil-success results upstream and
-review the protocol baseline before claiming interoperable null lookups/receipts.
+before adding convenience APIs. Use the reviewed explicit-null RPC baseline and
+its native envelope gate before extending typed lookup/receipt semantics.
 
 Typed reads require app-supplied identity on every logical operation, bracket
 methods with finality/identity reads and compare the complete finalized tuple.

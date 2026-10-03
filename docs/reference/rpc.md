@@ -60,12 +60,12 @@ AbortSignal. Wire spelling is always `rsc_`, including registered `eth_` aliases
 
 - `getAuthorizationFinalityStatus(options?)` calls
   `rsc_getAuthorizationFinalityStatus([])`: identity/capability and finalized state.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L302).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L302).
 - `getRootAuthority(owner20, options?)` calls `rsc_getRootAuthority([ownerHex])`:
   DIRECT/mode 0 requires null authority; ROOT/mode 1 returns epoch, root nonce,
   grant sequence/count, reserve, config/hash and canonical stored authority.
   Ed25519 points, key ordering/IDs, config hash and full bytes are cross-checked.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L68).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L68).
 - `getSessionGrant(owner20, grantId32, options?)` calls
   `rsc_getSessionGrant([ownerHex, grantIdHex])`: canonical grant/policy, scheme/key,
   validity, nonce/usage, deposit and index/usability. Ed25519/32-byte and P-256/
@@ -73,48 +73,48 @@ AbortSignal. Wire spelling is always `rsc_`, including registered `eth_` aliases
   owner, epoch, generation and key; checks policy hash, full stored bytes, exact
   deposit, validity and usage/bucket invariants.
   A standalone grant read cannot cross-check the current root epoch; use the snapshot.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L112).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L112).
 - `getSessionNonce(owner20, grantId32, options?)` calls
   `rsc_getSessionNonce([ownerHex, grantIdHex])`: state, owner/ID, exact nonce and
   usability. This subset cannot check root epoch or canonical grant.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L169).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L169).
 - `getSessionUsage(owner20, grantId32, options?)` calls
   `rsc_getSessionUsage([ownerHex, grantIdHex])`: state, owner/ID, policy hash and
   usage. Checks supported counter shapes/widths; policy limits and bucket
   configuration require full grant or snapshot.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L181).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L181).
 - `decodePolicy(canonicalPolicy, options?)` calls `rsc_decodePolicy([canonicalHex])`:
   bytes, policy view and computed hash must match the requested bytes.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L35).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L35).
 - `previewPolicy(canonicalPolicy, options?)` calls `rsc_previewPolicy([canonicalHex])`:
   also checks exact derived action (`TRANSFER`), warnings and security notice.
   Reachable warnings describe maximum u64 attempts and required Merkle proofs.
   Zero lifetime fee limits are rejected by the codec.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L45).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L45).
 - `getFeeSuggestions(options?)` batches `rsc_gasPrice([])` and
   `rsc_maxPriorityFeePerGas([])`: bigint suggestions and bracketed identity.
   These handlers report no state; that context does not prove fee provenance.
-  [Handlers](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/api.go#L1024).
+  [Handlers](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/api.go#L1024).
 - `getFeeHistory({blockCount, newestBlock, rewardPercentiles?}, options?)` calls
   `rsc_feeHistory([countHex, newestHexOrLatest, percentiles])`: count 1–64; newest
   u64 bigint or `"latest"`; SDK cap of 64 finite percentiles in [0,100], preserving
   order. Checks clamped range/oldest block, count+1 base fees, count gas ratios
   in [0,1] and reward matrix dimensions. Fees/rewards are bigint; ratios are
   approximate numbers. Identity brackets the advisory query.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/api.go#L1082).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/api.go#L1082).
 - `estimateAuthorizationGas(canonicalTransaction, options?)` calls
   `rsc_estimateAuthorizationGas([signedV2Hex])`: supported canonical V2 transaction
   with expected chain ID; positive authorization gas within declared gas limit;
   candidate height = observed height+1 and exact stale-state warning. This is
   authorization gas, not total gas or SDK signing.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L232).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L232).
 - `simulateAuthorizedTransaction(canonicalTransaction, options?)` calls
   `rsc_simulateAuthorizedTransaction([signedV2Hex])`: also binds transaction ID/
   sponsor to request, checks status/failure codes, gas, fee arithmetic, widths,
   event count ≤2 and version/type/303-byte framing. `authorized: true` can have
   action status 0/failed. Counter-delta/event-root hashes and full event semantics
   remain observations pending independent receipt verification in #16.
-  [Handler](https://github.com/Resilience-Network/Chain/blob/773d20810e46a67e2cc68a3e58df7c08e5ac3784/internal/rpc/authorization_api.go#L252).
+  [Handler](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go#L252).
 
 `getAuthorizationSnapshot(owner20, grantId32, options?)` composes root/grant/nonce/
 usage in one logical batch. Compares contexts, nonce/usability, policy hash and
@@ -165,6 +165,6 @@ redaction and real HTTP concurrency cases.
 
 This proves pinned contract interoperability and native simulation fixtures,
 not running-network/funded lifecycle finality, P-256 simulation signing, browser
-qualification or independent review. Receipt/lookup contracts require
-[SDK#40](https://github.com/Resilience-Network/sdk/issues/40) after
-[Chain#375](https://github.com/Resilience-Network/Chain/issues/375).
+qualification or independent review. Explicit-null envelope interoperability is covered by the refreshed baseline
+and native [envelope fixtures](../../tests/fixtures/rpc-envelopes.json). Typed
+receipt/lookup semantics remain [SDK#16](https://github.com/Resilience-Network/sdk/issues/16).

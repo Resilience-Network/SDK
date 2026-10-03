@@ -27,7 +27,7 @@ const unsupported = (error) =>
 test("policy golden maps every supported field using independently specified exact values", () => {
   const review = sdk.reviewPolicy(bytes(vectors.policy.canonical));
   assert.equal(
-    golden.provenance.chainRevision,
+    golden.provenance.validatedAtRevision,
     JSON.parse(readFileSync(new URL("../protocol-source.json", import.meta.url)))
       .revision,
   );

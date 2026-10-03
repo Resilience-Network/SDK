@@ -1,0 +1,385 @@
+{
+  "revision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d",
+  "provenance": "Actual production Handler/API; owned in-memory state. Falsy test probes are explicitly labelled, not public RPC methods. No running-network finality claim.",
+  "envelopes": [
+    {
+      "scenario": "rsc_getTransactionByHash-absent",
+      "source": "public-api",
+      "request": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "rsc_getTransactionByHash",
+        "params": ["0x00000000000000000000000000000000000000000000000000000000000000ff"]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": null
+      }
+    },
+    {
+      "scenario": "eth_getTransactionByHash-absent",
+      "source": "public-api",
+      "request": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionByHash",
+        "params": ["0x00000000000000000000000000000000000000000000000000000000000000ff"]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": null
+      }
+    },
+    {
+      "scenario": "rsc_getTransactionReceipt-absent",
+      "source": "public-api",
+      "request": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "rsc_getTransactionReceipt",
+        "params": ["0x00000000000000000000000000000000000000000000000000000000000000ff"]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": null
+      }
+    },
+    {
+      "scenario": "eth_getTransactionReceipt-absent",
+      "source": "public-api",
+      "request": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "eth_getTransactionReceipt",
+        "params": ["0x00000000000000000000000000000000000000000000000000000000000000ff"]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": null
+      }
+    },
+    {
+      "scenario": "rsc_getBlockByHash-absent",
+      "source": "public-api",
+      "request": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "rsc_getBlockByHash",
+        "params": [
+          "0x00000000000000000000000000000000000000000000000000000000000000ff",
+          false
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": null
+      }
+    },
+    {
+      "scenario": "eth_getBlockByHash-absent",
+      "source": "public-api",
+      "request": {
+        "id": 17,
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockByHash",
+        "params": [
+          "0x00000000000000000000000000000000000000000000000000000000000000ff",
+          false
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 17,
+        "result": null
+      }
+    },
+    {
+      "scenario": "invalid-params",
+      "source": "public-api",
+      "request": {
+        "id": 31,
+        "jsonrpc": "2.0",
+        "method": "rsc_getTransactionReceipt",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 31,
+        "error": {
+          "code": -32602,
+          "message": "expected transaction hash"
+        }
+      }
+    },
+    {
+      "scenario": "unknown-method",
+      "source": "production-dispatch",
+      "request": {
+        "id": 9,
+        "jsonrpc": "2.0",
+        "method": "sdk_missing_method",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 9,
+        "error": {
+          "code": -32601,
+          "message": "method \"sdk_missing_method\" not found"
+        }
+      }
+    },
+    {
+      "scenario": "nil",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_nil",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": null
+      }
+    },
+    {
+      "scenario": "typed-pointer",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_typed_pointer",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": null
+      }
+    },
+    {
+      "scenario": "typed-slice",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_typed_slice",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": null
+      }
+    },
+    {
+      "scenario": "typed-map",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_typed_map",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": null
+      }
+    },
+    {
+      "scenario": "false",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_false",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": false
+      }
+    },
+    {
+      "scenario": "zero",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_zero",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": 0
+      }
+    },
+    {
+      "scenario": "empty-string",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_empty_string",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": ""
+      }
+    },
+    {
+      "scenario": "empty-list",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_empty_list",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": []
+      }
+    },
+    {
+      "scenario": "empty-map",
+      "source": "production-handler-test-probe",
+      "request": {
+        "id": 42,
+        "jsonrpc": "2.0",
+        "method": "sdk_probe_empty_map",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 42,
+        "result": {}
+      }
+    },
+    {
+      "scenario": "mixed-public-batch",
+      "source": "public-api",
+      "request": [
+        {
+          "id": 19,
+          "jsonrpc": "2.0",
+          "method": "rsc_getTransactionReceipt",
+          "params": [
+            "0x00000000000000000000000000000000000000000000000000000000000000ff"
+          ]
+        },
+        {
+          "id": 3,
+          "jsonrpc": "2.0",
+          "method": "rsc_getTransactionReceipt",
+          "params": []
+        },
+        {
+          "id": 11,
+          "jsonrpc": "2.0",
+          "method": "rsc_gasPrice",
+          "params": []
+        }
+      ],
+      "response": [
+        {
+          "jsonrpc": "2.0",
+          "id": 19,
+          "result": null
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 3,
+          "error": {
+            "code": -32602,
+            "message": "expected transaction hash"
+          }
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 11,
+          "result": "0x1"
+        }
+      ]
+    },
+    {
+      "scenario": "mixed-probe-batch",
+      "source": "production-handler-test-probe",
+      "request": [
+        {
+          "id": 7,
+          "jsonrpc": "2.0",
+          "method": "sdk_probe_false",
+          "params": []
+        },
+        {
+          "id": 1,
+          "jsonrpc": "2.0",
+          "method": "sdk_missing_method",
+          "params": []
+        },
+        {
+          "id": 25,
+          "jsonrpc": "2.0",
+          "method": "sdk_probe_nil",
+          "params": []
+        },
+        {
+          "id": 13,
+          "jsonrpc": "2.0",
+          "method": "sdk_probe_zero",
+          "params": []
+        },
+        {
+          "id": 29,
+          "jsonrpc": "2.0",
+          "method": "sdk_probe_empty_string",
+          "params": []
+        }
+      ],
+      "response": [
+        {
+          "jsonrpc": "2.0",
+          "id": 7,
+          "result": false
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "error": {
+            "code": -32601,
+            "message": "method \"sdk_missing_method\" not found"
+          }
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 25,
+          "result": null
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 13,
+          "result": 0
+        },
+        {
+          "jsonrpc": "2.0",
+          "id": 29,
+          "result": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 {
   "provenance": {
     "chainRevision": "773d20810e46a67e2cc68a3e58df7c08e5ac3784",
-    "source": "tests/vectors/chain-v1.json (pinned independent Python model), policy field literals and explicitly authored control cases; not generated from the review implementation"
+    "source": "tests/vectors/chain-v1.json (pinned independent Python model), policy field literals and explicitly authored control cases; not generated from the review implementation",
+    "validatedAtRevision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d"
   },
   "policy": {
     "policy.version": "1",

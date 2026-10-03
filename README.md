@@ -64,7 +64,7 @@ Validate method results before use. The transport caps bytes, batches, deadlines
 and read retries, matches IDs and exposes sanitized typed errors. Submissions get
 one attempt; timeout is not proof of rejection. See the
 [HTTP API and exact limits](docs/reference/http-rpc.md), including the pinned
-node's omitted-null-result interoperability gap and separate qualification gates.
+node envelope conformance and separate receipt/network qualification gates.
 
 ## Available raw signers
 

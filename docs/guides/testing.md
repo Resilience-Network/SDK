@@ -38,9 +38,9 @@ node --test tests/rpc-contract.test.mjs tests/rpc-resilience.test.mjs tests/rpc-
 ```
 
 The suite checks Node behavior and imports without browser state/global fetch;
-it does not qualify browser engines. The pinned node's missing nil-success result
-is an upstream defect, not a reason to weaken envelope validation. Its separate
-correction/baseline gate is documented in the [HTTP API](../reference/http-rpc.md).
+it does not qualify browser engines. Native [envelope fixtures](../../tests/fixtures/rpc-envelopes.json)
+exercise corrected null successes, errors and falsy values through actual Node
+fetch. Missing results remain invalid; see the [HTTP API](../reference/http-rpc.md).
 
 Run `npm test` for the build and all Node unit suites. See the
 [canonical API](../reference/canonical-api.md) for exact implemented limits and

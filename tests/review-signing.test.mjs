@@ -575,7 +575,7 @@ test("SDK-only review binding matches independent pinned Python Keccak and manua
     readFileSync(new URL("./display/golden/signing-binding.json", import.meta.url)),
   );
   assert.equal(
-    fixture.chainRevision,
+    fixture.validatedAtRevision,
     JSON.parse(readFileSync(new URL("../protocol-source.json", import.meta.url)))
       .revision,
   );
