@@ -80,6 +80,10 @@ assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReser
 assert.equal(sdk.policyCodec, session.policyCodec);
 const coordinator = new session.NonceCoordinator(new session.MemoryNonceReservationStore());
 assert.equal(typeof coordinator.execute,"function");
+assert.equal(typeof session.SessionLifecycle.prototype.execute,"function");
+assert.equal(typeof session.requiredGrantStorageDeposit,"function");
+assert.equal(typeof rpc.ChainRpcClient.prototype.getAccountAuthorizationSnapshot,"function");
+assert.equal(typeof rpc.ChainRpcClient.prototype.getFundedGrantSnapshot,"function");
 assert.equal(typeof coordinator.retireObsolete,"function");
 const receiptDelta={version:1,mode:0,actionType:0,nonceDelta:1,attemptsDelta:0,successesDelta:0,claimsDelta:0,valueCategory:0,valueDelta:0n,feeDelta:1n<<200n,succeeded:false};
 assert.deepEqual(session.receiptCounterDeltaCodec.decode(session.receiptCounterDeltaCodec.encode(receiptDelta)),receiptDelta);

@@ -1,7 +1,7 @@
 # Protocol source baseline
 
 The SDK codec baseline is Chain revision
-`5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d`. It contains the reviewed explicit-null response correction in
+`007356ef5e5e1769cfda2290fcafc9db5d48bbfd`. It contains the reviewed explicit-null response correction in
 [Chain PR #379](https://github.com/Resilience-Network/Chain/pull/379). Supported
 codec/hash conformance is checked by independent and Go tests; this is not production authorization approval.
 [protocol-source.json](../../protocol-source.json) records the same immutable pin
@@ -11,15 +11,15 @@ verify its hash before using it. No upstream golden value was regenerated.
 
 ## Governing implementation and documentation
 
-- [Authorization architecture](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/docs/architecture/authorization.md).
-- [Session protocol](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/docs/reference/protocol/session-authorization.md).
-- [Authorization decisions](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/docs/decisions/session-authorization.md).
-- [P-256 session keys](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/docs/reference/protocol/p256-session-keys.md).
-- [Wallet integration](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/docs/guides/wallet-integration.md).
-- [RPC request contracts](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/docs/reference/rpc-requests.md).
-- [Canonical codecs](https://github.com/Resilience-Network/Chain/tree/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/pkg/sessionauth): codec.go, hash.go, verify.go, types.go, constants.go and action_codec.go.
-- [Authorization RPC handlers](https://github.com/Resilience-Network/Chain/blob/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/internal/rpc/authorization_api.go).
-- [Independent model and vectors](https://github.com/Resilience-Network/Chain/tree/5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d/reference/sessionauth).
+- [Authorization architecture](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/docs/architecture/authorization.md).
+- [Session protocol](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/docs/reference/protocol/session-authorization.md).
+- [Authorization decisions](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/docs/decisions/session-authorization.md).
+- [P-256 session keys](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/docs/reference/protocol/p256-session-keys.md).
+- [Wallet integration](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/docs/guides/wallet-integration.md).
+- [RPC request contracts](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/docs/reference/rpc-requests.md).
+- [Canonical codecs](https://github.com/Resilience-Network/Chain/tree/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/pkg/sessionauth): codec.go, hash.go, verify.go, types.go, constants.go and action_codec.go.
+- [Authorization RPC handlers](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/internal/rpc/authorization_api.go).
+- [Independent model and vectors](https://github.com/Resilience-Network/Chain/tree/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/reference/sessionauth).
 
 The independent model has deliberately incomplete coverage. Inventory current
 vectors against the pinned codecs before extending scope; record provenance and
@@ -80,3 +80,9 @@ interoperability, without proving running-network acceptance or finality.
 Request-ID validation and notification dispatch remain separately reported in
 [Chain#378](https://github.com/Resilience-Network/Chain/issues/378). The SDK sends
 explicit numeric IDs and does not use notifications.
+
+The lifecycle baseline consumes reviewed [Chain PR #381](https://github.com/Resilience-Network/Chain/pull/381)
+for canonical IDs in decoded block RPC transaction lists. No codec/hash, gas,
+state-root, manifest or genesis encoding changed. Native fixture goldens are
+revalidated at the new immutable pin; signing-review golden digest values are
+unchanged and only their validation provenance advances.

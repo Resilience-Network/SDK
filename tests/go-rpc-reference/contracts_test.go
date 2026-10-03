@@ -164,6 +164,8 @@ func TestSDKPinnedRPCContracts(t *testing.T) {
 		}
 		capture(api, scenario, "rsc_getAuthorizationFinalityStatus")
 		capture(api, scenario, "rsc_getRootAuthority", owner.Hex())
+		capture(api, scenario, "rsc_getTransactionCount", owner.Hex(), "latest")
+		capture(api, scenario, "rsc_getBalance", owner.Hex(), "latest")
 		for _, method := range []string{"rsc_getSessionGrant", "rsc_getSessionNonce", "rsc_getSessionUsage"} {
 			capture(api, scenario, method, owner.Hex(), grant.GrantID.Hex())
 		}
@@ -237,6 +239,8 @@ func TestSDKPinnedRPCContracts(t *testing.T) {
 	chain := &mockChain{height: 0, blocks: map[uint64]*types.Block{0: head}}
 	api := NewAPI(chain, func(r types.Hash) StateBackend { return state.NewStateDB(store, chaincrypto.Hash32(r)) }, nil, nil, nil, params, nil)
 	capture(api, "direct", "rsc_getRootAuthority", owner.Hex())
+	capture(api, "direct", "rsc_getTransactionCount", owner.Hex(), "latest")
+	capture(api, "direct", "rsc_getBalance", owner.Hex(), "latest")
 	capture(api, "direct", "rsc_gasPrice")
 	capture(api, "direct", "rsc_maxPriorityFeePerGas")
 	// feeHistory has a heterogeneous parameter array; use production Handler explicitly.

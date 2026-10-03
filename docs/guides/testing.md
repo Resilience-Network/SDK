@@ -306,3 +306,12 @@ safety sentinel. No native gate runs implicitly inside unit-only `npm run check`
 [Supervisor tests](../../tests/localnet-harness.test.mjs) are unit coverage for
 process groups/ports/path guards; they do not replace real native-node checks.
 Funded activation/grant/transfer/revocation qualification remains separate #29.
+
+## Funded account/session lifecycle
+
+`RSC_CHAIN_DIR=/absolute/pinned/chain npm run test:lifecycle-native` runs real
+four-validator funded DIRECT onboarding, both session signature schemes and
+root maintenance through the [lifecycle API](../reference/lifecycle.md). It checks
+typed finalized receipts, state/usage changes and revoked-key denial before signing.
+The broader replay/expiry/included-failure/concurrency gate is SDK #29; physical
+passkeys, independent review and publication are separate gates.

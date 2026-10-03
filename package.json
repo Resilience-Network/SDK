@@ -54,7 +54,8 @@
     "test:signatures-native": "npm run build && node scripts/check_signatures.mjs",
     "test:receipts-native": "npm run build && node scripts/check_receipts.mjs",
     "test:localnet": "npm run build && node scripts/check_localnet.mjs",
-    "test:localnet-failures": "npm run build && node scripts/check_localnet_failures.mjs"
+    "test:localnet-failures": "npm run build && node scripts/check_localnet_failures.mjs",
+    "test:lifecycle-native": "npm run build && node scripts/check_lifecycle.mjs"
   },
   "devDependencies": {
     "prettier": "3.9.9",
