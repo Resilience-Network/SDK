@@ -79,8 +79,9 @@ meta/recovery/grant/active keys, recipient leaf/empty-leaf/node hashes and
 the latter does not imply SDK delegation-policy support. Hash helpers mirror the
 source input/domain contract, not stateful authorization. `transactionId` hashes
 individually canonical components; use `transactionCodec` to check their sponsor
-binding before dispatch. Receipt-counter-delta and decision hashes are deferred
-with their receipt/state codecs.
+binding before dispatch. [Receipt commitments](receipts.md) add exact V1 counter
+deltas/events and the internal decision seal preimage/hash. Commitment inspection
+does not evaluate policy or create native decision authority.
 
 `intentHash` checks chain ID against the provided context. Changing the genesis
 changes the signed domain. The application must supply a trusted expected context;

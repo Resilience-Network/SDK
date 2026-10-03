@@ -38,6 +38,15 @@ assert.equal(
 );
 const temporary = await mkdtemp(join(tmpdir(), "resilience-sdk-rpc-"));
 const source = await readFile(join(root, "tests/go-rpc-reference/contracts_test.go"));
+const receiptSource = await readFile(
+  join(root, "tests/go-rpc-reference/receipts_test.go"),
+);
+const receiptInstalled = join(
+  chain,
+  "internal/rpc",
+  `sdk_receipts_${randomUUID().replaceAll("-", "")}_test.go`,
+);
+let receiptOwned = false;
 const installed = join(
   chain,
   "internal/rpc",
@@ -47,7 +56,10 @@ let owned = false;
 try {
   await writeFile(installed, source, { flag: "wx" });
   owned = true;
+  await writeFile(receiptInstalled, receiptSource, { flag: "wx" });
+  receiptOwned = true;
   const output = join(temporary, "rpc.json");
+  const receiptOutput = join(temporary, "receipts.json");
   const envelopeOutput = join(temporary, "envelopes.json");
   run(
     "go",
@@ -57,6 +69,7 @@ try {
         ...process.env,
         RSC_RPC_FIXTURE_OUTPUT: output,
         RSC_RPC_ENVELOPE_OUTPUT: envelopeOutput,
+        RSC_RPC_RECEIPT_OUTPUT: receiptOutput,
       },
       stdio: "inherit",
     },
@@ -71,16 +84,30 @@ try {
       "Actual production Handler/API; owned in-memory state. Falsy test probes are explicitly labelled, not public RPC methods. No running-network finality claim.",
     envelopes,
   };
+  const receipts = JSON.parse(await readFile(receiptOutput, "utf8"));
+  const receiptReference = join(root, "tests/fixtures/rpc-receipts.json");
+  const receiptRecord = {
+    revision: pin.revision,
+    provenance:
+      "Native production Handler/API with owned constructed receipt/state fixtures. Canonical native counter/event commitments; projection-only, not funded execution. SessionCancel has a structural test signature. No independent finality claim.",
+    fixtures: receipts,
+  };
   if (process.argv.includes("--write")) {
     await writeFile(
       reference,
       `${JSON.stringify({ revision: pin.revision, fixtures }, null, 2)}\n`,
     );
+    await writeFile(receiptReference, `${JSON.stringify(receiptRecord, null, 2)}\n`);
     await writeFile(envelopeReference, `${JSON.stringify(envelopeRecord, null, 2)}\n`);
     console.log(
-      `Wrote ${fixtures.length} native typed fixtures and ${envelopes.length} native envelope fixtures at ${pin.revision}.`,
+      `Wrote ${fixtures.length} native typed fixtures and ${envelopes.length} native envelope and ${receipts.length} receipt fixtures at ${pin.revision}.`,
     );
   } else {
+    assert.deepEqual(
+      JSON.parse(await readFile(receiptReference, "utf8")),
+      receiptRecord,
+      "Native receipt fixtures drifted; inspect semantics before regeneration.",
+    );
     assert.deepEqual(
       JSON.parse(await readFile(reference, "utf8")),
       { revision: pin.revision, fixtures },
@@ -92,10 +119,18 @@ try {
       "Native envelope fixtures drifted; inspect semantics before regeneration.",
     );
     console.log(
-      `Native production-handler fixtures match: ${fixtures.length} typed, ${envelopes.length} envelopes; pin ${pin.revision}.`,
+      `Native production-handler fixtures match: ${fixtures.length} typed, ${envelopes.length} envelopes, ${receipts.length} receipts; pin ${pin.revision}.`,
     );
   }
 } finally {
+  if (receiptOwned) {
+    assert.deepEqual(
+      await readFile(receiptInstalled),
+      receiptSource,
+      "Owned receipt test changed externally; preserve for inspection.",
+    );
+    await rm(receiptInstalled);
+  }
   if (owned) {
     assert.deepEqual(
       await readFile(installed),

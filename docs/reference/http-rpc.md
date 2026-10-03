@@ -163,8 +163,8 @@ error-only envelopes. Native production-handler fixtures are exercised through
 actual Node fetch, including mixed batches. The SDK still rejects omitted results
 and ambiguous envelopes as `INVALID_RESPONSE`; it applies no compatibility
 coercion. Null lookup is a bounded node observation, not proof of nonexistence or
-rejection. Typed receipt semantics remain the separate
-[SDK#16](https://github.com/Resilience-Network/sdk/issues/16) delivery gate.
+rejection. [Typed receipt semantics](receipts.md) validate exact native commitments;
+submission/reconciliation remains separate.
 
 Tests use injected fetch and actual Node fetch against owned loopback servers for
 truncation, gzip expansion, throttling, redirects, abort and deadlines. This is

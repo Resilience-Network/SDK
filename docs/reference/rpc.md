@@ -167,4 +167,5 @@ This proves pinned contract interoperability and native simulation fixtures,
 not running-network/funded lifecycle finality, P-256 simulation signing, browser
 qualification or independent review. Explicit-null envelope interoperability is covered by the refreshed baseline
 and native [envelope fixtures](../../tests/fixtures/rpc-envelopes.json). Typed
-receipt/lookup semantics remain [SDK#16](https://github.com/Resilience-Network/sdk/issues/16).
+receipt/lookup semantics are documented in the [receipt reference](receipts.md).
+Submission/polling/reconciliation remain separate.

@@ -30,15 +30,17 @@ P1 covers the existing independent transfer/root/session/sponsored vectors.
 Onboarding layout gaps (activation, revoke/replace, rotate, reserve, cleanup) are
 covered by native Go-generated field fixtures and differential tests. Transfer
 token buckets, Merkle recipients and proofs have Go differential coverage rather
-than independent Python vectors. Other policy/action grammars and receipt-delta/
-decision codecs remain outside the initial scope; see [canonical API](canonical-api.md).
+than independent Python vectors. Receipt deltas/events and internal decision
+commitments have independent native Go conformance; other intent/policy grammars
+remain outside the initial supported scope; see [canonical API](canonical-api.md).
 
 The [typed RPC API](rpc.md) consumes this same pin. Its native fixture gate
 checks production handler projections and stateful simulation using owned
 in-memory state. Stored authority/grant projections follow state_codec.go and
 state_validate.go; simulation event framing follows receipt.go. These files are
 recorded as sources; the codec-vector SHA-256 is unchanged.
-Full independent receipt hashes/event semantics remain a separate delivery gate.
+[Receipt commitments and reads](receipts.md) add independent native field/hash
+fixtures; funded lifecycle execution remains a separate delivery gate.
 
 ## Integration rules
 
