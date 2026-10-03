@@ -331,8 +331,8 @@ distinct. SESSION_CANCEL consumes a fee/attempt and keeps the grant active.
 
 Shared-adapter contention holds the first signer and proves the second flow signs
 nothing. A real loopback HTTP proxy forwards a write to the node then destroys
-the acknowledgment socket; one unknown send remains reserved and explicit
-read-only recovery finds that same finalized ID without signing/resending.
+the acknowledgment socket and keeps initial reconciliation reads unavailable.
+One unknown send remains reserved and explicit read-only recovery on a healthy endpoint finds that same finalized ID without signing/resending.
 The proxy and native process handles are run-owned. All logs are independently
 checked for hashes/coverage and known runtime/closure test-secret absence.
 

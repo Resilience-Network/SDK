@@ -533,7 +533,8 @@ try {
 }
 async function lostAcknowledgment(h, f, grant, signer) {
   let writes = 0,
-    dropped = 0;
+    dropped = 0,
+    unavailableReads = 0;
   const proxy = createServer(async (req, res) => {
     try {
       const chunks = [];
@@ -545,6 +546,11 @@ async function lostAcknowledgment(h, f, grant, signer) {
       }
       const body = Buffer.concat(chunks),
         request = JSON.parse(body.toString());
+      if (dropped > 0 && request.method !== "rsc_sendRawTransaction") {
+        unavailableReads++;
+        res.destroy();
+        return;
+      }
       const response = await fetch(h.urls[0], {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -571,6 +577,7 @@ async function lostAcknowledgment(h, f, grant, signer) {
       url: `http://127.0.0.1:${proxy.address().port}`,
       expected: h.expected,
       timeoutMs: 5000,
+      maxRetries: 0,
       maxContextRefreshes: 3,
     });
     const lifecycle = new sdk.SessionLifecycle({
@@ -587,7 +594,7 @@ async function lostAcknowledgment(h, f, grant, signer) {
         destination: f.recipient,
         value: 1n,
       }),
-      reconciliation: { timeoutMs: 1, maxPolls: 1, pollIntervalMs: 1 },
+      reconciliation: { timeoutMs: 5000, maxPolls: 1, pollIntervalMs: 1 },
     });
     assert.equal(result.flow.submission.status, "unknown");
     assert.equal(result.flow.submission.sendAttempts, 1);
@@ -595,6 +602,10 @@ async function lostAcknowledgment(h, f, grant, signer) {
     assert.equal(result.flow.reservation.state, "uncertain");
     assert.equal(writes, 1);
     assert.equal(dropped, 1);
+    assert(
+      unavailableReads > 0,
+      "initial reconciliation must actually encounter the controlled proxy outage",
+    );
     assert.equal(signingCalls(signer), calls + 1);
     const reserved = result.flow.reservation;
     assert.equal((await f.coordinator.inspect(reserved.key)).state, "uncertain");
@@ -633,6 +644,7 @@ async function lostAcknowledgment(h, f, grant, signer) {
       name: `scheme ${signer.keyScheme}: real HTTP lost acknowledgment`,
       unknownSend: result.flow.submission.status,
       dropped,
+      unavailableReads,
       writes,
       signatures: 1,
       readOnlyRecovery: recovered.reconciliation.status,

@@ -43,7 +43,9 @@ and signs/sends nothing. The slot remains owned by the first flow. This guarante
 one process sharing that adapter; other tabs/processes require a linearizable,
 durable application adapter as described in [coordination](../reference/coordinator.md).
 
-A real loopback proxy forwards one signed write then drops its HTTP response.
+A real loopback proxy forwards one signed write then drops its HTTP response and
+keeps read responses unavailable for initial reconciliation. Recovery uses a
+healthy endpoint; this test does not rely on a millisecond timeout race.
 Submission is unknown; the signed reservation remains uncertain, and a competing
 flow cannot reuse it. Explicit coordinator reconciliation uses persisted bytes
 and reads only, observes the same finalized ID and marks consumption. It never
