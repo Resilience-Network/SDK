@@ -29,6 +29,10 @@
       "types": "./dist/rpc/index.d.ts",
       "import": "./dist/rpc/index.js"
     },
+    "./webauthn": {
+      "types": "./dist/webauthn/index.d.ts",
+      "import": "./dist/webauthn/index.js"
+    },
     "./display": {
       "types": "./dist/display/index.d.ts",
       "import": "./dist/display/index.js"

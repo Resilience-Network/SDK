@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "oracle": "Node/OpenSSL SHA-256 ECDSA P1363 output, independently DER-verified; no SDK/noble imports",
+  "node": "v24.21.0",
+  "openssl": "3.5.8",
+  "w3c": {
+    "source": "https://www.w3.org/TR/webauthn-3/#sctn-public-key-examples",
+    "specification": "Level 3 Recommendation 2026-08-25, section 6.5.1.1 ES256 COSE example",
+    "cose": "a501020326200121582065eda5a12577c2bae829437fe338701a10aaa375e1bb5b5de108de439c08551d2258201e52ed75701163f7f9e40ddf9f341b3dc9ba860af7e0ca7ca7e9eecd0084d19c",
+    "publicKey": "65eda5a12577c2bae829437fe338701a10aaa375e1bb5b5de108de439c08551d1e52ed75701163f7f9e40ddf9f341b3dc9ba860af7e0ca7ca7e9eecd0084d19c"
+  },
+  "message": "UHVibGljIFNESyBwYXJzZXIgaW50ZXJvcGVyYWJpbGl0eSBmaXh0dXJlIHYxOyBub3QgbmF0aXZlIFNlc3Npb25EaWdlc3Q",
+  "publicKey": {
+    "kty": "EC",
+    "x": "CdYYDAbPNzYbBmbJMIjUyqjucGkxlKNeMmMQ8Fzo_58",
+    "y": "dUZgmdNt2DklyfecoVnVI73-S1f-8i2bWVUfiAgvodo",
+    "crv": "P-256"
+  },
+  "signatures": [
+    {
+      "id": "padding-0-original",
+      "raw": "0465ab76166041414fabaed27eec7747d700de96051f5f25f69d538e07e64dcc4f443cc2561ee6a038f12fb174fef49416ad3ae2c2f59147328cd125233d1239",
+      "der": "304402200465ab76166041414fabaed27eec7747d700de96051f5f25f69d538e07e64dcc02204f443cc2561ee6a038f12fb174fef49416ad3ae2c2f59147328cd125233d1239"
+    },
+    {
+      "id": "padding-0-reflected-s",
+      "raw": "0465ab76166041414fabaed27eec7747d700de96051f5f25f69d538e07e64dccb0bbc33ca9e11960c70ed04e8b010b6ba639bfcae4220d3dc12cf99dd9261318",
+      "der": "304502200465ab76166041414fabaed27eec7747d700de96051f5f25f69d538e07e64dcc022100b0bbc33ca9e11960c70ed04e8b010b6ba639bfcae4220d3dc12cf99dd9261318"
+    },
+    {
+      "id": "padding-1-original",
+      "raw": "f06712ab9900f2e6c6c79c3e9fb7052283d94999c0af3654b38c01a4ff471c5b2715ec35bc84af85a90ebc7fabd2a9272d5193e5968803fbdb54db471633c72b",
+      "der": "3045022100f06712ab9900f2e6c6c79c3e9fb7052283d94999c0af3654b38c01a4ff471c5b02202715ec35bc84af85a90ebc7fabd2a9272d5193e5968803fbdb54db471633c72b"
+    },
+    {
+      "id": "padding-1-reflected-s",
+      "raw": "f06712ab9900f2e6c6c79c3e9fb7052283d94999c0af3654b38c01a4ff471c5bd8ea13c9437b507b56f14380542d56d88f9566c8108f9a891864ef7be62f5e26",
+      "der": "3046022100f06712ab9900f2e6c6c79c3e9fb7052283d94999c0af3654b38c01a4ff471c5b022100d8ea13c9437b507b56f14380542d56d88f9566c8108f9a891864ef7be62f5e26"
+    },
+    {
+      "id": "padding-2-original",
+      "raw": "396630f0e87a41b3be4ea86cf4d2037d8330010da05b854d114b3ca1e1e8a6b6859f93cd135f04cbc1841424d227413cee4e79b561bde773269342bad9aa3dc4",
+      "der": "30450220396630f0e87a41b3be4ea86cf4d2037d8330010da05b854d114b3ca1e1e8a6b6022100859f93cd135f04cbc1841424d227413cee4e79b561bde773269342bad9aa3dc4"
+    },
+    {
+      "id": "padding-2-reflected-s",
+      "raw": "396630f0e87a41b3be4ea86cf4d2037d8330010da05b854d114b3ca1e1e8a6b67a606c31eca0fb353e7bebdb2dd8bec2ce9880f84559b711cd26880822b8e78d",
+      "der": "30440220396630f0e87a41b3be4ea86cf4d2037d8330010da05b854d114b3ca1e1e8a6b602207a606c31eca0fb353e7bebdb2dd8bec2ce9880f84559b711cd26880822b8e78d"
+    },
+    {
+      "id": "padding-3-original",
+      "raw": "99a6fe9dbe0576305fd5869d444fe2d7279e354e2c7b77cb8f9990de78222250db8c595b98cddf87cea1473c29cb1fcf902ca784be8e1f641f4cc94223fa2fe2",
+      "der": "304602210099a6fe9dbe0576305fd5869d444fe2d7279e354e2c7b77cb8f9990de78222250022100db8c595b98cddf87cea1473c29cb1fcf902ca784be8e1f641f4cc94223fa2fe2"
+    },
+    {
+      "id": "padding-3-reflected-s",
+      "raw": "99a6fe9dbe0576305fd5869d444fe2d7279e354e2c7b77cb8f9990de782222502473a6a367322079315eb8c3d634e0302cba5328e8897f20d46d0180d868f56f",
+      "der": "304502210099a6fe9dbe0576305fd5869d444fe2d7279e354e2c7b77cb8f9990de7822225002202473a6a367322079315eb8c3d634e0302cba5328e8897f20d46d0180d868f56f"
+    }
+  ]
+}

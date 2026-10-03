@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "fixtureSha256": "ec22e9e693de2417adcfbf3409916949d7d31f70722c98d46b13545e2c9440d6",
+  "generatorSha256": "131fb32700b12423be48a1061b34aaa35e9ef68d1352142e1df506e0b443e45b",
+  "generatedBy": "scripts/generate_webauthn_parser_fixtures.mjs --write",
+  "note": "Intentional regeneration uses new disposable keys/signatures; review semantic/provenance changes. No private key stored."
+}

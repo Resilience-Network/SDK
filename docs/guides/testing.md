@@ -361,3 +361,20 @@ mutations and required outcomes, not signed fixtures or executed test results.
 It does not increase the SDK passing-test count. Implemented parser/browser/
 verifier suites must supply actual bytes, cryptographic checks and store races;
 planned cases cannot substitute for those gates.
+
+## WebAuthn parser/interoperability tests
+
+After `npm run build`, `node --test tests/webauthn-parsers.test.mjs` runs actual
+bounded representation tests: W3C public point and eight Node/OpenSSL DER/P1363
+fixtures, all truncations, canonical CBOR/JSON count/depth/duplicate checks,
+point/scalar/flag/credential-size boundaries, intrinsic byte-limit/shadow-property
+regressions, owned copies and 5000 seeded byte mutations. OpenSSL verifies both
+DER and converted signatures. `npm run check` includes these tests and installed
+root/webauthn import/type/representation checks plus cold Node imports with DOM
+access blocked. This is not a browser-engine/authoritative RP/device test.
+
+Public fixture/provenance files and deliberate generator `--write` are linked in
+[the parser reference](../reference/webauthn-parsers.md). Regeneration changes
+disposable signatures/keys; review semantic/provenance changes rather than treating
+a newly generated golden as independent approval. Actual #27/#30/#31/#34 gates
+remain open.

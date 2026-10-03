@@ -10,8 +10,9 @@ Ed25519/P-256 transaction signers and canonical review data. Typed transaction/r
 Single-send submission and bounded same-ID reconciliation are available.
 Explicit funded DIRECT activation, grant controls and both native session schemes
 are exposed through the [lifecycle API](docs/reference/lifecycle.md) with canonical
-approval and coordinated nonces. Browser passkey APIs and release qualification
-remain planned work.
+approval and coordinated nonces. Bounded WebAuthn representation parsers are
+available; browser ceremony helpers, authoritative verifier conformance and
+release qualification remain planned work.
 
 ## Development
 
@@ -92,15 +93,23 @@ validity.
 
 ## Planned capabilities
 
-- Bounded session grants, policy inspection, submission and revocation.
-- Receipts and ambiguous-submission handling.
 - WebAuthn registration/authentication helpers with explicit trust boundaries.
-- Browser and disposable-localnet examples verified against independent vectors.
+- Authoritative RP verifier/store and actual browser-engine conformance.
+- Reviewed combined passkey-login/native-session example and release qualification.
 
 P-256 session verification already exists in Chain. WebAuthn assertions sign a
 different message: DER conversion alone cannot make a passkey assertion a valid
 native session signature. The [authorization decision](docs/decisions/0001-passkey-authorization-boundary.md)
-explains the boundary and the unresolved product choice.
+explains the selected external key/application authentication boundary.
+
+## Available WebAuthn representation parsers
+
+`@resilience-network/sdk/webauthn` parses bounded canonical ES256 COSE keys,
+registration/assertion authenticator data, `none` attestation objects, original
+clientDataJSON and minimal DER signature representations. See the
+[parser API](docs/reference/webauthn-parsers.md) for exact bounds and unsupported
+forms. Authoritative challenge/origin/RP/UV/signature verification and one-use
+storage still require the application RP; parsing does not grant Chain authority.
 
 ## Start here
 

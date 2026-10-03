@@ -145,7 +145,7 @@ response bytes and secrets; private service diagnostics follow its access policy
 
 The reference profile caps decoded request bodies at 64 KiB, clientDataJSON at
 8 KiB, authenticator data at 8 KiB, `none` attestation objects at 16 KiB, credential
-IDs at 1–1024 bytes, supported COSE keys at 1024 bytes, user handles at 1–64 bytes,
+IDs at 1–1023 bytes, supported COSE keys at 1024 bytes, user handles at 1–64 bytes,
 and ES256 DER signatures at 72 bytes. Bound JSON/CBOR nesting and entry counts
 before allocating or traversing. Unsupported versions/encodings fail; there is
 no legacy decoder or relaxed fallback. Parser #26 and browser #25 must publish
