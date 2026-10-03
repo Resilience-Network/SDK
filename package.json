@@ -55,7 +55,9 @@
     "test:receipts-native": "npm run build && node scripts/check_receipts.mjs",
     "test:localnet": "npm run build && node scripts/check_localnet.mjs",
     "test:localnet-failures": "npm run build && node scripts/check_localnet_failures.mjs",
-    "test:lifecycle-native": "npm run build && node scripts/check_lifecycle.mjs"
+    "test:lifecycle-native": "npm run build && node scripts/check_lifecycle.mjs",
+    "test:session-e2e": "npm run build && node scripts/check_session_end_to_end.mjs",
+    "example:session": "npm run build && node examples/session-localnet.mjs"
   },
   "devDependencies": {
     "prettier": "3.9.9",

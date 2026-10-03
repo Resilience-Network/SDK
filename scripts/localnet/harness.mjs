@@ -202,7 +202,12 @@ export async function withNativeLocalnet(options, work) {
     workTimeoutMs = 600000,
     signal,
     failureStage,
+    overflowRecipient = false,
   } = options ?? {};
+  assert(
+    typeof overflowRecipient === "boolean",
+    "overflowRecipient must be explicit boolean",
+  );
   assert(chainDir, "Set RSC_CHAIN_DIR to the immutable clean Chain checkout");
   assert(
     [1, 4].includes(validators),
@@ -249,6 +254,7 @@ export async function withNativeLocalnet(options, work) {
       chainRevision: pin.revision,
       nodeRuntime: process.version,
       validators,
+      overflowRecipient,
       runtime,
       artifacts,
       commands: [],
@@ -376,6 +382,7 @@ export async function withNativeLocalnet(options, work) {
     const walletPaths = {
       owner: join(keys, "wallet-owner.json"),
       recipient: join(keys, "wallet-recipient.json"),
+      ...(overflowRecipient ? { overflow: join(keys, "wallet-overflow.json") } : {}),
     };
     for (const path of Object.values(walletPaths))
       await command(binaries.keygen, ["--out", path]);
@@ -386,7 +393,12 @@ export async function withNativeLocalnet(options, work) {
     for (const [role, wallet] of Object.entries(wallets))
       genesis.allocations.push({
         address: wallet.address,
-        balance: role === "owner" ? "1000000000000000000000" : "0",
+        balance:
+          role === "owner"
+            ? "1000000000000000000000"
+            : role === "overflow"
+              ? ((1n << 256n) - 1n).toString()
+              : "0",
       });
     await writeFile(genesisPath, JSON.stringify(genesis), { mode: 0o600 });
     for (const path of [

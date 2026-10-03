@@ -119,3 +119,7 @@ package publishing is disabled. No open-source license has been selected.
 [Nonce coordination](docs/reference/coordinator.md) composes external signing and
 single-send/reconciliation with explicit authority reservations. Applications own
 validated authority reads and durable cross-tab/process adapters.
+
+Run the [disposable native session example](docs/guides/session-example.md) with
+`RSC_CHAIN_DIR=/absolute/pinned/chain npm run example:session`.
+Native adversity checks are separate: `npm run test:session-e2e`.

@@ -23,7 +23,11 @@ The first command builds `make build-crypto`, then native node/keygen binaries i
 its owned runtime. It checks CGO=1 and runs Chain's static-link/release-loader check.
 A public test genesis is generated with four validators, 20,000 RSC self-stake
 per validator, fresh genesis time/keys, a separate owner funded with 1,000 RSC and
-an unfunded recipient. Keys are generated solely for this disposable network;
+an unfunded recipient. The explicit test-only `overflowRecipient: true` option
+adds a separate generated recipient with balance `2^256-1`. It lets supported
+transfers fail execution (recipient overflow) after authorization, without a
+contract/unsupported action or node source change. It is never enabled implicitly.
+Keys are generated solely for this disposable network;
 never use these files/accounts for valuable assets or another genesis.
 
 The [native bootstrap oracle](../../tests/go-localnet-reference/genesis_test.go)
@@ -121,6 +125,7 @@ later authorization to kill a process.
 
 A working native harness qualifies startup/identity/progress/API/teardown behavior.
 [Funded lifecycle qualification](../../scripts/check_lifecycle.mjs) separately checks
-actual SDK activation/grant/transfer/revocation. The broader expiry/replay/failure/
-concurrency gate remains SDK #29. Harness checks do not prove Byzantine resilience,
+actual SDK activation/grant/transfer/revocation. [Session adversity qualification](../../scripts/check_session_end_to_end.mjs)
+checks expiry/replay/included failure/concurrency and actual lost HTTP responses;
+[the executable example](../../examples/session-localnet.mjs) demonstrates both schemes. Harness checks do not prove Byzantine resilience,
 independent finality verification, browser/device behavior or security review.

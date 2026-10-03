@@ -317,3 +317,29 @@ root maintenance through the [lifecycle API](../reference/lifecycle.md). It chec
 typed finalized receipts, state/usage changes and revoked-key denial before signing.
 The broader replay/expiry/included-failure/concurrency gate is SDK #29; physical
 passkeys, independent review and publication are separate gates.
+
+## Native session adversity and executable example
+
+`RSC_CHAIN_DIR=/absolute/pinned/chain npm run test:session-e2e` runs a separate
+fresh four-validator genesis with an explicit maximum-balance recipient. Both
+raw session schemes exercise real native simulation/admission rejection for
+premature/expired/revoked/old-epoch grants, wrong chain/genesis/key/policy/nonce,
+invalid signatures, denied recipients/value limits and finalized replay.
+It verifies failed transfer execution consumes exactly nonce/attempt/actual fee
+without value/success consumption; DIRECT/ROOT failures keep their nonce domains
+distinct. SESSION_CANCEL consumes a fee/attempt and keeps the grant active.
+
+Shared-adapter contention holds the first signer and proves the second flow signs
+nothing. A real loopback HTTP proxy forwards a write to the node then destroys
+the acknowledgment socket; one unknown send remains reserved and explicit
+read-only recovery finds that same finalized ID without signing/resending.
+The proxy and native process handles are run-owned. All logs are independently
+checked for hashes/coverage and known runtime/closure test-secret absence.
+
+`RSC_CHAIN_DIR=/absolute/pinned/chain npm run example:session` executes the
+[session-only example](../../examples/session-localnet.mjs): DIRECT activation,
+ROOT grant, both raw SESSION transfers and finalized ROOT revocation.
+The broader [lifecycle gate](../../scripts/check_lifecycle.mjs) additionally
+checks replacement, reserve, revoke-all, cleanup and root rotation. These are
+trusted-node observations on disposable test networks; they do not qualify
+physical passkeys, cross-process adapter durability or independent finality.
