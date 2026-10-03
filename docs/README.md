@@ -32,6 +32,8 @@ lifecycle. Browser APIs remain planned.
   semantics, canonical witnesses, mutation guards and bounded cancellation.
 - [Canonical review API](reference/display.md): frozen bytes/hash-bound policy,
   intent and transaction fields with exact amounts and authority semantics.
+- [WebAuthn representation API](reference/webauthn-parsers.md): bounded ES256
+  COSE/authenticator/client-data/none-attestation/DER parsing; no verification claim.
 - [Passkey authorization decision](decisions/0001-passkey-authorization-boundary.md).
 - [Authoritative relying-party contract](decisions/0002-authoritative-webauthn-rp.md):
   selected WebAuthn implementation profile, challenge/store ownership and future

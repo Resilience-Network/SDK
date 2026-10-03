@@ -33,6 +33,8 @@ try {
     "dist/rpc/index.d.ts",
     "dist/display/index.js",
     "dist/display/index.d.ts",
+    "dist/webauthn/index.js",
+    "dist/webauthn/index.d.ts",
     "README.md",
     "package.json",
   ]) {
@@ -66,6 +68,12 @@ try {
   const metadata = JSON.parse(
     await readFile(new URL("../package.json", import.meta.url), "utf8"),
   );
+  const parserFixtures = JSON.parse(
+    await readFile(
+      new URL("../tests/webauthn/parser-v1.json", import.meta.url),
+      "utf8",
+    ),
+  );
   const smoke = `
 import assert from "node:assert/strict";
 import * as sdk from ${JSON.stringify(metadata.name)};
@@ -74,6 +82,12 @@ import * as core from ${JSON.stringify(`${metadata.name}/core`)};
 import * as session from ${JSON.stringify(`${metadata.name}/session`)};
 import * as rpc from ${JSON.stringify(`${metadata.name}/rpc`)};
 import * as display from ${JSON.stringify(`${metadata.name}/display`)};
+import * as webauthn from ${JSON.stringify(`${metadata.name}/webauthn`)};
+assert.equal(webauthn.parseCoseP256PublicKey, sdk.parseCoseP256PublicKey);
+const parsedKey = webauthn.parseCoseP256PublicKey(core.hexToBytes(${JSON.stringify("0x" + parserFixtures.w3c.cose)}));
+assert.equal(core.bytesToHex(parsedKey.publicKey), ${JSON.stringify("0x" + parserFixtures.w3c.publicKey)});
+assert.equal(core.bytesToHex(webauthn.derToP256Signature(core.hexToBytes(${JSON.stringify("0x" + parserFixtures.signatures[0].der)}))), ${JSON.stringify("0x" + parserFixtures.signatures[0].raw)});
+assert.equal(webauthn.parseClientDataJSON(new TextEncoder().encode('{"type":"webauthn.get","challenge":"AQ","origin":"https://wallet.example"}')).type, "webauthn.get");
 assert.equal(core.decodeUint64(core.encodeUint64((1n << 64n) - 1n)), (1n << 64n) - 1n);
 assert.equal(core.bytesToHex(core.keccak256(new Uint8Array())), "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470");
 assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReserveCodec.encode({ version: 1, securityReserve: 1n << 200n })), { version: 1, securityReserve: 1n << 200n });
@@ -132,12 +146,25 @@ const review = display.reviewTransaction(signingContext, session.transactionCode
 assert.equal(review.binding.hash, core.bytesToHex(session.transactionId(signingContext, direct.intent, direct.envelope)));
 assert.equal(review.fields.find(field => field.path === "envelope.nonce").value, "3");
 assert(Object.isFrozen(review.fields));
-console.log("Installed root/core/session/rpc/display imports and API smoke checks OK; exports:", Object.keys(sdk).length);
+console.log("Installed root/core/session/rpc/display/webauthn imports and API smoke checks OK; exports:", Object.keys(sdk).length);
 `;
   execFileSync(process.execPath, ["--input-type=module", "-e", smoke], {
     cwd: temporary,
     stdio: "inherit",
   });
+  execFileSync(
+    process.execPath,
+    [
+      "--input-type=module",
+      "-e",
+      `
+for (const name of ["window", "navigator", "document"]) Object.defineProperty(globalThis, name, { configurable: true, get() { throw Error("DOM access during Node import"); } });
+for (const name of ${JSON.stringify([metadata.name, ...["core", "session", "rpc", "display", "webauthn"].map((entry) => `${metadata.name}/${entry}`)])}) await import(name);
+console.log("Cold installed Node imports require no browser globals.");
+`,
+    ],
+    { cwd: temporary, stdio: "inherit" },
+  );
   await writeFile(
     join(temporary, "consumer.ts"),
     `
@@ -147,6 +174,23 @@ import { signDirectTransaction, signRootTransaction, signSessionTransaction, Sig
 import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type CanonicalReview, type ReviewBinding, type ReviewField } from ${JSON.stringify(`${metadata.name}/display`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
 import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type SubmissionOutcome, type ReconciliationOutcome, type ReconcileOptions, type ReceiptObservation, type TransactionObservation, type LookupOptions, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
+import { parseCoseP256PublicKey, parseAuthenticatorData, parseNoneAttestationObject, parseClientDataJSON, derToP256Signature, WebAuthnParseError, WEBAUTHN_PARSE_LIMITS, type ParsedP256PublicKey, type ParsedAuthenticatorData, type ParsedNoneAttestation, type ParsedClientData, type WebAuthnParseErrorCode, type WebAuthnCeremony } from ${JSON.stringify(`${metadata.name}/webauthn`)};
+declare const webBytes: Uint8Array;
+const webKey: ParsedP256PublicKey = parseCoseP256PublicKey(webBytes);
+const webAuth: ParsedAuthenticatorData = parseAuthenticatorData(webBytes, "registration");
+const webAttestation: ParsedNoneAttestation = parseNoneAttestationObject(webBytes);
+const webClient: ParsedClientData = parseClientDataJSON(webBytes);
+const webSignature: Uint8Array = derToP256Signature(webBytes);
+const webCode: WebAuthnParseErrorCode = new WebAuthnParseError("INVALID_DER").code;
+const webCeremony: WebAuthnCeremony = "authentication";
+// @ts-expect-error Binary response structures require explicit bytes.
+parseCoseP256PublicKey("base64-or-hex");
+// @ts-expect-error Ceremony context must be explicitly supported.
+parseAuthenticatorData(webBytes, "infer");
+// @ts-expect-error Parsing never produces a verification result.
+const webVerified: boolean = webClient.verified;
+// @ts-expect-error Observational fields are readonly.
+webAuth.userVerified = true;
 const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
 const context: ChainContext = { chainId: 1n, genesisHash: new Uint8Array(32) };
 encodeUint256(reserve.securityReserve);
@@ -222,7 +266,7 @@ signRootTransaction({ context, intent, nonce: 1n, authEpoch: 1n, config: { versi
     },
   );
   console.log(
-    "Package archive and downstream root/core/session/rpc/display TypeScript resolution OK.",
+    "Package archive and downstream root/core/session/rpc/display/webauthn TypeScript resolution OK.",
   );
 } finally {
   await rm(temporary, { recursive: true, force: true });
