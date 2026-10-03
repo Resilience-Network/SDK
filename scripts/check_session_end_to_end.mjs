@@ -71,6 +71,12 @@ try {
               : sdk.transactionCodec.encode(transaction),
           );
         const outcomes = [];
+        const family =
+          /premature grant|exclusive expiry|denied recipient|value limit/.test(label)
+            ? "AUTH_ACTION_DENIED"
+            : /bad signature|wrong genesis|wrong key/.test(label)
+              ? "AUTH_BAD_SIGNATURE"
+              : "AUTH_MALFORMED";
         for (const method of [
           "rsc_simulateAuthorizedTransaction",
           "rsc_sendRawTransaction",
@@ -82,6 +88,19 @@ try {
                 error instanceof sdk.RpcClientError && error.kind === "node",
                 `${label} must reach actual node rejection`,
               );
+              assert.equal(
+                error.rpcCode,
+                method === "rsc_sendRawTransaction" &&
+                  /wrong chain|native P-256/.test(label)
+                  ? -32602
+                  : -32000,
+              );
+              if (method === "rsc_simulateAuthorizedTransaction")
+                assert.equal(
+                  error.authorizationFamily,
+                  family,
+                  `${label}: unrelated server error cannot qualify authorization rejection`,
+                );
               outcomes.push({
                 method,
                 code: error.code,
@@ -126,7 +145,7 @@ try {
             "bad signature",
             (tx) => {
               const witness = sdk.sessionWitnessCodec.decode(tx.envelope.witness);
-              witness.signature[0] ^= 1;
+              witness.signature[31] ^= 1;
               tx.envelope.witness = sdk.sessionWitnessCodec.encode(witness);
             },
           ],

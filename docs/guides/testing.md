@@ -324,7 +324,9 @@ passkeys, independent review and publication are separate gates.
 fresh four-validator genesis with an explicit maximum-balance recipient. Both
 raw session schemes exercise real native simulation/admission rejection for
 premature/expired/revoked/old-epoch grants, wrong chain/genesis/key/policy/nonce,
-invalid signatures, denied recipients/value limits and finalized replay.
+invalid signatures, denied recipients/value limits and finalized replay. Each
+requires the expected simulation authorization family and method-specific RPC
+code; unrelated server errors cannot count as authority rejection.
 It verifies failed transfer execution consumes exactly nonce/attempt/actual fee
 without value/success consumption; DIRECT/ROOT failures keep their nonce domains
 distinct. SESSION_CANCEL consumes a fee/attempt and keeps the grant active.
