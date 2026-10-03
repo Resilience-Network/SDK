@@ -96,6 +96,11 @@ test("core snapshots own Buffer/subarray bytes and ignore overridden iteration",
 });
 
 test("exact core byte boundary and valid fixed width preserve encoding", () => {
+  const deep = new Uint8Array(1);
+  let prototype = Uint8Array.prototype;
+  for (let i = 0; i < 33; i++) prototype = Object.create(prototype);
+  Object.setPrototypeOf(deep, prototype);
+  invalid(() => checkedBytes(deep, 1), "LIMIT_EXCEEDED");
   const value = new Uint8Array(MAX_TRANSACTION_BYTES);
   assert.equal(bytesToHex(value).length, MAX_TRANSACTION_BYTES * 2 + 2);
   invalid(

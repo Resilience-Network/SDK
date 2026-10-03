@@ -67,7 +67,13 @@ export function checkedBytes(value: Uint8Array, maximum: number): Uint8Array {
     requireCondition(length <= maximum, "Byte length exceeds limit", "LIMIT_EXCEEDED");
     // Some callers use this as a guard then inspect the original view. Reject
     // shadowed layout properties without invoking their getters in that case.
+    let depth = 0;
     for (let prototype: object | null = value; prototype !== typedArrayPrototype;) {
+      requireCondition(
+        ++depth <= 32,
+        "Byte prototype depth exceeds limit",
+        "LIMIT_EXCEEDED",
+      );
       requireCondition(prototype !== null, "Invalid byte view");
       for (const field of ["length", "buffer", "byteLength", "byteOffset"])
         requireCondition(

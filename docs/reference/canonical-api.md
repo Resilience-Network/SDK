@@ -21,7 +21,8 @@ throw `CodecError` with a code; no private input values are included in messages
 
 Byte guards measure intrinsic typed-array length before copying. Shared, detached,
 proxied views and shadowed layout properties (`length`, `buffer`, `byteLength`,
-`byteOffset`, including inherited overrides) fail with typed errors. Ordinary
+`byteOffset`, including inherited overrides) fail with typed errors. Layout
+prototype inspection is capped at 32 levels. Ordinary
 `Uint8Array`, Buffer and subarray inputs are supported; normalization owns the
 view's bytes and ignores overridden iteration methods. This protects local
 resource/representation bounds, not a compromised JavaScript global environment.
