@@ -64,7 +64,19 @@ test("shared, detached and proxied core byte views fail with typed errors", () =
   const shared = new Uint8Array(new SharedArrayBuffer(8));
   const detached = new Uint8Array(8);
   structuredClone(detached.buffer, { transfer: [detached.buffer] });
-  for (const value of [shared, detached, new Proxy(new Uint8Array(8), {}), {}, null]) {
+  const hostileProxy = new Proxy(new Uint8Array(8), {
+    getPrototypeOf() {
+      throw new Error("private-sentinel");
+    },
+  });
+  for (const value of [
+    shared,
+    detached,
+    new Proxy(new Uint8Array(8), {}),
+    hostileProxy,
+    {},
+    null,
+  ]) {
     invalid(() => checkedBytes(value, 8));
     invalid(() => bytesToHex(value));
     invalid(() => isZero(value));

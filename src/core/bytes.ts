@@ -59,9 +59,9 @@ const typedArrayPrototype = Object.getPrototypeOf(Uint8Array.prototype) as objec
   )!.get!;
 
 export function checkedBytes(value: Uint8Array, maximum: number): Uint8Array {
-  requireCondition(value instanceof Uint8Array, "Expected Uint8Array");
   checkedNumber(maximum, MAX_TRANSACTION_BYTES);
   try {
+    requireCondition(value instanceof Uint8Array, "Expected Uint8Array");
     const length = intrinsicLength.call(value) as number;
     intrinsicBufferLength.call(intrinsicBuffer.call(value));
     requireCondition(length <= maximum, "Byte length exceeds limit", "LIMIT_EXCEEDED");
