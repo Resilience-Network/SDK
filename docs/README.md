@@ -12,6 +12,8 @@ lifecycle. Browser APIs remain planned.
 - [Testing](guides/testing.md): available commands and required feature evidence.
 - [Owned native localnet](guides/native-localnet.md): generated funded genesis,
   real native validators, bounded ownership, evidence and failure/interrupt checks.
+- [Native session example](guides/session-example.md): executable funded lifecycle,
+  approval/signing boundaries and adversity/uncertainty checks.
 - [Protocol sources](reference/protocol-sources.md): immutable Chain source baseline.
 - [Canonical API](reference/canonical-api.md): supported codecs/hashes and their limits.
 - [HTTP RPC API](reference/http-rpc.md): envelope transport, limits, cancellation,

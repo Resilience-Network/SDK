@@ -94,6 +94,7 @@ test("invalid native harness options fail before creating/starting a network", a
     { chainDir: "/invalid", readyTimeoutMs: 0 },
     { chainDir: "/invalid", workTimeoutMs: 0 },
     { chainDir: "/invalid", failureStage: "unowned-delete" },
+    { chainDir: "/invalid", overflowRecipient: "true" },
   ])
     await assert.rejects(
       withNativeLocalnet(options, () => {
