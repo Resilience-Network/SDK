@@ -84,6 +84,11 @@ import * as rpc from ${JSON.stringify(`${metadata.name}/rpc`)};
 import * as display from ${JSON.stringify(`${metadata.name}/display`)};
 import * as webauthn from ${JSON.stringify(`${metadata.name}/webauthn`)};
 assert.equal(webauthn.parseCoseP256PublicKey, sdk.parseCoseP256PublicKey);
+assert.equal(webauthn.createPasskeyCredential, sdk.createPasskeyCredential);
+assert.equal(webauthn.getPasskeyAssertion, sdk.getPasskeyAssertion);
+assert.equal(typeof webauthn.serializePasskeyRegistration, "function");
+assert.equal(typeof webauthn.serializePasskeyAssertion, "function");
+assert.deepEqual(webauthn.webAuthnCapabilities(), { secureContext: false, registrationAvailable: false, authenticationAvailable: false });
 const parsedKey = webauthn.parseCoseP256PublicKey(core.hexToBytes(${JSON.stringify("0x" + parserFixtures.w3c.cose)}));
 assert.equal(core.bytesToHex(parsedKey.publicKey), ${JSON.stringify("0x" + parserFixtures.w3c.publicKey)});
 assert.equal(core.bytesToHex(webauthn.derToP256Signature(core.hexToBytes(${JSON.stringify("0x" + parserFixtures.signatures[0].der)}))), ${JSON.stringify("0x" + parserFixtures.signatures[0].raw)});
@@ -175,6 +180,23 @@ import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type Ca
 import { chainDomain } from ${JSON.stringify(metadata.name)};
 import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type SubmissionOutcome, type ReconciliationOutcome, type ReconcileOptions, type ReceiptObservation, type TransactionObservation, type LookupOptions, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
 import { parseCoseP256PublicKey, parseAuthenticatorData, parseNoneAttestationObject, parseClientDataJSON, derToP256Signature, WebAuthnParseError, WEBAUTHN_PARSE_LIMITS, type ParsedP256PublicKey, type ParsedAuthenticatorData, type ParsedNoneAttestation, type ParsedClientData, type WebAuthnParseErrorCode, type WebAuthnCeremony } from ${JSON.stringify(`${metadata.name}/webauthn`)};
+import { createPasskeyCredential, getPasskeyAssertion, webAuthnCapabilities, serializePasskeyRegistration, serializePasskeyAssertion, WebAuthnBrowserError, type WebAuthnBrowserErrorCode, type PasskeyRegistrationOptions, type PasskeyAssertionOptions, type SerializedPasskeyRegistration, type SerializedPasskeyAssertion, type WebAuthnCapabilities } from ${JSON.stringify(`${metadata.name}/webauthn`)};
+const capabilities: WebAuthnCapabilities = webAuthnCapabilities();
+const ceremonyCode: WebAuthnBrowserErrorCode = new WebAuthnBrowserError("CANCELLED").code;
+declare const registrationOptions: PasskeyRegistrationOptions;
+declare const assertionOptions: PasskeyAssertionOptions;
+const registration: Promise<SerializedPasskeyRegistration> = createPasskeyCredential(registrationOptions);
+const assertion: Promise<SerializedPasskeyAssertion> = getPasskeyAssertion(assertionOptions);
+const registrationWire: SerializedPasskeyRegistration = serializePasskeyRegistration({});
+const assertionWire: SerializedPasskeyAssertion = serializePasskeyAssertion({});
+// @ts-expect-error The selected profile does not accept algorithm negotiation.
+createPasskeyCredential({ ...registrationOptions, pubKeyCredParams: [{ alg: -8 }] });
+// @ts-expect-error Account-bound assertions require a credential allow-list.
+getPasskeyAssertion({ rpId: "wallet.example", origin: "https://wallet.example", challenge: new Uint8Array(32) });
+// @ts-expect-error Transport output does not authenticate an account.
+const ceremonyVerified: boolean = assertionWire.verified;
+// @ts-expect-error Serialized fields are readonly.
+registrationWire.response.attestationObject = "tampered";
 declare const webBytes: Uint8Array;
 const webKey: ParsedP256PublicKey = parseCoseP256PublicKey(webBytes);
 const webAuth: ParsedAuthenticatorData = parseAuthenticatorData(webBytes, "registration");

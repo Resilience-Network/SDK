@@ -378,3 +378,15 @@ Public fixture/provenance files and deliberate generator `--write` are linked in
 disposable signatures/keys; review semantic/provenance changes rather than treating
 a newly generated golden as independent approval. Actual #27/#30/#31/#34 gates
 remain open.
+
+## WebAuthn browser API contract tests
+
+After `npm run build`, `node --test tests/webauthn-ceremonies.test.mjs` checks
+call-time capabilities, explicit options/copies, create/get projection, unsupported
+contexts, browser denial, pre/in-flight abort, controlled timeout/late completion,
+malformed/hostile buffers and sanitization. It uses mocked browser methods and
+public parser fixtures, including an intentionally unrelated signature; serialization
+does not verify that signature. The suite is included in `npm run check`.
+Installed-package checks cover types/exports and cold Node imports. Actual browser
+engine/virtual-authenticator qualification remains #30, verifier/store conformance
+#27 and physical-device evidence #31. See the [browser API](../reference/webauthn-browser.md).
