@@ -5,6 +5,7 @@ Chain validators for SDK integration. It never invokes Chain's shared
 localnet start/stop/reset scripts. [Smoke qualification](../../scripts/check_localnet.mjs),
 [failure qualification](../../scripts/check_localnet_failures.mjs) and
 [supervisor tests](../../tests/localnet-harness.test.mjs) are distinct executable gates.
+[Capture tests](../../tests/localnet-logs.test.mjs) cover log evidence boundaries.
 
 ## Run
 
@@ -95,20 +96,31 @@ Public evidence is retained under ignored `test-results/localnet/<run-id>/`:
 revision/toolchain/native CGO/static-build information and hashes, exact command
 arguments, generated public genesis/configs, independently derived identity,
 public validators/wallets, actual checks, node handles/PIDs, teardown status and
-text logs. Key files, databases and signing records are never copied into public
-artifacts. Exact generated private-key strings are redacted from copied logs;
+text logs. Each command entry records its actual `log` filename: node starts
+use `node-N.log`, other commands use `command-N.log`. `logCapture` lists every
+required file with captured byte size and SHA-256, or a sanitized failure code.
+Capture refuses symlinks, nonregular sources, artifact replacements and logs over
+8 MiB; it checks the actual read bound as well as file size. Qualification verifies
+the copied bytes, manifest coverage and generated-key redaction. A required capture
+failure rejects an otherwise successful run and preserves its restricted runtime.
+An early failed run may have no commands/logs; it is never passing native evidence.
+Key files, databases and signing records are never copied into public artifacts. Exact generated private-key strings are redacted from copied logs;
 callback errors use a fixed evidence code. These artifacts can still contain
 local paths/network metadata and are owner-readable only. Treat callback logging
 as a separate application responsibility. Do not count initial or failed evidence
 as a final passing run.
 
 Failure qualification executes real native setup failure, a ready-network failure,
-a readiness deadline, a callback ignoring cancellation and actual SIGINT/SIGTERM. Each asserts stopped owned handles,
+a readiness deadline, a callback ignoring cancellation, actual SIGINT/SIGTERM and
+an injected missing log (renamed in the owned runtime, preserving its bytes).
+Each verifies the capture manifest and asserts stopped owned handles,
 retained restricted runtime and unchanged external signing-state sentinel. Path,
 port, process and tampering unit tests supplement this evidence. All runtime/PIDs
 in evidence belong to that run; retained PIDs are historical references, never
 later authorization to kill a process.
 
 A working native harness qualifies startup/identity/progress/API/teardown behavior.
-It does not yet prove SDK activation/grant/transfer/revocation, Byzantine resilience,
+[Funded lifecycle qualification](../../scripts/check_lifecycle.mjs) separately checks
+actual SDK activation/grant/transfer/revocation. The broader expiry/replay/failure/
+concurrency gate remains SDK #29. Harness checks do not prove Byzantine resilience,
 independent finality verification, browser/device behavior or security review.

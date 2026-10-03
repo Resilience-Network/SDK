@@ -96,7 +96,8 @@ limits. Parsing is never labeled verification; assertions cannot sign SessionDig
 
 ### G4 — Prove native and browser flows end to end
 
-Tasks: #28 (owned disposable pinned-Chain harness), #29 (funded onboarding and
+Tasks: #28 (owned disposable pinned-Chain harness), #56 (verified bounded redacted
+log evidence and explicit capture failure), #29 (funded onboarding and
 finalized lifecycle for both schemes), #30 (actual browser imports/virtual
 authenticators), #32 (accurate combined reference example) and #33 (executable
 integration/troubleshooting guides). Harness work may start earlier to support

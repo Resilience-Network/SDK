@@ -24,6 +24,8 @@ import {
 } from "../../dist/rpc/index.js";
 import { hexToBytes } from "../../dist/core/index.js";
 
+import { captureOwnedLogs } from "./logs.mjs";
+
 const sdkRoot = fileURLToPath(new URL("../../", import.meta.url));
 const sha = (data) => createHash("sha256").update(data).digest("hex");
 /** Tracks actual child handles only. Never scans/kills processes by name or stale PID files. */
@@ -273,7 +275,12 @@ export async function withNativeLocalnet(options, work) {
     { cwd = chain, env = process.env, timeoutMs = 120000 } = {},
   ) => {
     check();
-    evidence.commands.push({ executable, args, cwd });
+    evidence.commands.push({
+      executable,
+      args,
+      cwd,
+      log: `command-${evidence.commands.length + 1}.log`,
+    });
     const logs = join(runtime, `command-${evidence.commands.length}.log`),
       file = await open(logs, "wx", 0o600);
     files.push(file);
@@ -508,7 +515,12 @@ export async function withNativeLocalnet(options, work) {
         "--validator-key",
         join(keys, `validator-${i + 1}.key.json`),
       ];
-      evidence.commands.push({ executable: binaries.resilienced, args, cwd: chain });
+      evidence.commands.push({
+        executable: binaries.resilienced,
+        args,
+        cwd: chain,
+        log: `node-${i + 1}.log`,
+      });
       const entry = processes.start(binaries.resilienced, args, {
         cwd: chain,
         env: {
@@ -642,23 +654,20 @@ export async function withNativeLocalnet(options, work) {
       await portsLease?.release();
       for (const file of files) await file.close().catch(() => {});
       evidence.teardown = { allOwnedChildrenClosed: teardown };
-      // Copy only text logs and public metadata. Never copy key files/DB/signing records.
-      for (let i = 1; i <= evidence.commands.length; i++) {
-        const path = join(runtime, `command-${i}.log`);
-        try {
-          let data = await readFile(path, "utf8");
-          for (const secret of secrets)
-            if (secret) data = data.replaceAll(secret, "[REDACTED_TEST_SECRET]");
-          await writeFile(join(artifacts, `command-${i}.log`), data, { mode: 0o600 });
-        } catch {}
-      }
-      for (let i = 1; i <= validators; i++) {
-        try {
-          let data = await readFile(join(runtime, `node-${i}.log`), "utf8");
-          for (const secret of secrets)
-            if (secret) data = data.replaceAll(secret, "[REDACTED_TEST_SECRET]");
-          await writeFile(join(artifacts, `node-${i}.log`), data, { mode: 0o600 });
-        } catch {}
+      // Only the explicit log of an owned command/node is required; node starts
+      // appear in commands but use node-N.log rather than command-N.log.
+      evidence.logCapture = await captureOwnedLogs(
+        runtime,
+        artifacts,
+        evidence.commands.map((entry) => entry.log),
+        secrets,
+      );
+      const captureFailedAfterSuccess =
+        success && evidence.logCapture.status !== "passed";
+      if (captureFailedAfterSuccess) {
+        success = false;
+        evidence.status = "failed";
+        evidence.failure = { code: "LOG_CAPTURE_FAILED" };
       }
       evidence.runtimeRetained = !(success && teardown);
       let output = JSON.stringify(evidence, null, 2);
@@ -683,6 +692,7 @@ export async function withNativeLocalnet(options, work) {
       console.log(
         `Native owned run ${evidence.status}; evidence ${join(artifacts, "evidence.json")}${evidence.runtimeRetained ? `; restricted runtime retained ${runtime}` : ""}`,
       );
+      if (captureFailedAfterSuccess) throw Error("Native required log capture failed");
     }
   }
 }
