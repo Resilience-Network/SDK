@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { p256 } from "@noble/curves/nist.js";
 import * as sdk from "../dist/index.js";
+import { systemClock } from "../dist/rpc/deadline.js";
+import { FakeClock } from "./rpc-helpers.mjs";
 import { checkSessionTransfer } from "../dist/session/lifecycle-policy.js";
 import { expected, findFixture, methodHarness } from "./rpc-methods-helpers.mjs";
 import { edSigner, deferred } from "./signer-helpers.mjs";
@@ -236,7 +238,7 @@ test("denied grants and policy budgets never invoke approval, signer, submit or 
     assert.equal(f.records.size, 0);
   }
 });
-test("review rejection/failure/deadline leaves no nonce reservation or key invocation", async () => {
+test("immediate review rejection/failure leaves no nonce reservation or key invocation", async () => {
   for (const [approve, code] of [
     [() => false, "REVIEW_REJECTED"],
     [
@@ -245,16 +247,79 @@ test("review rejection/failure/deadline leaves no nonce reservation or key invoc
       },
       "REVIEW_FAILED",
     ],
-    [() => new Promise(() => {}), "TIMEOUT"],
   ]) {
     const f = await setup();
     f.options.approve = approve;
-    f.options.timeoutMs = 20;
+    // This case tests a review outcome, not a race with pre-review work.
     await assert.rejects(f.lifecycle.execute(f.options), fail(code));
     assert.equal(f.records.size, 0);
     assert.equal(f.stats().signs, 0);
+    assert.equal(f.stats().sends, 0);
   }
 });
+function controlledClock(t) {
+  const clock = new FakeClock();
+  for (const method of ["now", "setTimeout", "clearTimeout"])
+    t.mock.method(systemClock, method, clock[method]);
+  return clock;
+}
+test(
+  "entered noncooperating review expires deterministically without reservation/sign/send or leaked timers",
+  { timeout: 10000 },
+  async (t) => {
+    const f = await setup(),
+      clock = controlledClock(t),
+      entered = deferred();
+    f.options.timeoutMs = 1000;
+    f.options.approve = () => {
+      entered.resolve();
+      return new Promise(() => {});
+    };
+    const pending = f.lifecycle.execute(f.options),
+      rejected = assert.rejects(pending, fail("TIMEOUT"));
+    await entered.promise;
+    assert.equal(f.records.size, 0);
+    assert.equal(f.stats().signs, 0);
+    assert.equal(f.stats().sends, 0);
+    assert.equal(clock.time, 0);
+    assert(clock.tasks.size > 0);
+    await clock.advance(999);
+    assert.equal(f.records.size, 0);
+    assert.equal(f.stats().signs, 0);
+    await clock.advance(1);
+    await rejected;
+    assert.equal(f.records.size, 0);
+    assert.equal(f.stats().signs, 0);
+    assert.equal(f.stats().sends, 0);
+    assert.equal(clock.tasks.size, 0);
+  },
+);
+test(
+  "whole-flow expiry before review is TIMEOUT and never masquerades as rejection",
+  { timeout: 10000 },
+  async (t) => {
+    const f = await setup(),
+      clock = controlledClock(t);
+    let approvals = 0;
+    f.options.timeoutMs = 20;
+    f.options.approve = () => {
+      approvals++;
+      return false;
+    };
+    const read = f.client.getFundedGrantSnapshot;
+    f.client.getFundedGrantSnapshot = async (...args) => {
+      const value = await read.apply(f.client, args);
+      await clock.advance(21);
+      return value;
+    };
+    await assert.rejects(f.lifecycle.execute(f.options), fail("TIMEOUT"));
+    assert.equal(approvals, 0);
+    assert.equal(f.records.size, 0);
+    assert.equal(f.stats().signs, 0);
+    assert.equal(f.stats().sends, 0);
+    assert.equal(clock.tasks.size, 0);
+  },
+);
 test("reviewed state never silently refreshes nonce, balance, root or grant", async () => {
   for (const mutate of [
     (f) => f.target.grant.sessionNonce++,

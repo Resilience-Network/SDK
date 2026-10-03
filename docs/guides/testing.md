@@ -345,3 +345,9 @@ The broader [lifecycle gate](../../scripts/check_lifecycle.mjs) additionally
 checks replacement, reserve, revoke-all, cleanup and root rotation. These are
 trusted-node observations on disposable test networks; they do not qualify
 physical passkeys, cross-process adapter durability or independent finality.
+
+Lifecycle approval deadline tests use a controlled internal clock in their isolated
+Node test context. They establish reviewer entry before advancing to expiry,
+verify no reservation/sign/send and disposed timers, and separately prove that
+pre-review whole-flow expiry yields TIMEOUT. Immediate rejection/failure tests
+use the normal flow budget; a scheduling race is not approval behavior evidence.
