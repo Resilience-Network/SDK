@@ -288,3 +288,21 @@ These are client orchestration tests; an in-memory adapter does not establish
 cross-tab/process durability. Application durable adapters must separately qualify
 atomic compare/exchange, linearizable reads, persistence before acknowledgement and
 crash behavior. Funded running-node lifecycle qualification remains a distinct gate.
+
+## Owned native localnet
+
+After `npm ci`, set `RSC_CHAIN_DIR` to a clean detached checkout at the immutable
+source pin and run `npm run test:localnet`. This builds native crypto and real
+CGO-enabled node/keygen binaries, independently computes the generated genesis
+identity through production Go initialization, and starts four explicitly peered
+loopback validators in a new owned temporary directory. It requires finalized
+progress and hash/state agreement, shielded read APIs, genesis funding and actual
+SDK root/fee/absent-receipt probes. `npm run test:localnet-failures` separately
+qualifies setup/ready-node failure, readiness deadline, ignored-callback timeout and actual SIGINT/SIGTERM
+with restricted failed-run retention, closed owned processes and preserved external
+safety sentinel. No native gate runs implicitly inside unit-only `npm run check`.
+
+[Harness guide](native-localnet.md) defines ownership, artifacts, trust and cleanup.
+[Supervisor tests](../../tests/localnet-harness.test.mjs) are unit coverage for
+process groups/ports/path guards; they do not replace real native-node checks.
+Funded activation/grant/transfer/revocation qualification remains separate #29.

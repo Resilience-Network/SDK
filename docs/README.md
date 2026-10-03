@@ -10,6 +10,8 @@ browser APIs remain planned.
   dependencies, status labels and progress views.
 - [Local development](guides/local-development.md): install, build and package checks.
 - [Testing](guides/testing.md): available commands and required feature evidence.
+- [Owned native localnet](guides/native-localnet.md): generated funded genesis,
+  real native validators, bounded ownership, evidence and failure/interrupt checks.
 - [Protocol sources](reference/protocol-sources.md): immutable Chain source baseline.
 - [Canonical API](reference/canonical-api.md): supported codecs/hashes and their limits.
 - [HTTP RPC API](reference/http-rpc.md): envelope transport, limits, cancellation,
