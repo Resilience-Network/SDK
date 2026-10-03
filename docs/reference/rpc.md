@@ -168,4 +168,5 @@ not running-network/funded lifecycle finality, P-256 simulation signing, browser
 qualification or independent review. Explicit-null envelope interoperability is covered by the refreshed baseline
 and native [envelope fixtures](../../tests/fixtures/rpc-envelopes.json). Typed
 receipt/lookup semantics are documented in the [receipt reference](receipts.md).
-Submission/polling/reconciliation remain separate.
+[Submission/polling/reconciliation](submission.md) has explicit single-send and
+unknown-history contracts.

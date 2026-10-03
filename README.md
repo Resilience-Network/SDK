@@ -7,7 +7,8 @@ The implementation provides canonical transaction/session codecs and typed
 hashes checked against pinned Chain and independent vectors, plus bounded HTTP
 JSON-RPC transport, validated Chain authorization/fee/simulation reads and raw
 Ed25519/P-256 transaction signers and canonical review data. Typed transaction/receipt observations and receipt commitments are implemented.
-Grant lifecycle, submission, browser
+Single-send submission and bounded same-ID reconciliation are available.
+Grant lifecycle, browser
 passkey APIs and release qualification
 remain planned work.
 

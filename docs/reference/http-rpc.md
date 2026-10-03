@@ -164,7 +164,7 @@ actual Node fetch, including mixed batches. The SDK still rejects omitted result
 and ambiguous envelopes as `INVALID_RESPONSE`; it applies no compatibility
 coercion. Null lookup is a bounded node observation, not proof of nonexistence or
 rejection. [Typed receipt semantics](receipts.md) validate exact native commitments;
-submission/reconciliation remains separate.
+[submission/reconciliation](submission.md) preserves typed uncertainty.
 
 Tests use injected fetch and actual Node fetch against owned loopback servers for
 truncation, gzip expansion, throttling, redirects, abort and deadlines. This is

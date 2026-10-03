@@ -1,4 +1,4 @@
-import { checkedUint, compareBytes } from "../core/bytes.js";
+import { checkedUint, compareBytes, isZero } from "../core/bytes.js";
 import { policyCodec, transactionCodec, transactionId } from "../session/index.js";
 import { AUTHORIZATION_CAPABILITY, RpcContractError } from "./contracts.js";
 import type {
@@ -21,6 +21,16 @@ import type {
 } from "./contracts.js";
 import { Deadline, systemClock } from "./deadline.js";
 import { HttpRpcClient } from "./http.js";
+import { RpcClientError } from "./errors.js";
+import { finalizedTransactionBlock } from "./blocks.js";
+import type {
+  AuthorityNonceObservation,
+  ReconcileOptions,
+  ReconciliationOutcome,
+  SubmissionDiagnostic,
+  SubmissionOutcome,
+} from "./submission.js";
+import type { Transaction } from "../session/index.js";
 import {
   canonicalLookup,
   receiptProjection,
@@ -59,6 +69,18 @@ import {
 } from "./validate.js";
 
 const identityCall: RpcCall = { method: "rsc_getAuthorizationFinalityStatus" };
+function diagnostic(error: unknown): SubmissionDiagnostic {
+  if (error instanceof RpcContractError) return { code: error.code };
+  if (error instanceof RpcClientError)
+    return {
+      code: error.code,
+      ...(error.rpcCode === undefined ? {} : { rpcCode: error.rpcCode }),
+      ...(error.authorizationFamily === undefined
+        ? {}
+        : { authorizationFamily: error.authorizationFamily }),
+    };
+  return { code: "INVALID_RESULT" };
+}
 type ReadResult = {
   identity: AuthorizationFinalityStatus;
   results: readonly unknown[];
@@ -119,7 +141,7 @@ export class ChainRpcClient {
 
   async #read(
     calls: readonly RpcCall[],
-    contextual: boolean,
+    contextual: boolean | readonly number[],
     options: RpcRequestOptions,
     refresh = true,
     validateInconsistent?: (read: ReadResult) => void,
@@ -141,19 +163,26 @@ export class ChainRpcClient {
         const first = resultGuard(() => identity(results[0], this.#expected));
         const last = resultGuard(() => identity(results.at(-1), this.#expected));
         const values = results.slice(1, -1);
-        const contexts = contextual
-          ? values.map((value) =>
-              resultGuard(() => {
-                requireResult(
-                  value !== null &&
-                    typeof value === "object" &&
-                    !Array.isArray(value) &&
-                    Object.hasOwn(value, "state"),
-                );
-                return state((value as Record<string, unknown>).state);
-              }),
-            )
-          : [];
+        const contextualValues =
+          contextual === true
+            ? values
+            : contextual === false
+              ? []
+              : contextual.map((index) => values[index]);
+        const contexts =
+          contextualValues.length > 0
+            ? contextualValues.map((value) =>
+                resultGuard(() => {
+                  requireResult(
+                    value !== null &&
+                      typeof value === "object" &&
+                      !Array.isArray(value) &&
+                      Object.hasOwn(value, "state"),
+                  );
+                  return state((value as Record<string, unknown>).state);
+                }),
+              )
+            : [];
         if (
           sameState(first.state, last.state) &&
           contexts.every((context) => sameState(first.state, context))
@@ -223,6 +252,311 @@ export class ChainRpcClient {
             transaction,
           };
     });
+  }
+  #prepared(canonical: Uint8Array): {
+    bytes: Uint8Array;
+    transaction: Transaction;
+    id: Uint8Array;
+  } {
+    return inputGuard(() => {
+      const transaction = transactionCodec.decode(canonical);
+      const bytes = transactionCodec.encode(transaction);
+      const id = transactionId(
+        this.#expected,
+        transaction.intent,
+        transaction.envelope,
+      );
+      return { bytes, transaction, id };
+    });
+  }
+  async submitTransaction(
+    canonical: Uint8Array,
+    options: RpcRequestOptions = {},
+  ): Promise<SubmissionOutcome> {
+    const prepared = this.#prepared(canonical),
+      deadline = new Deadline(this.#clock, this.#timeoutMs, options.signal);
+    let sending = false;
+    const outcome = (
+      status: SubmissionOutcome["status"],
+      sendAttempts: 0 | 1,
+      error?: unknown,
+    ): SubmissionOutcome => ({
+      transactionHash: prepared.id,
+      status,
+      sendAttempts,
+      verification: "node-observation",
+      ...(error === undefined ? {} : { diagnostic: diagnostic(error) }),
+    });
+    try {
+      deadline.check();
+      await deadline.race(
+        this.getAuthorizationFinalityStatus({ signal: deadline.controller.signal }),
+      );
+      deadline.check();
+      sending = true;
+      deadline.attempts = 1;
+      const result = await deadline.race(
+        this.#http.request("rsc_sendRawTransaction", [bytesToHex(prepared.bytes)], {
+          signal: deadline.controller.signal,
+        }),
+      );
+      deadline.check();
+      resultGuard(() => sameBytes(wireBytes(result, 32, 32), prepared.id));
+      return outcome("reported-accepted", 1);
+    } catch (error) {
+      if (!sending || (error instanceof RpcClientError && error.attempts === 0))
+        return outcome("not-sent", 0, error);
+      return outcome(
+        error instanceof RpcClientError && error.code === "NODE_ERROR"
+          ? "reported-rejected"
+          : "unknown",
+        1,
+        error,
+      );
+    } finally {
+      deadline.dispose();
+    }
+  }
+  async #authority(
+    transaction: Transaction,
+    options: RpcRequestOptions,
+  ): Promise<AuthorityNonceObservation> {
+    const { intent: i, envelope: e } = transaction,
+      owner = bytesToHex(i.sender),
+      sponsored = !isZero(i.sponsor);
+    const calls: RpcCall[] = [{ method: "rsc_getRootAuthority", params: [owner] }];
+    if (e.mode === 0)
+      calls.push({ method: "rsc_getTransactionCount", params: [owner, "latest"] });
+    else if (e.mode === 2)
+      calls.push({
+        method: "rsc_getSessionGrant",
+        params: [owner, bytesToHex(e.credentialId)],
+      });
+    if (sponsored)
+      calls.push({
+        method: "rsc_getTransactionCount",
+        params: [bytesToHex(i.sponsor), "latest"],
+      });
+    const parse = (read: ReadResult) => {
+      const root = rootObservation(read.results[0], i.sender);
+      requireResult(sameState(root.state, read.identity.state));
+      let matches = false,
+        nonce: bigint | null = null;
+      if (e.mode === 0) {
+        matches = root.authorizationMode === 0;
+        nonce = quantity(read.results[1]);
+      } else if (e.mode === 1 && root.authorizationMode === 1) {
+        matches =
+          root.authority.authEpoch === e.authEpoch &&
+          compareBytes(root.authority.rootConfigHash, e.credentialId) === 0;
+        nonce = root.authority.rootNonce;
+      } else if (e.mode === 2) {
+        const grant = grantObservation(
+          read.results[1],
+          i.sender,
+          e.credentialId,
+          this.#expected,
+        );
+        requireResult(sameState(grant.state, read.identity.state));
+        nonce = grant.sessionNonce;
+        requireResult(
+          root.authorizationMode === 1 &&
+            grant.authEpoch <= root.authority.authEpoch &&
+            grant.generationSequence < root.authority.nextGrantSequence,
+        );
+        requireResult(
+          grant.usableAtObservedBlock ===
+            (grant.authEpoch === root.authority.authEpoch &&
+              grant.state.height >= grant.validAfterHeight &&
+              grant.state.height < grant.validUntilHeight),
+        );
+        matches =
+          root.authority.authEpoch === e.authEpoch &&
+          grant.authEpoch === e.authEpoch &&
+          grant.keyScheme === e.keyScheme &&
+          compareBytes(grant.policyHash, e.policyHash) === 0 &&
+          grant.usableAtObservedBlock;
+      }
+      return {
+        identity: read.identity,
+        mode: e.mode,
+        expectedNonce: e.nonce,
+        observedNonce: nonce,
+        authorityMatches: matches,
+        comparison: !matches
+          ? "authority-changed"
+          : nonce === e.nonce
+            ? "unchanged"
+            : nonce !== null && nonce > e.nonce
+              ? "advanced"
+              : "behind",
+        sponsor: sponsored
+          ? {
+              expectedNonce: e.sponsorNonce,
+              observedNonce: quantity(read.results.at(-1)),
+            }
+          : null,
+      } as AuthorityNonceObservation;
+    };
+    const read = await this.#read(
+      calls,
+      e.mode === 2 ? [0, 1] : [0],
+      options,
+      true,
+      (read) => {
+        // Only root/grant results carry state; quantity results are independently bounded.
+        rootObservation(read.results[0], i.sender);
+        if (e.mode === 0) quantity(read.results[1]);
+        if (e.mode === 2)
+          grantObservation(read.results[1], i.sender, e.credentialId, this.#expected);
+        if (sponsored) quantity(read.results.at(-1));
+      },
+    );
+    return resultGuard(() => parse(read));
+  }
+  async reconcileTransaction(
+    canonical: Uint8Array,
+    options: ReconcileOptions = {},
+  ): Promise<ReconciliationOutcome> {
+    const prepared = this.#prepared(canonical);
+    const config = inputGuard(() => {
+      const timeoutMs = options.timeoutMs ?? 30000,
+        maxPolls = options.maxPolls ?? 10,
+        pollIntervalMs = options.pollIntervalMs ?? 250;
+      for (const [value, max] of [
+        [timeoutMs, 300000],
+        [maxPolls, 1000],
+        [pollIntervalMs, 60000],
+      ])
+        requireResult(Number.isSafeInteger(value) && value! >= 1 && value! <= max!);
+      return { timeoutMs, maxPolls, pollIntervalMs };
+    });
+    const deadline = new Deadline(this.#clock, config.timeoutMs, options.signal);
+    let polls = 0,
+      lastObservation: ReceiptObservation | null = null,
+      authority: AuthorityNonceObservation | null = null;
+    const unknown = (
+      reason: "poll-limit" | "deadline" | "aborted" | "observation-error",
+      error?: unknown,
+    ): ReconciliationOutcome => ({
+      transactionHash: prepared.id,
+      verification: "node-observation",
+      status: "unknown",
+      reason,
+      polls,
+      authority,
+      lastObservation,
+      ...(error === undefined ? {} : { diagnostic: diagnostic(error) }),
+    });
+    try {
+      for (; polls < config.maxPolls;) {
+        deadline.check();
+        polls++;
+        lastObservation = await deadline.race(
+          this.getTransactionReceipt(prepared.id, {
+            canonicalTransaction: prepared.bytes,
+            signal: deadline.controller.signal,
+          }),
+        );
+        deadline.check();
+        authority = await deadline.race(
+          this.#authority(prepared.transaction, { signal: deadline.controller.signal }),
+        );
+        deadline.check();
+        resultGuard(() => {
+          requireResult(
+            authority!.identity.state.height >= lastObservation!.identity.state.height,
+          );
+          if (
+            authority!.identity.state.height === lastObservation!.identity.state.height
+          )
+            requireResult(
+              sameState(authority!.identity.state, lastObservation!.identity.state),
+            );
+        });
+        if (lastObservation.status === "reported-included") {
+          const receipt = lastObservation.receipt;
+          const read = await deadline.race(
+            this.#read(
+              [
+                {
+                  method: "rsc_getBlockByNumber",
+                  params: [toQuantity(receipt.blockNumber), false],
+                },
+              ],
+              false,
+              { signal: deadline.controller.signal },
+              true,
+              (r) => {
+                finalizedTransactionBlock(
+                  r.results[0],
+                  receipt.blockNumber,
+                  receipt.blockHash,
+                  receipt.transactionIndex,
+                  prepared.id,
+                  r.identity,
+                  false,
+                );
+              },
+            ),
+          );
+          deadline.check();
+          resultGuard(() => {
+            requireResult(
+              read.identity.state.height >= authority!.identity.state.height,
+            );
+            if (read.identity.state.height === authority!.identity.state.height)
+              requireResult(sameState(read.identity.state, authority!.identity.state));
+            requireResult(
+              !authority!.authorityMatches ||
+                (authority!.observedNonce !== null &&
+                  authority!.observedNonce > prepared.transaction.envelope.nonce),
+            );
+            if (authority!.sponsor)
+              requireResult(
+                authority!.sponsor.observedNonce > authority!.sponsor.expectedNonce,
+              );
+          });
+          if (
+            resultGuard(() =>
+              finalizedTransactionBlock(
+                read.results[0],
+                receipt.blockNumber,
+                receipt.blockHash,
+                receipt.transactionIndex,
+                prepared.id,
+                read.identity,
+              ),
+            )
+          )
+            return {
+              transactionHash: prepared.id,
+              verification: "node-observation",
+              polls,
+              authority,
+              status:
+                receipt.actionStatus === 1
+                  ? "reported-finalized-success"
+                  : "reported-finalized-failure",
+              receipt,
+              identity: read.identity,
+            };
+        }
+        if (polls < config.maxPolls) await deadline.delay(config.pollIntervalMs);
+      }
+      return unknown("poll-limit");
+    } catch (error) {
+      return unknown(
+        deadline.controller.signal.aborted
+          ? options.signal?.aborted
+            ? "aborted"
+            : "deadline"
+          : "observation-error",
+        error,
+      );
+    } finally {
+      deadline.dispose();
+    }
   }
   async getTransactionReceipt(
     transactionHash: Uint8Array,
