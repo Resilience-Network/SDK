@@ -1,8 +1,9 @@
 # SDK documentation
 
 This index separates intended SDK capabilities from the currently available
-implemented canonical codecs/hashes, HTTP transport and typed Chain reads.
-Submission/receipts, signer lifecycle and browser APIs remain planned.
+implemented canonical codecs/hashes, HTTP transport, typed Chain reads
+and raw transaction signer adapters. Submission/receipts, grant lifecycle and
+browser APIs remain planned.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
 - [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
@@ -15,6 +16,8 @@ Submission/receipts, signer lifecycle and browser APIs remain planned.
   errors, read retries and interoperability boundaries.
 - [Typed Chain RPC API](reference/rpc.md): expected identity, finalized context,
   authorization/policy reads, fee contracts and advisory estimation/simulation.
+- [Raw signer API](reference/signers.md): external key ownership, exact digest
+  semantics, canonical witnesses, mutation guards and bounded cancellation.
 - [Passkey authorization decision](decisions/0001-passkey-authorization-boundary.md).
 - [Security boundaries](security/threat-model.md).
 - [Documentation policy](documentation-policy.md).

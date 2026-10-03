@@ -75,9 +75,10 @@ Source modules and export boundaries:
 - `tests/`: unit/adversarial, versioned vectors, Go differential and browser suites.
 - `examples/`: a basic session lifecycle and a separate passkey ceremony example.
 
-Core/session codecs, hashes and HTTP envelope transport are available. Typed RPC
-methods, reconciliation, display, signers and WebAuthn remain planned. Do not add
-placeholder functions that claim support.
+Core/session codecs, hashes, typed authorization RPC reads, HTTP transport and
+[raw signer contracts](docs/reference/signers.md) are available. Grant lifecycle,
+nonce coordination, reconciliation, display and WebAuthn remain planned. Do not
+add placeholder functions that claim support.
 
 Use ESM with emitted declarations, strict TypeScript, `Uint8Array` for binary
 values and checked `bigint` for amounts/nonces/heights. Never round a protocol

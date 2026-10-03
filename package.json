@@ -46,7 +46,8 @@
     "check": "npm run format:check && npm run typecheck && npm run docs:check && npm test && npm run package:check",
     "test": "npm run build && node --test tests/*.test.mjs",
     "test:differential": "npm run build && node scripts/check_differential.mjs",
-    "test:rpc-native": "node scripts/check_rpc_contracts.mjs"
+    "test:rpc-native": "node scripts/check_rpc_contracts.mjs",
+    "test:signatures-native": "npm run build && node scripts/check_signatures.mjs"
   },
   "devDependencies": {
     "prettier": "3.9.9",

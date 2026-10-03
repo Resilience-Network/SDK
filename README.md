@@ -5,8 +5,9 @@ originating from [Chain issue #25 (FR-013)](https://github.com/Resilience-Networ
 
 The implementation provides canonical transaction/session codecs and typed
 hashes checked against pinned Chain and independent vectors, plus bounded HTTP
-JSON-RPC transport and validated Chain authorization/fee/simulation reads. Signer
-lifecycle, submission/receipts, browser passkey APIs and release qualification
+JSON-RPC transport, validated Chain authorization/fee/simulation reads and raw
+Ed25519/P-256 transaction signers. Grant lifecycle, submission/receipts, browser
+passkey APIs and release qualification
 remain planned work.
 
 ## Development
@@ -65,11 +66,19 @@ one attempt; timeout is not proof of rejection. See the
 [HTTP API and exact limits](docs/reference/http-rpc.md), including the pinned
 node's omitted-null-result interoperability gap and separate qualification gates.
 
+## Available raw signers
+
+`signDirectTransaction` and `signRootTransaction` use explicitly owned external
+Ed25519 adapters; `signSessionTransaction` additionally supports raw prehashed
+P-256. They validate signatures, collect exactly the ROOT threshold and guard
+async mutations/cancellation. See [the signer API](docs/reference/signers.md)
+for exact digest contracts, ownership, examples and limits. They do not establish
+current authority, coordinate nonces or submit transactions.
+
 ## Planned capabilities
 
-- Ed25519 root/direct signer interfaces and Ed25519/P-256 session interfaces.
 - Bounded session grants, policy inspection, submission and revocation.
-- Typed RPC reads, simulations, receipts and ambiguous-submission handling.
+- Receipts and ambiguous-submission handling.
 - WebAuthn registration/authentication helpers with explicit trust boundaries.
 - Browser and disposable-localnet examples verified against independent vectors.
 
