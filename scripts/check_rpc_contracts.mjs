@@ -46,6 +46,15 @@ const receiptInstalled = join(
   "internal/rpc",
   `sdk_receipts_${randomUUID().replaceAll("-", "")}_test.go`,
 );
+const reconcileSource = await readFile(
+  join(root, "tests/go-rpc-reference/reconciliation_test.go"),
+);
+const reconcileInstalled = join(
+  chain,
+  "internal/rpc",
+  `sdk_reconcile_${randomUUID().replaceAll("-", "")}_test.go`,
+);
+let reconcileOwned = false;
 let receiptOwned = false;
 const installed = join(
   chain,
@@ -58,8 +67,11 @@ try {
   owned = true;
   await writeFile(receiptInstalled, receiptSource, { flag: "wx" });
   receiptOwned = true;
+  await writeFile(reconcileInstalled, reconcileSource, { flag: "wx" });
+  reconcileOwned = true;
   const output = join(temporary, "rpc.json");
   const receiptOutput = join(temporary, "receipts.json");
+  const reconcileOutput = join(temporary, "reconcile.json");
   const envelopeOutput = join(temporary, "envelopes.json");
   run(
     "go",
@@ -70,6 +82,7 @@ try {
         RSC_RPC_FIXTURE_OUTPUT: output,
         RSC_RPC_ENVELOPE_OUTPUT: envelopeOutput,
         RSC_RPC_RECEIPT_OUTPUT: receiptOutput,
+        RSC_RPC_RECONCILE_OUTPUT: reconcileOutput,
       },
       stdio: "inherit",
     },
@@ -92,7 +105,19 @@ try {
       "Native production Handler/API with owned constructed receipt/state fixtures. Canonical native counter/event commitments; projection-only, not funded execution. SessionCancel has a structural test signature. No independent finality claim.",
     fixtures: receipts,
   };
+  const reconciliation = JSON.parse(await readFile(reconcileOutput, "utf8"));
+  const reconcileReference = join(root, "tests/fixtures/rpc-reconciliation.json");
+  const reconcileRecord = {
+    revision: pin.revision,
+    provenance:
+      "Production Handler/API against owned constructed receipts plus native rooted/grant state, signature/policy evaluation and session usage settlement. DIRECT/sponsor nonces are explicitly constructed. Block processor/funded transfer/fee execution, pool acceptance and independent finality are not qualified by this fixture. Cancellation uses the pinned reference test-only Ed25519 seed and native evaluated signature.",
+    fixtures: reconciliation,
+  };
   if (process.argv.includes("--write")) {
+    await writeFile(
+      reconcileReference,
+      `${JSON.stringify(reconcileRecord, null, 2)}\n`,
+    );
     await writeFile(
       reference,
       `${JSON.stringify({ revision: pin.revision, fixtures }, null, 2)}\n`,
@@ -100,9 +125,14 @@ try {
     await writeFile(receiptReference, `${JSON.stringify(receiptRecord, null, 2)}\n`);
     await writeFile(envelopeReference, `${JSON.stringify(envelopeRecord, null, 2)}\n`);
     console.log(
-      `Wrote ${fixtures.length} native typed fixtures and ${envelopes.length} native envelope and ${receipts.length} receipt fixtures at ${pin.revision}.`,
+      `Wrote ${fixtures.length} native typed fixtures and ${envelopes.length} native envelope and ${receipts.length} receipt + ${reconciliation.length} reconciliation fixtures at ${pin.revision}.`,
     );
   } else {
+    assert.deepEqual(
+      JSON.parse(await readFile(reconcileReference, "utf8")),
+      reconcileRecord,
+      "Native reconciliation projections drifted; inspect semantics before regeneration.",
+    );
     assert.deepEqual(
       JSON.parse(await readFile(receiptReference, "utf8")),
       receiptRecord,
@@ -119,10 +149,18 @@ try {
       "Native envelope fixtures drifted; inspect semantics before regeneration.",
     );
     console.log(
-      `Native production-handler fixtures match: ${fixtures.length} typed, ${envelopes.length} envelopes, ${receipts.length} receipts; pin ${pin.revision}.`,
+      `Native production-handler fixtures match: ${fixtures.length} typed, ${envelopes.length} envelopes, ${receipts.length} receipts, ${reconciliation.length} reconciliation; pin ${pin.revision}.`,
     );
   }
 } finally {
+  if (reconcileOwned) {
+    assert.deepEqual(
+      await readFile(reconcileInstalled),
+      reconcileSource,
+      "Owned reconcile test changed externally; preserve for inspection.",
+    );
+    await rm(reconcileInstalled);
+  }
   if (receiptOwned) {
     assert.deepEqual(
       await readFile(receiptInstalled),

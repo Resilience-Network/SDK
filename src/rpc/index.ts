@@ -4,6 +4,13 @@ export { RpcClientError } from "./errors.js";
 export { ChainRpcClient } from "./methods.js";
 export * from "./contracts.js";
 export type {
+  SubmissionDiagnostic,
+  SubmissionOutcome,
+  ReconcileOptions,
+  AuthorityNonceObservation,
+  ReconciliationOutcome,
+} from "./submission.js";
+export type {
   TransactionLocation,
   TransactionProjection,
   TransactionReceipt,

@@ -101,8 +101,8 @@ receipt positions are cross-checked with transaction observations, without
 independent block-header authentication. Every observation explicitly reports
 `verification:"node-observation"`. A malicious node can forge mutually consistent
 responses. This API does not verify inclusion/state proofs, validator certificates
-or independently authenticated finality. Polling/submission/reconciliation is a
-separate implementation step in [the plan](../../PLAN.md).
+or independently authenticated finality. [Submission/reconciliation](submission.md) adds explicit same-ID outcomes and
+bounded polling; node-observation trust still applies.
 
 ## Independent evidence
 

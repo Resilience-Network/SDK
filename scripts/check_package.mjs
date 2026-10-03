@@ -82,6 +82,8 @@ const receiptDelta={version:1,mode:0,actionType:0,nonceDelta:1,attemptsDelta:0,s
 assert.deepEqual(session.receiptCounterDeltaCodec.decode(session.receiptCounterDeltaCodec.encode(receiptDelta)),receiptDelta);
 assert.equal(session.receiptCounterDeltaHash(receiptDelta).length,32);
 assert.equal(typeof rpc.ChainRpcClient.prototype.getTransactionReceipt,"function");
+assert.equal(typeof rpc.ChainRpcClient.prototype.submitTransaction,"function");
+assert.equal(typeof rpc.ChainRpcClient.prototype.reconcileTransaction,"function");
 assert.equal(typeof rpc.ChainRpcClient.prototype.getTransactionByHash,"function");
 assert.equal(sdk.CodecError, core.CodecError);
 assert.equal(sdk.HttpRpcClient, rpc.HttpRpcClient);
@@ -137,7 +139,7 @@ import { receiptCounterDeltaCodec, sessionDecisionCommitmentHash, type ReceiptCo
 import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential, type SigningReview, type ReviewApproval, type ReviewApprovalRequest } from ${JSON.stringify(`${metadata.name}/session`)};
 import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type CanonicalReview, type ReviewBinding, type ReviewField } from ${JSON.stringify(`${metadata.name}/display`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
-import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type ReceiptObservation, type TransactionObservation, type LookupOptions, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
+import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type SubmissionOutcome, type ReconciliationOutcome, type ReconcileOptions, type ReceiptObservation, type TransactionObservation, type LookupOptions, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
 const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
 const context: ChainContext = { chainId: 1n, genesisHash: new Uint8Array(32) };
 encodeUint256(reserve.securityReserve);

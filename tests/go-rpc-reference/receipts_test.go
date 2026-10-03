@@ -196,6 +196,7 @@ func sdkWriteReceiptFixtures(t *testing.T) {
 			store.Close()
 		}
 	}
+	sdkReconciliationFixtures(t, fixtures)
 	b, err := json.MarshalIndent(fixtures, "", "  ")
 	if err != nil {
 		t.Fatal(err)

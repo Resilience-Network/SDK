@@ -2,7 +2,7 @@
 
 This index separates intended SDK capabilities from the currently available
 implemented canonical codecs/hashes, HTTP transport, typed Chain reads
-and raw transaction signer adapters and canonical review data. Submission, grant lifecycle and
+and raw transaction signer adapters and canonical review data. Grant lifecycle and
 browser APIs remain planned.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
@@ -18,6 +18,8 @@ browser APIs remain planned.
   authorization/policy reads, fee contracts and advisory estimation/simulation.
 - [Receipt API](reference/receipts.md): canonical commitments, bounded transaction/receipt
   observations, execution/consumption semantics and node trust boundaries.
+- [Submission API](reference/submission.md): one send, typed uncertainty and bounded
+  same-ID reconciliation with node-reported finality/consumption.
 - [Raw signer API](reference/signers.md): external key ownership, exact digest
   semantics, canonical witnesses, mutation guards and bounded cancellation.
 - [Canonical review API](reference/display.md): frozen bytes/hash-bound policy,

@@ -258,3 +258,21 @@ command includes this gate alongside the original canonical suite. Native RPC
 regeneration also checks constructed receipt/transaction projections against the
 production Handler/API; cancellation's structural test signature is explicitly
 identified. Funded/native lifecycle and browser/security gates remain separate.
+
+## Submission and reconciliation checks
+
+`node --test tests/submission.test.mjs` exercises single writes, lost/malformed/
+conflicting replies, node rejection, canonical snapshots, read-only same-ID
+reconciliation, native success/failure/authority observations, pending/pruning,
+state/nonce/block contradictions, polling bounds and cancellation/deadline. An
+actual Node HTTP server records a send then drops its reply; reconciliation
+confirms the same fixture ID with one write total. This is transport/projection
+evidence, not live pool acceptance or independent finality.
+
+`test:rpc-native` additionally regenerates native reconciliation fixtures using
+owned rooted/grant state, source signature/policy evaluation and session usage
+settlement. Grant activation heights come from pinned intervals (Ed25519101,
+P-256201). Cancellation has a native evaluated reference test signature. Receipts/
+blocks and DIRECT/sponsor nonce observations remain explicitly constructed; funded
+block processor/network execution stays separate. Source pin, all existing
+commitment/receipt vectors and full differential gate remain unchanged.
