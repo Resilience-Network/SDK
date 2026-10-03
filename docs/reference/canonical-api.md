@@ -19,6 +19,14 @@ safe integer numbers. Addresses/hashes are exact 20/32-byte `Uint8Array`.
 Hex parsers require `0x`, complete byte pairs and bounded length. Invalid values
 throw `CodecError` with a code; no private input values are included in messages.
 
+Byte guards measure intrinsic typed-array length before copying. Shared, detached,
+proxied views and shadowed layout properties (`length`, `buffer`, `byteLength`,
+`byteOffset`, including inherited overrides) fail with typed errors. Layout
+prototype inspection is capped at 32 levels. Ordinary
+`Uint8Array`, Buffer and subarray inputs are supported; normalization owns the
+view's bytes and ignores overridden iteration methods. This protects local
+resource/representation bounds, not a compromised JavaScript global environment.
+
 Codec objects expose `encode(value)` and `decode(bytes)`. Decoders reject trailing
 bytes, invalid versions, counts/order, booleans, sentinel fields and unsupported
 features. Returned byte arrays are owned copies. Encoders reject unknown enumerable
