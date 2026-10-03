@@ -276,3 +276,15 @@ P-256201). Cancellation has a native evaluated reference test signature. Receipt
 blocks and DIRECT/sponsor nonce observations remain explicitly constructed; funded
 block processor/network execution stays separate. Source pin, all existing
 commitment/receipt vectors and full differential gate remain unchanged.
+
+## Nonce coordination
+
+[Coordinator tests](../../tests/coordinator.test.mjs) run in `npm run check` and cover
+atomic contention across coordinator instances, duplicate requests, consumed action
+failure, fresh nonce watermarks, unknown/rejected/not-sent retention, read-only
+recovery, ignored signer cancellation, input/state mutations at async boundaries,
+strict persisted records, capacity, owner checks and explicit obsolete retirement.
+These are client orchestration tests; an in-memory adapter does not establish
+cross-tab/process durability. Application durable adapters must separately qualify
+atomic compare/exchange, linearizable reads, persistence before acknowledgement and
+crash behavior. Funded running-node lifecycle qualification remains a distinct gate.

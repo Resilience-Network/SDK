@@ -19,3 +19,5 @@ export type {
   ReviewApprovalRequest,
   ReviewApproval,
 } from "./signing-review.js";
+
+export * from "./coordinator.js";

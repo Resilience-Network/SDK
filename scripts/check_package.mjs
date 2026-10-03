@@ -78,6 +78,9 @@ assert.equal(core.decodeUint64(core.encodeUint64((1n << 64n) - 1n)), (1n << 64n)
 assert.equal(core.bytesToHex(core.keccak256(new Uint8Array())), "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470");
 assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReserveCodec.encode({ version: 1, securityReserve: 1n << 200n })), { version: 1, securityReserve: 1n << 200n });
 assert.equal(sdk.policyCodec, session.policyCodec);
+const coordinator = new session.NonceCoordinator(new session.MemoryNonceReservationStore());
+assert.equal(typeof coordinator.execute,"function");
+assert.equal(typeof coordinator.retireObsolete,"function");
 const receiptDelta={version:1,mode:0,actionType:0,nonceDelta:1,attemptsDelta:0,successesDelta:0,claimsDelta:0,valueCategory:0,valueDelta:0n,feeDelta:1n<<200n,succeeded:false};
 assert.deepEqual(session.receiptCounterDeltaCodec.decode(session.receiptCounterDeltaCodec.encode(receiptDelta)),receiptDelta);
 assert.equal(session.receiptCounterDeltaHash(receiptDelta).length,32);
@@ -136,7 +139,7 @@ console.log("Installed root/core/session/rpc/display imports and API smoke check
     `
 import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
 import { receiptCounterDeltaCodec, sessionDecisionCommitmentHash, type ReceiptCounterDelta, type SessionDecisionCommitment, setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
-import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential, type SigningReview, type ReviewApproval, type ReviewApprovalRequest } from ${JSON.stringify(`${metadata.name}/session`)};
+import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential, NonceCoordinator, MemoryNonceReservationStore, type NonceReservationStore, type NonceAuthoritySnapshot, type CoordinatedTransactionOptions, type SigningReview, type ReviewApproval, type ReviewApprovalRequest } from ${JSON.stringify(`${metadata.name}/session`)};
 import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type CanonicalReview, type ReviewBinding, type ReviewField } from ${JSON.stringify(`${metadata.name}/display`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
 import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type SubmissionOutcome, type ReconciliationOutcome, type ReconcileOptions, type ReceiptObservation, type TransactionObservation, type LookupOptions, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};

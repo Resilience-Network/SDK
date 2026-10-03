@@ -114,3 +114,7 @@ explains the boundary and the unresolved product choice.
 The proposed package name is `@resilience-network/sdk`; npm ownership and name
 availability must be verified before release. The repository is private and
 package publishing is disabled. No open-source license has been selected.
+
+[Nonce coordination](docs/reference/coordinator.md) composes external signing and
+single-send/reconciliation with explicit authority reservations. Applications own
+validated authority reads and durable cross-tab/process adapters.
