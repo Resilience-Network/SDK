@@ -1,7 +1,8 @@
 # Canonical API and supported scope
 
-This page describes the implemented P1 codecs and hashes. It does not provide a
-signer, node transport, authority verifier, browser ceremony or production wallet.
+This page describes the implemented P1 codecs and hashes. See the separate
+[raw signer API](signers.md) and [typed RPC API](rpc.md) for implemented signing
+and transport behavior. There is no stateful authority verifier or production wallet.
 The [source baseline](protocol-sources.md) is immutable for this implementation.
 
 ## Entry points and values
@@ -67,8 +68,8 @@ Ed25519 session keys use 32 wire bytes; P-256 keys use 64 raw big-endian X||Y by
 Public SDK inputs do not accept 64-byte zero-padded Ed25519 storage keys. Grant
 codecs validate canonical non-small-order Ed25519 points or valid P-256 points.
 P-256 has no low-S consensus rule; signatures here are structural 64-byte r||s.
-No signing API is provided and neither DER assertions nor WebCrypto signing are
-automatically converted to native session signatures.
+The separate raw signer API validates exact native signatures; neither DER
+assertions nor WebCrypto signing are automatically converted to session signatures.
 
 Available typed hashes: `chainDomain`, `intentHash`, `transactionId`,
 `rootKeyId`, `rootConfigHash`, `policyHash`, `sessionKeyFingerprint`, `grantId`,

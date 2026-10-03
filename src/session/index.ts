@@ -11,3 +11,4 @@ export { policyCodec } from "./policy.js";
 export * from "./actions.js";
 export * from "./transaction.js";
 export * from "./hash.js";
+export * from "./signers.js";

@@ -134,6 +134,41 @@ workflow; it requires the private Chain checkout and native toolchains. It prove
 native handler/SDK contract agreement on the pin, not a running-network funded
 lifecycle, P-256 signer acceptance, browser qualification or release sign-off.
 
+## Native signature verification gate
+
+```sh
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:signatures-native
+```
+
+The [checker](../../scripts/check_signatures.mjs) rejects wrong HEAD, tracked
+source changes and disabled CGO, runs `make build-crypto`, and compiles the owned
+test-only [Go oracle](../../tests/go-signature-reference/main.go) without modifying
+Chain source. It removes only its temporary binary directory; native crypto build
+outputs remain in the pinned checkout. No databases, existing keys or signing
+watermarks are used or removed. All signing keys are predictable public test data.
+
+The gate verifies SDK-assembled transactions through production DIRECT, ROOT and
+SESSION verification. Independent Node/OpenSSL Ed25519 and Go standard Ed25519/
+P-256 signing, ROOT thresholds 1–8, high-S, wrong context/nonce/epoch/key/intent,
+signature mutations with seed `0x18a11ce`, malformed witnesses, actual WebCrypto
+double hashing and a different assertion message are covered. Explicit Ed25519
+cofactor-only signatures fail in SDK and Go; an exact-equation mixed-order key is
+accepted by both, preserving the pin's actual rule rather than adding a key ban.
+
+Run affected SDK tests after building:
+
+```sh
+node --test tests/session-signers.test.mjs
+```
+
+The [signer API](../reference/signers.md) explains external ownership and limits.
+The unit suite covers mutation/cancellation/deadline isolation and diagnostic
+redaction. The native gate proves stateless signature agreement, not grant policy/
+budget execution, funded localnet lifecycle, device qualification or independent
+security approval. It requires the private pinned checkout and is not included
+in the SDK-only manual hosted workflow. Run the canonical differential gate for
+this signing change as well as full SDK checks.
+
 ## Further feature gates
 
 - Extend unit/vector, mutation and differential cases for each added codec/hash,

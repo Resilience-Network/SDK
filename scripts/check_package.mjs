@@ -67,6 +67,7 @@ try {
   const smoke = `
 import assert from "node:assert/strict";
 import * as sdk from ${JSON.stringify(metadata.name)};
+import { createPrivateKey, createPublicKey, sign as signEd25519 } from "node:crypto";
 import * as core from ${JSON.stringify(`${metadata.name}/core`)};
 import * as session from ${JSON.stringify(`${metadata.name}/session`)};
 import * as rpc from ${JSON.stringify(`${metadata.name}/rpc`)};
@@ -92,6 +93,19 @@ const typed = new rpc.ChainRpcClient({ url: "https://rpc.example.invalid", expec
   },
 })))) });
 assert.equal((await typed.getAuthorizationFinalityStatus()).state.height, 1n);
+assert.equal(sdk.signDirectTransaction, session.signDirectTransaction);
+assert.equal(sdk.SignerError, session.SignerError);
+const privateKey = createPrivateKey({ key: Buffer.concat([Buffer.from("302e020100300506032b657004220420", "hex"), Buffer.alloc(32, 1)]), format: "der", type: "pkcs8" });
+const publicKey = new Uint8Array(createPublicKey(privateKey).export({ format: "der", type: "spki" }).subarray(-32));
+const signer = { keyScheme: 1, publicKey, async sign({ digest }) { return { keyScheme: 1, publicKey, signature: signEd25519(null, digest, privateKey) }; } };
+const signingContext = { chainId: 1337n, genesisHash: new Uint8Array(32).fill(1) };
+const intent = { version: 2, chainId: 1337n, sender: core.keccak256(publicKey).slice(12), actionType: 0, flags: 0, destination: new Uint8Array(20).fill(2), value: 1n, gasLimit: 100000n, maxFeePerGas: 1n, maxPriorityFeePerGas: 0n, sponsor: new Uint8Array(20), data: new Uint8Array() };
+const direct = await session.signDirectTransaction({ context: signingContext, intent, nonce: 3n, signer });
+assert.equal(direct.envelope.witness.length, 96);
+const rooted = await session.signRootTransaction({ context: signingContext, intent, config: { version: 1, threshold: 1, keys: [{ keyScheme: 1, publicKey }] }, authEpoch: 1n, nonce: 4n, signers: [signer] });
+assert.equal(session.decodeRootWitness(rooted.envelope.witness, 1).length, 1);
+const signedSession = await session.signSessionTransaction({ context: signingContext, intent, credential: { grantId: new Uint8Array(32).fill(1), authEpoch: 1n, policyHash: new Uint8Array(32).fill(2), nonce: 5n, keyScheme: 1, publicKey }, signer });
+assert.equal(session.transactionCodec.decode(session.transactionCodec.encode(signedSession)).envelope.mode, 2);
 console.log("Installed root/core/session/rpc imports and API smoke checks OK; exports:", Object.keys(sdk).length);
 `;
   execFileSync(process.execPath, ["--input-type=module", "-e", smoke], {
@@ -103,6 +117,7 @@ console.log("Installed root/core/session/rpc imports and API smoke checks OK; ex
     `
 import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
 import { setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
+import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential } from ${JSON.stringify(`${metadata.name}/session`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
 import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
 const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
@@ -129,6 +144,18 @@ const family: AuthorizationErrorFamily | undefined = new RpcClientError("NODE_ER
 new ChainRpcClient({ url: "https://rpc.example.invalid" });
 // @ts-expect-error Nonces and chain identity remain bigint, never number.
 new ChainRpcClient({ url: "https://rpc.example.invalid", expected: { ...expected, chainId: 1 } });
+declare const intent: import(${JSON.stringify(`${metadata.name}/session`)}).TxIntent;
+const edSigner: RawSigner<1> = { keyScheme: 1, publicKey: new Uint8Array(32), async sign(request: SignerRequest): Promise<SignerResponse> { return { keyScheme: 1, publicKey: request.publicKey, signature: new Uint8Array(64) }; } };
+const pSigner: RawSigner<2> = { ...edSigner, keyScheme: 2, publicKey: new Uint8Array(64) };
+const direct = signDirectTransaction({ context, intent, nonce: 1n, signer: edSigner });
+const root = signRootTransaction({ context, intent, nonce: 2n, authEpoch: 1n, config: { version: 1, threshold: 1, keys: [{ keyScheme: 1, publicKey: edSigner.publicKey }] }, signers: [edSigner] });
+const credential: SessionSigningCredential = { grantId: new Uint8Array(32), authEpoch: 1n, policyHash: new Uint8Array(32), nonce: 3n, keyScheme: 2, publicKey: pSigner.publicKey };
+const session = signSessionTransaction({ context, intent, credential, signer: pSigner, timeoutMs: 30000, signal: new AbortController().signal });
+const signerErrorCode: string = new SignerError("INVALID_SIGNATURE").code;
+// @ts-expect-error P-256 cannot authorize DIRECT.
+signDirectTransaction({ context, intent, nonce: 1n, signer: pSigner });
+// @ts-expect-error P-256 cannot authorize ROOT.
+signRootTransaction({ context, intent, nonce: 1n, authEpoch: 1n, config: { version: 1, threshold: 1, keys: [{ keyScheme: 1, publicKey: edSigner.publicKey }] }, signers: [pSigner] });
 `,
   );
   execFileSync(
