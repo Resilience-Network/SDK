@@ -317,3 +317,9 @@ root maintenance through the [lifecycle API](../reference/lifecycle.md). It chec
 typed finalized receipts, state/usage changes and revoked-key denial before signing.
 The broader replay/expiry/included-failure/concurrency gate is SDK #29; physical
 passkeys, independent review and publication are separate gates.
+
+Lifecycle approval deadline tests use a controlled internal clock in their isolated
+Node test context. They establish reviewer entry before advancing to expiry,
+verify no reservation/sign/send and disposed timers, and separately prove that
+pre-review whole-flow expiry yields TIMEOUT. Immediate rejection/failure tests
+use the normal flow budget; a scheduling race is not approval behavior evidence.
