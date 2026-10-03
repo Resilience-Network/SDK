@@ -6,7 +6,7 @@ originating from [Chain issue #25 (FR-013)](https://github.com/Resilience-Networ
 The implementation provides canonical transaction/session codecs and typed
 hashes checked against pinned Chain and independent vectors, plus bounded HTTP
 JSON-RPC transport, validated Chain authorization/fee/simulation reads and raw
-Ed25519/P-256 transaction signers. Grant lifecycle, submission/receipts, browser
+Ed25519/P-256 transaction signers and canonical review data. Grant lifecycle, submission/receipts, browser
 passkey APIs and release qualification
 remain planned work.
 
@@ -74,6 +74,15 @@ P-256. They validate signatures, collect exactly the ROOT threshold and guard
 async mutations/cancellation. See [the signer API](docs/reference/signers.md)
 for exact digest contracts, ownership, examples and limits. They do not establish
 current authority, coordinate nonces or submit transactions.
+
+## Available canonical review
+
+`@resilience-network/sdk/display` derives frozen permission, intent and transaction
+review fields from exact canonical bytes/hash bindings. Every supported field,
+zero cap, recipient/proof and authority boundary is explicit. See the
+[review API](docs/reference/display.md) for mapping, exact base-unit formatting
+and limits. Structure-only review does not establish live authority or signature
+validity.
 
 ## Planned capabilities
 

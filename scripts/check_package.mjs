@@ -31,6 +31,8 @@ try {
     "dist/session/index.d.ts",
     "dist/rpc/index.js",
     "dist/rpc/index.d.ts",
+    "dist/display/index.js",
+    "dist/display/index.d.ts",
     "README.md",
     "package.json",
   ]) {
@@ -71,6 +73,7 @@ import { createPrivateKey, createPublicKey, sign as signEd25519 } from "node:cry
 import * as core from ${JSON.stringify(`${metadata.name}/core`)};
 import * as session from ${JSON.stringify(`${metadata.name}/session`)};
 import * as rpc from ${JSON.stringify(`${metadata.name}/rpc`)};
+import * as display from ${JSON.stringify(`${metadata.name}/display`)};
 assert.equal(core.decodeUint64(core.encodeUint64((1n << 64n) - 1n)), (1n << 64n) - 1n);
 assert.equal(core.bytesToHex(core.keccak256(new Uint8Array())), "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470");
 assert.deepEqual(session.setSecurityReserveCodec.decode(session.setSecurityReserveCodec.encode({ version: 1, securityReserve: 1n << 200n })), { version: 1, securityReserve: 1n << 200n });
@@ -106,7 +109,13 @@ const rooted = await session.signRootTransaction({ context: signingContext, inte
 assert.equal(session.decodeRootWitness(rooted.envelope.witness, 1).length, 1);
 const signedSession = await session.signSessionTransaction({ context: signingContext, intent, credential: { grantId: new Uint8Array(32).fill(1), authEpoch: 1n, policyHash: new Uint8Array(32).fill(2), nonce: 5n, keyScheme: 1, publicKey }, signer });
 assert.equal(session.transactionCodec.decode(session.transactionCodec.encode(signedSession)).envelope.mode, 2);
-console.log("Installed root/core/session/rpc imports and API smoke checks OK; exports:", Object.keys(sdk).length);
+assert.equal(display.reviewTransaction, sdk.reviewTransaction);
+assert.equal(display.formatBaseUnits(1000000000000000001n, 18), "1.000000000000000001");
+const review = display.reviewTransaction(signingContext, session.transactionCodec.encode(direct));
+assert.equal(review.binding.hash, core.bytesToHex(session.transactionId(signingContext, direct.intent, direct.envelope)));
+assert.equal(review.fields.find(field => field.path === "envelope.nonce").value, "3");
+assert(Object.isFrozen(review.fields));
+console.log("Installed root/core/session/rpc/display imports and API smoke checks OK; exports:", Object.keys(sdk).length);
 `;
   execFileSync(process.execPath, ["--input-type=module", "-e", smoke], {
     cwd: temporary,
@@ -118,6 +127,7 @@ console.log("Installed root/core/session/rpc imports and API smoke checks OK; ex
 import { encodeUint256 } from ${JSON.stringify(`${metadata.name}/core`)};
 import { setSecurityReserveCodec, type SetSecurityReserve, type ChainContext } from ${JSON.stringify(`${metadata.name}/session`)};
 import { signDirectTransaction, signRootTransaction, signSessionTransaction, SignerError, type RawSigner, type SignerRequest, type SignerResponse, type SessionSigningCredential } from ${JSON.stringify(`${metadata.name}/session`)};
+import { reviewIntent, reviewPolicy, reviewTransaction, formatBaseUnits, type CanonicalReview, type ReviewBinding, type ReviewField } from ${JSON.stringify(`${metadata.name}/display`)};
 import { chainDomain } from ${JSON.stringify(metadata.name)};
 import { ChainRpcClient, AUTHORIZATION_CAPABILITY, RpcContractError, HttpRpcClient, RpcClientError, type RpcCall, type RpcClock, type RpcOutcome, type AuthorizationSnapshot, type ExpectedChainIdentity, type AuthorizationErrorFamily } from ${JSON.stringify(`${metadata.name}/rpc`)};
 const reserve: SetSecurityReserve = { version: 1, securityReserve: 1n << 200n };
@@ -151,6 +161,16 @@ const direct = signDirectTransaction({ context, intent, nonce: 1n, signer: edSig
 const root = signRootTransaction({ context, intent, nonce: 2n, authEpoch: 1n, config: { version: 1, threshold: 1, keys: [{ keyScheme: 1, publicKey: edSigner.publicKey }] }, signers: [edSigner] });
 const credential: SessionSigningCredential = { grantId: new Uint8Array(32), authEpoch: 1n, policyHash: new Uint8Array(32), nonce: 3n, keyScheme: 2, publicKey: pSigner.publicKey };
 const session = signSessionTransaction({ context, intent, credential, signer: pSigner, timeoutMs: 30000, signal: new AbortController().signal });
+const reviewed: CanonicalReview = reviewIntent(context, new Uint8Array());
+const reviewBinding: ReviewBinding = reviewed.binding;
+const reviewFields: readonly ReviewField[] = reviewed.fields;
+formatBaseUnits(1n, 18);
+// @ts-expect-error Review values cannot be changed.
+reviewed.fields[0].value = "spoof";
+// @ts-expect-error Base units must be bigint.
+formatBaseUnits(1);
+// @ts-expect-error Application summaries cannot replace canonical bytes.
+reviewIntent(context, intent);
 const signerErrorCode: string = new SignerError("INVALID_SIGNATURE").code;
 // @ts-expect-error P-256 cannot authorize DIRECT.
 signDirectTransaction({ context, intent, nonce: 1n, signer: pSigner });
@@ -176,7 +196,7 @@ signRootTransaction({ context, intent, nonce: 1n, authEpoch: 1n, config: { versi
     },
   );
   console.log(
-    "Package archive and downstream root/core/session/rpc TypeScript resolution OK.",
+    "Package archive and downstream root/core/session/rpc/display TypeScript resolution OK.",
   );
 } finally {
   await rm(temporary, { recursive: true, force: true });

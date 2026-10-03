@@ -201,13 +201,15 @@ Source modules and export boundaries:
   currently implements bounded HTTP envelope transport.
 - `src/webauthn/`: browser ceremonies, credential serialization and supported
   ES256 response parsing; planned entry `@resilience-network/sdk/webauthn`.
-- `src/display/`: structured review data derived from decoded canonical bytes.
+- `src/display/`: implemented frozen canonical review fields and exact formatting;
+  entry `@resilience-network/sdk/display`.
 - `tests/`: unit/adversarial, versioned vectors, Go differential and browser suites.
 - `examples/`: a basic session lifecycle and a separate passkey ceremony example.
 
 Core/session codecs, hashes, typed authorization RPC reads, HTTP transport and
-[raw signer contracts](docs/reference/signers.md) are available. Grant lifecycle,
-nonce coordination, reconciliation, display and WebAuthn remain planned. Do not
+[raw signer contracts](docs/reference/signers.md) and
+[canonical review](docs/reference/display.md) are available. Grant lifecycle,
+nonce coordination, reconciliation, review-to-signing binding and WebAuthn remain planned. Do not
 add placeholder functions that claim support.
 
 Use ESM with emitted declarations, strict TypeScript, `Uint8Array` for binary
