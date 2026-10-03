@@ -14,6 +14,136 @@ defines completion and owns the actionable hierarchy; the
 The [source baseline](docs/reference/protocol-sources.md) pins the Chain revision.
 This initial scope adds no chain state, gas, activation, manifest or genesis rules.
 
+## 0. Ordered completion goals
+
+The owner authorized sustained implementation and self-review/merge of completed
+tasks on 2026-10-03 in chat `01a0fc3b-4334-7943-a9bc-3ba63342124b`.
+The execution target is a complete, robustly tested local release candidate for
+the supported scope below. External qualifications remain separate unfinished
+gates; this target does not redefine a fully published, independently approved v1.
+GitHub retains live status and acceptance; these goals define order and exits.
+
+### G0 — Reconcile delivery and establish the execution loop
+
+Tasks: [execution plan #47](https://github.com/Resilience-Network/sdk/issues/47),
+merged RPC/signature deliveries #15/#18/#45, and roadmap #13. Verify merged commit
+and evidence, review the actual source/diff, close satisfied tasks with summaries,
+then work from a fresh topic branch based on current main. Preserve historical
+test evidence as revision-bound; rerun applicable checks for changed code.
+
+Exit: reviewed plan, complete task/dependency mapping and explicit external gates.
+Every later task follows claim → implement → focused tests → all applicable checks
+→ PR → documented self-review → merge matching the verified head → acceptance
+summary/closure → refresh prerequisites. A review finding returns to implementation.
+Owner-authorized self-review is not independent security review. Never bypass
+required branch checks or report absent/manual hosted runs as passing.
+
+### G1 — Canonical review and signing binding
+
+Tasks: #21 (structured permission/transaction review) then #22 (adversarial review
+and signing binding). Consume canonical bytes rather than application summaries.
+Map every supported network/account/action/authority/key/height/value/fee/reserve/
+deposit/attempt/bucket/recipient/proof field. Show zero/unrestricted/disabled
+semantics explicitly. Untrusted labels and time estimates cannot alter authority.
+
+Exit: framework-independent immutable review data tied to exact canonical bytes
+and hashes; golden field coverage; malformed/unsupported/precision/Unicode cases;
+adversarial mutation and asynchronous signing tests. Add installed consumer and
+export/type checks. These tasks do not infer live authority from display alone.
+
+### G2 — Receipts, submission and stateful session safety
+
+Tasks in dependency order:
+
+1. Resolve unassigned [Chain#375](https://github.com/Resilience-Network/Chain/issues/375)
+   through Chain's own claim/branch/full native CI/review/merge workflow. This is
+   executable upstream work, not an assumed external-party waiver. Then #40
+   reviews the entire protocol diff and refreshes the immutable SDK baseline,
+   native fixtures, provenance and applicable vectors; no omitted-result shim.
+2. #16 implements bounded canonical receipt/event/counter/decision models and
+   hashes, distinguishing inclusion, success and authority/fee/nonce consumption.
+3. #17 implements explicit one-attempt submission, exact transaction-ID binding,
+   bounded finalized receipt tracking and ambiguous-send reconciliation. Null
+   historical lookup never proves non-inclusion or authorizes nonce reuse.
+4. #19 implements explicit activation, create/use/replace/revoke/revoke-all,
+   rotation/reserve/cleanup construction and bounded authority checks for the
+   initial supported transfer-grant scope.
+5. #20 coordinates account/root/grant nonces and freezes asynchronous authority
+   snapshots. Define serialization, conflicts, consumed failure, uncertain-send
+   retention and caller-injected coordination/storage boundaries.
+
+Exit: independent canonical/native receipt fixtures and hashes; malformed/large/
+wrong-context/error/timeout cases; exact deadlines and cancellation; concurrency
+and uncertain submission stories; no automatic resign/replay, nonce rollback,
+secret transport or safety-state deletion. Run SDK checks, canonical/signature/
+RPC native gates as affected. Complete Chain source CI for any upstream change.
+
+### G3 — Separate WebAuthn ceremonies and native key authority
+
+Tasks: #23 (authoritative RP contract) and #24 (explicit key/authority model),
+then #26 (bounded COSE/CBOR/authenticator/DER parsing), #25 (ES256 registration/
+assertion helpers), and #27 (verifier integration, replay and negative domains).
+The locally implementable reference model keeps native keys externally owned and
+uses WebAuthn for separately verified off-chain authentication. It introduces no
+custody, key persistence, passkey-derived root or on-chain assertion extension.
+Application RP/challenge/account policy is explicit and injected, not inferred.
+
+Exit: reviewed contracts/decision, exact bounded bytes, secure-context/API checks,
+abort behavior, authoritative origin/RP/type/challenge/UP/UV/signature verification,
+single-use challenge semantics and adversarial parser/replay/context tests.
+Registration attestation trust, counters and synced credentials have explicit
+limits. Parsing is never labeled verification; assertions cannot sign SessionDigest.
+
+### G4 — Prove native and browser flows end to end
+
+Tasks: #28 (owned disposable pinned-Chain harness), #29 (funded onboarding and
+finalized lifecycle for both schemes), #30 (actual browser imports/virtual
+authenticators), #32 (accurate combined reference example) and #33 (executable
+integration/troubleshooting guides). Harness work may start earlier to support
+G2; complete acceptance after its dependent APIs are available.
+
+Exit: actual DIRECT activation → ROOT grant → raw session transfer → finalized
+revocation for Ed25519 and P-256; wrong identity/nonce/grant/epoch, expiry/replay,
+included action failure/consumption, concurrency and ambiguous-send outcomes.
+Retain reproducible revision/toolchain/commands/owned evidence and verify secrets
+are absent. Actual browser-engine tests cover imports, ceremony behavior,
+cancellation and verifier negatives. Examples show separate passkey and native
+authority. Cleanup owns only disposable paths/processes and preserves all existing
+wallet databases, keys, validator locks and signing watermarks.
+
+### G5 — Qualify the local release candidate
+
+Tasks: #36 (public API/platform/package/performance budgets) and #37 (reproducible
+qualification/release checks), plus all implemented guides and support/version/
+protocol compatibility policy. Build an installable candidate, dependency/license
+inventory, export/declaration/browser bundle checks and executable final verifier.
+
+Exit: all locally applicable unit/vector/mutation/native/concurrency/localnet/
+browser/installed-consumer suites pass on one final candidate without required
+skips; no unresolved implementation High/Critical findings; documented supported
+matrix and measured budgets; reproducible package and complete evidence inventory.
+Review final source and clean consumers. An implementer's review does not close
+independent security sign-off. Keep registry publishing disabled until its gates.
+
+### External gates retained outside the autonomous implementation target
+
+- #31: physical passkey/biometric device evidence requires the corresponding
+  hardware/operator. Virtual authenticator success does not count as device proof.
+- #34: independent security review/sign-off requires an independent reviewer.
+- #35: license and npm registry ownership require owner decisions/credentials;
+  prepare the dependency inventory and decision material without inventing approval.
+- #38: actual registry publication/tag/distribution and downstream registry install
+  require satisfied owner/license/security/credential gates. Local package smoke
+  checks do not count as a published release.
+- Chain#25's original direct-passkey-native-signature wording remains separately
+  accounted for under the reviewed authority boundary; no SDK implementation can
+  satisfy it by DER conversion or silently adding a Chain extension.
+
+Milestone/parent issues remain open when these gates remain. Continue independent
+implementation when an external gate is unavailable. Report completion of the
+local target and outstanding external qualifications distinctly; never inflate a
+numeric rating or close the original full-release goal by ignoring its requirements.
+
 ## 1. Product objective and boundaries
 
 Enable a wallet or dApp developer to construct exact Transaction V2 intents,
