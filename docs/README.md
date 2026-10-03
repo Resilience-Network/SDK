@@ -3,7 +3,8 @@
 This index separates intended SDK capabilities from the currently available
 implemented canonical codecs/hashes, HTTP transport, typed Chain reads
 and raw transaction signer adapters, canonical review data and account/session
-lifecycle. Browser APIs remain planned.
+lifecycle and bounded WebAuthn parsers/browser helpers. Actual engine and RP
+verification qualification remain separate gates.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
 - [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
@@ -32,6 +33,8 @@ lifecycle. Browser APIs remain planned.
   semantics, canonical witnesses, mutation guards and bounded cancellation.
 - [Canonical review API](reference/display.md): frozen bytes/hash-bound policy,
   intent and transaction fields with exact amounts and authority semantics.
+- [WebAuthn browser API](reference/webauthn-browser.md): explicit account-bound
+  registration/assertion collection and bounded immutable transport responses.
 - [WebAuthn representation API](reference/webauthn-parsers.md): bounded ES256
   COSE/authenticator/client-data/none-attestation/DER parsing; no verification claim.
 - [Passkey authorization decision](decisions/0001-passkey-authorization-boundary.md).

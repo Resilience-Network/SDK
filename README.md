@@ -11,8 +11,8 @@ Single-send submission and bounded same-ID reconciliation are available.
 Explicit funded DIRECT activation, grant controls and both native session schemes
 are exposed through the [lifecycle API](docs/reference/lifecycle.md) with canonical
 approval and coordinated nonces. Bounded WebAuthn representation parsers are
-available; browser ceremony helpers, authoritative verifier conformance and
-release qualification remain planned work.
+available alongside explicit browser ceremony collection. Authoritative verifier
+conformance, actual engine qualification and release qualification remain planned work.
 
 ## Development
 
@@ -132,3 +132,7 @@ validated authority reads and durable cross-tab/process adapters.
 Run the [disposable native session example](docs/guides/session-example.md) with
 `RSC_CHAIN_DIR=/absolute/pinned/chain npm run example:session`.
 Native adversity checks are separate: `npm run test:session-e2e`.
+
+Browser helpers are documented in the [browser API](docs/reference/webauthn-browser.md).
+They collect public responses for an application-owned verifier and never replace
+external native root/session signers.
