@@ -298,7 +298,9 @@ identity through production Go initialization, and starts four explicitly peered
 loopback validators in a new owned temporary directory. It requires finalized
 progress and hash/state agreement, shielded read APIs, genesis funding and actual
 SDK root/fee/absent-receipt probes. `npm run test:localnet-failures` separately
-qualifies setup/ready-node failure, readiness deadline, ignored-callback timeout and actual SIGINT/SIGTERM
+qualifies setup/ready-node failure, readiness deadline, ignored-callback timeout,
+actual SIGINT/SIGTERM and an injected missing-log capture. It checks the explicit
+log manifest, copied byte sizes/hashes and generated-key redaction,
 with restricted failed-run retention, closed owned processes and preserved external
 safety sentinel. No native gate runs implicitly inside unit-only `npm run check`.
 
