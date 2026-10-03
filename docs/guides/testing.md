@@ -351,3 +351,13 @@ Node test context. They establish reviewer entry before advancing to expiry,
 verify no reservation/sign/send and disposed timers, and separately prove that
 pre-review whole-flow expiry yields TIMEOUT. Immediate rejection/failure tests
 use the normal flow budget; a scheduling race is not approval behavior evidence.
+
+## WebAuthn contract inventory
+
+[ADR-0002](../decisions/0002-authoritative-webauthn-rp.md) and its
+[normative cases](../../tests/webauthn/rp-contract-cases.json) define future real
+verifier/storage coverage for SDK #27. The inventory contains scenario IDs,
+mutations and required outcomes, not signed fixtures or executed test results.
+It does not increase the SDK passing-test count. Implemented parser/browser/
+verifier suites must supply actual bytes, cryptographic checks and store races;
+planned cases cannot substitute for those gates.

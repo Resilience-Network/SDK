@@ -1,0 +1,478 @@
+{
+  "version": 1,
+  "kind": "normative-design-inventory-not-executed-verification",
+  "decision": "ADR-0002",
+  "implementationIssue": 27,
+  "profile": "account-bound-es256-same-origin-uv-required-none-attestation",
+  "cases": [
+    {
+      "id": "registration-wrong-type",
+      "ceremony": "registration",
+      "mutation": "wrong-type",
+      "expected": "reject",
+      "requirement": "ceremony"
+    },
+    {
+      "id": "registration-wrong-challenge",
+      "ceremony": "registration",
+      "mutation": "wrong-challenge",
+      "expected": "reject",
+      "requirement": "challenge"
+    },
+    {
+      "id": "registration-wrong-origin",
+      "ceremony": "registration",
+      "mutation": "wrong-origin",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "registration-origin-suffix-confusion",
+      "ceremony": "registration",
+      "mutation": "origin-suffix-confusion",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "registration-wrong-rp-id-hash",
+      "ceremony": "registration",
+      "mutation": "wrong-rp-id-hash",
+      "expected": "reject",
+      "requirement": "rp"
+    },
+    {
+      "id": "registration-missing-up",
+      "ceremony": "registration",
+      "mutation": "missing-up",
+      "expected": "reject",
+      "requirement": "flags"
+    },
+    {
+      "id": "registration-missing-uv",
+      "ceremony": "registration",
+      "mutation": "missing-uv",
+      "expected": "reject",
+      "requirement": "flags"
+    },
+    {
+      "id": "registration-cross-origin",
+      "ceremony": "registration",
+      "mutation": "cross-origin",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "registration-top-origin",
+      "ceremony": "registration",
+      "mutation": "top-origin",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "registration-malformed-client-json",
+      "ceremony": "registration",
+      "mutation": "malformed-client-json",
+      "expected": "reject",
+      "requirement": "parser"
+    },
+    {
+      "id": "registration-duplicate-client-json-key",
+      "ceremony": "registration",
+      "mutation": "duplicate-client-json-key",
+      "expected": "reject",
+      "requirement": "parser"
+    },
+    {
+      "id": "registration-oversized-response",
+      "ceremony": "registration",
+      "mutation": "oversized-response",
+      "expected": "reject",
+      "requirement": "bounds"
+    },
+    {
+      "id": "registration-expired-at-boundary",
+      "ceremony": "registration",
+      "mutation": "expired-at-boundary",
+      "expected": "reject",
+      "requirement": "expiry"
+    },
+    {
+      "id": "registration-clock-before-issuance",
+      "ceremony": "registration",
+      "mutation": "clock-before-issuance",
+      "expected": "reject",
+      "requirement": "expiry"
+    },
+    {
+      "id": "registration-wrong-session-binding",
+      "ceremony": "registration",
+      "mutation": "wrong-session-binding",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "registration-wrong-account-binding",
+      "ceremony": "registration",
+      "mutation": "wrong-account-binding",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "registration-replay-consumed-challenge",
+      "ceremony": "registration",
+      "mutation": "replay-consumed-challenge",
+      "expected": "reject",
+      "requirement": "replay"
+    },
+    {
+      "id": "registration-storage-take-failure",
+      "ceremony": "registration",
+      "mutation": "storage-take-failure",
+      "expected": "reject",
+      "requirement": "storage"
+    },
+    {
+      "id": "registration-commit-failure-after-take",
+      "ceremony": "registration",
+      "mutation": "commit-failure-after-take",
+      "expected": "reject",
+      "requirement": "storage"
+    },
+    {
+      "id": "authentication-wrong-type",
+      "ceremony": "authentication",
+      "mutation": "wrong-type",
+      "expected": "reject",
+      "requirement": "ceremony"
+    },
+    {
+      "id": "authentication-wrong-challenge",
+      "ceremony": "authentication",
+      "mutation": "wrong-challenge",
+      "expected": "reject",
+      "requirement": "challenge"
+    },
+    {
+      "id": "authentication-wrong-origin",
+      "ceremony": "authentication",
+      "mutation": "wrong-origin",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "authentication-origin-suffix-confusion",
+      "ceremony": "authentication",
+      "mutation": "origin-suffix-confusion",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "authentication-wrong-rp-id-hash",
+      "ceremony": "authentication",
+      "mutation": "wrong-rp-id-hash",
+      "expected": "reject",
+      "requirement": "rp"
+    },
+    {
+      "id": "authentication-missing-up",
+      "ceremony": "authentication",
+      "mutation": "missing-up",
+      "expected": "reject",
+      "requirement": "flags"
+    },
+    {
+      "id": "authentication-missing-uv",
+      "ceremony": "authentication",
+      "mutation": "missing-uv",
+      "expected": "reject",
+      "requirement": "flags"
+    },
+    {
+      "id": "authentication-cross-origin",
+      "ceremony": "authentication",
+      "mutation": "cross-origin",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "authentication-top-origin",
+      "ceremony": "authentication",
+      "mutation": "top-origin",
+      "expected": "reject",
+      "requirement": "origin"
+    },
+    {
+      "id": "authentication-malformed-client-json",
+      "ceremony": "authentication",
+      "mutation": "malformed-client-json",
+      "expected": "reject",
+      "requirement": "parser"
+    },
+    {
+      "id": "authentication-duplicate-client-json-key",
+      "ceremony": "authentication",
+      "mutation": "duplicate-client-json-key",
+      "expected": "reject",
+      "requirement": "parser"
+    },
+    {
+      "id": "authentication-oversized-response",
+      "ceremony": "authentication",
+      "mutation": "oversized-response",
+      "expected": "reject",
+      "requirement": "bounds"
+    },
+    {
+      "id": "authentication-expired-at-boundary",
+      "ceremony": "authentication",
+      "mutation": "expired-at-boundary",
+      "expected": "reject",
+      "requirement": "expiry"
+    },
+    {
+      "id": "authentication-clock-before-issuance",
+      "ceremony": "authentication",
+      "mutation": "clock-before-issuance",
+      "expected": "reject",
+      "requirement": "expiry"
+    },
+    {
+      "id": "authentication-wrong-session-binding",
+      "ceremony": "authentication",
+      "mutation": "wrong-session-binding",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-wrong-account-binding",
+      "ceremony": "authentication",
+      "mutation": "wrong-account-binding",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-replay-consumed-challenge",
+      "ceremony": "authentication",
+      "mutation": "replay-consumed-challenge",
+      "expected": "reject",
+      "requirement": "replay"
+    },
+    {
+      "id": "authentication-storage-take-failure",
+      "ceremony": "authentication",
+      "mutation": "storage-take-failure",
+      "expected": "reject",
+      "requirement": "storage"
+    },
+    {
+      "id": "authentication-commit-failure-after-take",
+      "ceremony": "authentication",
+      "mutation": "commit-failure-after-take",
+      "expected": "reject",
+      "requirement": "storage"
+    },
+    {
+      "id": "registration-unsupported-algorithm",
+      "ceremony": "registration",
+      "mutation": "unsupported-algorithm",
+      "expected": "reject",
+      "requirement": "algorithm"
+    },
+    {
+      "id": "registration-invalid-p256-point",
+      "ceremony": "registration",
+      "mutation": "invalid-p256-point",
+      "expected": "reject",
+      "requirement": "algorithm"
+    },
+    {
+      "id": "registration-non-none-attestation",
+      "ceremony": "registration",
+      "mutation": "non-none-attestation",
+      "expected": "reject",
+      "requirement": "attestation"
+    },
+    {
+      "id": "registration-nonempty-none-statement",
+      "ceremony": "registration",
+      "mutation": "nonempty-none-statement",
+      "expected": "reject",
+      "requirement": "attestation"
+    },
+    {
+      "id": "registration-missing-at",
+      "ceremony": "registration",
+      "mutation": "missing-at",
+      "expected": "reject",
+      "requirement": "flags"
+    },
+    {
+      "id": "registration-duplicate-credential-id",
+      "ceremony": "registration",
+      "mutation": "duplicate-credential-id",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-tampered-signature",
+      "ceremony": "authentication",
+      "mutation": "tampered-signature",
+      "expected": "reject",
+      "requirement": "signature"
+    },
+    {
+      "id": "authentication-tampered-original-client-bytes",
+      "ceremony": "authentication",
+      "mutation": "tampered-original-client-bytes",
+      "expected": "reject",
+      "requirement": "signature"
+    },
+    {
+      "id": "authentication-unknown-credential",
+      "ceremony": "authentication",
+      "mutation": "unknown-credential",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-revoked-credential",
+      "ceremony": "authentication",
+      "mutation": "revoked-credential",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-wrong-user-handle",
+      "ceremony": "authentication",
+      "mutation": "wrong-user-handle",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-credential-id-raw-id-mismatch",
+      "ceremony": "authentication",
+      "mutation": "credential-id-raw-id-mismatch",
+      "expected": "reject",
+      "requirement": "binding"
+    },
+    {
+      "id": "authentication-unexpected-at",
+      "ceremony": "authentication",
+      "mutation": "unexpected-at",
+      "expected": "reject",
+      "requirement": "flags"
+    },
+    {
+      "id": "authentication-unexpected-ed",
+      "ceremony": "authentication",
+      "mutation": "unexpected-ed",
+      "expected": "reject",
+      "requirement": "extensions"
+    },
+    {
+      "id": "authentication-backup-state-without-eligibility",
+      "ceremony": "authentication",
+      "mutation": "backup-state-without-eligibility",
+      "expected": "reject",
+      "requirement": "backup"
+    },
+    {
+      "id": "authentication-changed-backup-eligibility",
+      "ceremony": "authentication",
+      "mutation": "changed-backup-eligibility",
+      "expected": "reject",
+      "requirement": "backup"
+    },
+    {
+      "id": "authentication-single-device-counter-regression",
+      "ceremony": "authentication",
+      "mutation": "single-device-counter-regression",
+      "expected": "reject",
+      "requirement": "counter"
+    },
+    {
+      "id": "authentication-credential-version-conflict",
+      "ceremony": "authentication",
+      "mutation": "credential-version-conflict",
+      "expected": "reject",
+      "requirement": "storage"
+    },
+    {
+      "id": "authentication-synced-counter-nonincreasing",
+      "ceremony": "authentication",
+      "mutation": "synced-counter-nonincreasing",
+      "expected": "accept-if-all-other-checks-pass",
+      "requirement": "counter"
+    },
+    {
+      "id": "authentication-synced-backup-state-change",
+      "ceremony": "authentication",
+      "mutation": "synced-backup-state-change",
+      "expected": "accept-if-all-other-checks-pass",
+      "requirement": "backup"
+    },
+    {
+      "id": "authentication-zero-counter-single-device",
+      "ceremony": "authentication",
+      "mutation": "zero-counter-single-device",
+      "expected": "accept-if-all-other-checks-pass",
+      "requirement": "counter"
+    },
+    {
+      "id": "authentication-null-handle-account-bound",
+      "ceremony": "authentication",
+      "mutation": "null-handle-account-bound",
+      "expected": "accept-if-all-other-checks-pass",
+      "requirement": "binding"
+    },
+    {
+      "id": "concurrent-challenge-take",
+      "ceremony": "authentication",
+      "mutation": "two-simultaneous-valid-consumers",
+      "expected": "at-most-one-take-and-success",
+      "requirement": "replay"
+    },
+    {
+      "id": "invalid-response-burns-challenge",
+      "ceremony": "authentication",
+      "mutation": "invalid-then-valid-same-request",
+      "expected": "both-reject-challenge-stays-terminal",
+      "requirement": "replay"
+    },
+    {
+      "id": "lost-result-does-not-revive",
+      "ceremony": "authentication",
+      "mutation": "valid-commit-response-lost-then-retry",
+      "expected": "retry-rejects-no-second-success",
+      "requirement": "replay"
+    },
+    {
+      "id": "credential-revoked-during-verification",
+      "ceremony": "authentication",
+      "mutation": "revoke-after-read-before-commit",
+      "expected": "reject-no-session",
+      "requirement": "storage"
+    },
+    {
+      "id": "registration-none-awaits-proof",
+      "ceremony": "registration",
+      "mutation": "valid-none-registration-without-fresh-assertion",
+      "expected": "awaiting-proof-no-new-authenticated-session",
+      "requirement": "attestation"
+    },
+    {
+      "id": "authentication-expiry-during-verification",
+      "ceremony": "authentication",
+      "mutation": "expiry-during-verification",
+      "expected": "reject-no-credential-update-or-session",
+      "requirement": "expiry"
+    },
+    {
+      "id": "authentication-late-verifier-completion-after-cancel",
+      "ceremony": "authentication",
+      "mutation": "late-verifier-completion-after-cancel",
+      "expected": "reject-no-credential-update-or-session",
+      "requirement": "expiry"
+    }
+  ]
+}

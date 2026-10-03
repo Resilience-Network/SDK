@@ -33,6 +33,9 @@ lifecycle. Browser APIs remain planned.
 - [Canonical review API](reference/display.md): frozen bytes/hash-bound policy,
   intent and transaction fields with exact amounts and authority semantics.
 - [Passkey authorization decision](decisions/0001-passkey-authorization-boundary.md).
+- [Authoritative relying-party contract](decisions/0002-authoritative-webauthn-rp.md):
+  selected WebAuthn implementation profile, challenge/store ownership and future
+  verifier conformance; this decision is not a shipped server/browser API.
 - [Security boundaries](security/threat-model.md).
 - [Documentation policy](documentation-policy.md).
 - [Contribution workflow](../CONTRIBUTING.md) and [agent instructions](../AGENTS.md).
