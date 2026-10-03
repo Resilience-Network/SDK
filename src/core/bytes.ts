@@ -44,27 +44,58 @@ export function checkedNumber(value: number, maximum: number): number {
   return value;
 }
 
+const typedArrayPrototype = Object.getPrototypeOf(Uint8Array.prototype) as object,
+  intrinsicLength = Object.getOwnPropertyDescriptor(
+    typedArrayPrototype,
+    "length",
+  )!.get!,
+  intrinsicBuffer = Object.getOwnPropertyDescriptor(
+    typedArrayPrototype,
+    "buffer",
+  )!.get!,
+  intrinsicBufferLength = Object.getOwnPropertyDescriptor(
+    ArrayBuffer.prototype,
+    "byteLength",
+  )!.get!;
+
 export function checkedBytes(value: Uint8Array, maximum: number): Uint8Array {
   requireCondition(value instanceof Uint8Array, "Expected Uint8Array");
-  requireCondition(
-    value.length <= maximum,
-    "Byte length exceeds limit",
-    "LIMIT_EXCEEDED",
-  );
-  return value;
+  checkedNumber(maximum, MAX_TRANSACTION_BYTES);
+  try {
+    const length = intrinsicLength.call(value) as number;
+    intrinsicBufferLength.call(intrinsicBuffer.call(value));
+    requireCondition(length <= maximum, "Byte length exceeds limit", "LIMIT_EXCEEDED");
+    // Some callers use this as a guard then inspect the original view. Reject
+    // shadowed layout properties without invoking their getters in that case.
+    for (let prototype: object | null = value; prototype !== typedArrayPrototype;) {
+      requireCondition(prototype !== null, "Invalid byte view");
+      for (const field of ["length", "buffer", "byteLength", "byteOffset"])
+        requireCondition(
+          !Object.getOwnPropertyDescriptor(prototype, field),
+          "Shadowed byte layout",
+        );
+      prototype = Object.getPrototypeOf(prototype) as object | null;
+    }
+    return new Uint8Array(value);
+  } catch (error) {
+    if (error instanceof CodecError) throw error;
+    throw new CodecError("MALFORMED", "Invalid byte view");
+  }
 }
 
 export function fixedBytes(value: Uint8Array, size: number): Uint8Array {
-  checkedBytes(value, size);
-  requireCondition(value.length === size, "Incorrect fixed byte width");
-  return value;
+  const bytes = checkedBytes(value, size);
+  requireCondition(bytes.length === size, "Incorrect fixed byte width");
+  return bytes;
 }
 
 export function isZero(value: Uint8Array): boolean {
-  return value.every((byte) => byte === 0);
+  return checkedBytes(value, MAX_TRANSACTION_BYTES).every((byte) => byte === 0);
 }
 
 export function compareBytes(a: Uint8Array, b: Uint8Array): number {
+  a = checkedBytes(a, MAX_TRANSACTION_BYTES);
+  b = checkedBytes(b, MAX_TRANSACTION_BYTES);
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     if (a[i] !== b[i]) return a[i]! - b[i]!;
   }
@@ -72,7 +103,7 @@ export function compareBytes(a: Uint8Array, b: Uint8Array): number {
 }
 
 export function bytesToHex(value: Uint8Array): `0x${string}` {
-  checkedBytes(value, MAX_TRANSACTION_BYTES);
+  value = checkedBytes(value, MAX_TRANSACTION_BYTES);
   return `0x${Array.from(value, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
 }
 
@@ -123,8 +154,10 @@ export class Writer {
   private readonly parts: Uint8Array[] = [];
   private length = 0;
   constructor(private readonly maximum = MAX_TRANSACTION_BYTES) {}
-  fixed(value: Uint8Array, size = value.length): void {
-    fixedBytes(value, size);
+  fixed(value: Uint8Array, size?: number): void {
+    value = checkedBytes(value, this.maximum);
+    size ??= value.length;
+    value = fixedBytes(value, size);
     requireCondition(
       this.length + size <= this.maximum,
       "Encoded bytes exceed limit",
@@ -150,7 +183,7 @@ export class Writer {
     this.number(value ? 1 : 0, 8);
   }
   bytes(value: Uint8Array, maximum: number): void {
-    checkedBytes(value, maximum);
+    value = checkedBytes(value, maximum);
     this.number(value.length, 32);
     this.fixed(value);
   }
@@ -167,7 +200,10 @@ export class Writer {
 
 export class Reader {
   position = 0;
-  constructor(private readonly bytes: Uint8Array) {}
+  private readonly bytes: Uint8Array;
+  constructor(bytes: Uint8Array) {
+    this.bytes = checkedBytes(bytes, MAX_TRANSACTION_BYTES);
+  }
   fixed(size: number): Uint8Array {
     requireCondition(
       size <= this.bytes.length - this.position,
