@@ -31,7 +31,7 @@ const contractFailure =
 const fixture = (method, scenario = "ed25519") =>
   findFixture(scenario, `rsc_${method}`);
 
-test("35 native production-handler fixtures cover all typed methods and both grant schemes", async () => {
+test("41 native production-handler fixtures cover all typed methods and both grant schemes", async () => {
   const pin = JSON.parse(
     readFileSync(new URL("../protocol-source.json", import.meta.url), "utf8"),
   );
@@ -68,7 +68,7 @@ test("35 native production-handler fixtures cover all typed methods and both gra
     assert.equal(h.calls.length, 1);
     assert.equal(h.clock.tasks.size, 0);
   }
-  assert.equal(methods.size, 12);
+  assert.equal(methods.size, 14);
 });
 
 function fieldPaths(value, path = []) {

@@ -2,6 +2,7 @@ import { checkedUint, compareBytes, isZero } from "../core/bytes.js";
 import { policyCodec, transactionCodec, transactionId } from "../session/index.js";
 import { AUTHORIZATION_CAPABILITY, RpcContractError } from "./contracts.js";
 import type {
+  AccountAuthorizationSnapshot,
   AuthorizationFinalityStatus,
   AuthorizationGasEstimate,
   AuthorizationSnapshot,
@@ -12,6 +13,7 @@ import type {
   FeeHistory,
   FeeHistoryRequest,
   FeeSuggestions,
+  FundedGrantSnapshot,
   FinalizedState,
   PolicyPreview,
   RootAuthorityObservation,
@@ -618,6 +620,33 @@ export class ChainRpcClient {
       };
     });
   }
+  async getAccountAuthorizationSnapshot(
+    owner: Uint8Array,
+    options: RpcRequestOptions = {},
+  ): Promise<AccountAuthorizationSnapshot> {
+    const address = inputGuard(() => fixedInput(owner, 20, true));
+    const read = await this.#read(
+      [
+        { method: "rsc_getRootAuthority", params: [bytesToHex(address)] },
+        { method: "rsc_getTransactionCount", params: [bytesToHex(address), "latest"] },
+        { method: "rsc_getBalance", params: [bytesToHex(address), "latest"] },
+      ],
+      [0],
+      options,
+      true,
+      (r) => {
+        rootObservation(r.results[0], address);
+        quantity(r.results[1]);
+        quantity(r.results[2], 256);
+      },
+    );
+    return resultGuard(() => ({
+      identity: read.identity,
+      root: rootObservation(read.results[0], address),
+      accountNonce: quantity(read.results[1]),
+      balance: quantity(read.results[2], 256),
+    }));
+  }
   async getRootAuthority(
     owner: Uint8Array,
     options: RpcRequestOptions = {},
@@ -633,6 +662,54 @@ export class ChainRpcClient {
       },
     );
     return resultGuard(() => rootObservation(read.results[0], address));
+  }
+  async getFundedGrantSnapshot(
+    owner: Uint8Array,
+    grantId: Uint8Array,
+    options: RpcRequestOptions = {},
+  ): Promise<FundedGrantSnapshot> {
+    const [address, id] = this.#grantInputs(owner, grantId);
+    const read = await this.#read(
+      [
+        { method: "rsc_getRootAuthority", params: [bytesToHex(address)] },
+        {
+          method: "rsc_getSessionGrant",
+          params: [bytesToHex(address), bytesToHex(id)],
+        },
+        { method: "rsc_getBalance", params: [bytesToHex(address), "latest"] },
+      ],
+      [0, 1],
+      options,
+      true,
+      (r) => {
+        rootObservation(r.results[0], address);
+        grantObservation(r.results[1], address, id, this.#expected);
+        quantity(r.results[2], 256);
+      },
+    );
+    return resultGuard(() => {
+      const root = rootObservation(read.results[0], address),
+        grant = grantObservation(read.results[1], address, id, this.#expected);
+      requireResult(
+        root.authorizationMode === 1 &&
+          grant.authEpoch <= root.authority.authEpoch &&
+          grant.generationSequence < root.authority.nextGrantSequence,
+      );
+      requireResult(
+        grant.usableAtObservedBlock ===
+          (grant.authEpoch === root.authority.authEpoch &&
+            grant.state.height >= grant.validAfterHeight &&
+            grant.state.height < grant.validUntilHeight),
+      );
+      if (grant.authEpoch === root.authority.authEpoch)
+        requireResult(root.authority.activeGrantCount > 0);
+      return {
+        identity: read.identity,
+        root,
+        grant,
+        balance: quantity(read.results[2], 256),
+      };
+    });
   }
   async getSessionGrant(
     owner: Uint8Array,

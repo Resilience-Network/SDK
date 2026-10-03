@@ -29,3 +29,5 @@ export type {
   RpcParams,
   RpcRequestOptions,
 } from "./types.js";
+
+export type { AccountAuthorizationSnapshot, FundedGrantSnapshot } from "./contracts.js";

@@ -2,8 +2,8 @@
 
 This index separates intended SDK capabilities from the currently available
 implemented canonical codecs/hashes, HTTP transport, typed Chain reads
-and raw transaction signer adapters and canonical review data. Grant lifecycle and
-browser APIs remain planned.
+and raw transaction signer adapters, canonical review data and account/session
+lifecycle. Browser APIs remain planned.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
 - [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
@@ -22,6 +22,8 @@ browser APIs remain planned.
   observations, execution/consumption semantics and node trust boundaries.
 - [Submission API](reference/submission.md): one send, typed uncertainty and bounded
   same-ID reconciliation with node-reported finality/consumption.
+- [Account/session lifecycle](reference/lifecycle.md): DIRECT onboarding, bounded
+  grant controls, both native transfer schemes, approval and post-finalized state.
 - [Nonce coordination](reference/coordinator.md): explicit reservations, async authority
   binding, uncertain-send retention and durable adapter/recovery requirements.
 - [Raw signer API](reference/signers.md): external key ownership, exact digest

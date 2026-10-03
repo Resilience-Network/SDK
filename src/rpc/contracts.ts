@@ -40,6 +40,13 @@ export type RootAuthorityObservation = {
   | { readonly authorizationMode: 0; readonly authority: null }
   | { readonly authorizationMode: 1; readonly authority: RootAuthority }
 );
+/** Root/account nonce/balance from one consistent trusted-node finalized bracket. */
+export interface AccountAuthorizationSnapshot {
+  readonly identity: AuthorizationFinalityStatus;
+  readonly root: RootAuthorityObservation;
+  readonly accountNonce: bigint;
+  readonly balance: bigint;
+}
 export interface BucketState {
   readonly available: bigint;
   readonly lastRefillHeight: bigint;
@@ -77,6 +84,13 @@ export interface SessionGrantObservation {
   readonly storageDeposit: bigint;
   readonly activeIndexPresent: true;
   readonly usableAtObservedBlock: boolean;
+}
+/** Root/grant/balance observed in one finalized bracket; no independent proof. */
+export interface FundedGrantSnapshot {
+  readonly identity: AuthorizationFinalityStatus;
+  readonly root: RootAuthorityObservation;
+  readonly grant: SessionGrantObservation;
+  readonly balance: bigint;
 }
 export interface SessionNonceObservation {
   readonly state: FinalizedState;

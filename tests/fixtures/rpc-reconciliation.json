@@ -1,5 +1,5 @@
 {
-  "revision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d",
+  "revision": "007356ef5e5e1769cfda2290fcafc9db5d48bbfd",
   "provenance": "Production Handler/API against owned constructed receipts plus native rooted/grant state, signature/policy evaluation and session usage settlement. DIRECT/sponsor nonces are explicitly constructed. Block processor/funded transfer/fee execution, pool acceptance and independent finality are not qualified by this fixture. Cancellation uses the pinned reference test-only Ed25519 seed and native evaluated signature.",
   "fixtures": [
     {

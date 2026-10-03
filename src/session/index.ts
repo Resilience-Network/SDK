@@ -21,3 +21,12 @@ export type {
 } from "./signing-review.js";
 
 export * from "./coordinator.js";
+
+export {
+  requiredGrantStorageDeposit,
+  refilledBucketAvailable,
+  MINIMUM_SECURITY_RESERVE,
+  MAX_SESSION_LIFETIME_BLOCKS,
+} from "./lifecycle-policy.js";
+export type { GrantParameters } from "./lifecycle-policy.js";
+export * from "./lifecycle.js";

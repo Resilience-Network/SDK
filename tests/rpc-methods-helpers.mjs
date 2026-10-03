@@ -51,6 +51,11 @@ export function methodHarness(
 }
 
 export function invokeFixture(client, fixture, options) {
+  if (["rsc_getBalance", "rsc_getTransactionCount"].includes(fixture.method))
+    return client.getAccountAuthorizationSnapshot(
+      hexToBytes(fixture.params[0]),
+      options,
+    );
   const p =
     fixture.method === "rsc_feeHistory"
       ? []

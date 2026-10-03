@@ -1,5 +1,5 @@
 {
-  "revision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d",
+  "revision": "007356ef5e5e1769cfda2290fcafc9db5d48bbfd",
   "provenance": "Actual production Handler/API; owned in-memory state. Falsy test probes are explicitly labelled, not public RPC methods. No running-network finality claim.",
   "envelopes": [
     {

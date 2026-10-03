@@ -1,5 +1,5 @@
 {
-  "revision": "5b8e6b59830ca36bbae935ba27b95a7ee1bcae6d",
+  "revision": "007356ef5e5e1769cfda2290fcafc9db5d48bbfd",
   "fixtures": [
     {
       "scenario": "ed25519",
@@ -75,6 +75,56 @@
             "finality": "finalized"
           }
         }
+      },
+      "identity": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "authorizationCapability": "resilience/tx-auth/2",
+          "chainId": "0x539",
+          "genesisHash": "0x00000000000000000000000000000000000000000000000000000000000000aa",
+          "state": {
+            "blockHash": "0xb316df914bfb1b273f4569542bbc961d6927055953e4779c8383f6cd2a3c5284",
+            "height": "0xb",
+            "stateRoot": "0x16543aacce376cfa53417d96d84986988496b5476f26c3c2db430865e9c6ec64",
+            "finality": "finalized"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "ed25519",
+      "method": "rsc_getTransactionCount",
+      "params": ["0x0000000000000000000000000000000000000001", "latest"],
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x1"
+      },
+      "identity": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "authorizationCapability": "resilience/tx-auth/2",
+          "chainId": "0x539",
+          "genesisHash": "0x00000000000000000000000000000000000000000000000000000000000000aa",
+          "state": {
+            "blockHash": "0xb316df914bfb1b273f4569542bbc961d6927055953e4779c8383f6cd2a3c5284",
+            "height": "0xb",
+            "stateRoot": "0x16543aacce376cfa53417d96d84986988496b5476f26c3c2db430865e9c6ec64",
+            "finality": "finalized"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "ed25519",
+      "method": "rsc_getBalance",
+      "params": ["0x0000000000000000000000000000000000000001", "latest"],
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x55de6a779bbac0000"
       },
       "identity": {
         "jsonrpc": "2.0",
@@ -969,6 +1019,56 @@
     },
     {
       "scenario": "p256",
+      "method": "rsc_getTransactionCount",
+      "params": ["0x0000000000000000000000000000000000000001", "latest"],
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x1"
+      },
+      "identity": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "authorizationCapability": "resilience/tx-auth/2",
+          "chainId": "0x539",
+          "genesisHash": "0x00000000000000000000000000000000000000000000000000000000000000aa",
+          "state": {
+            "blockHash": "0xf6cd5924d781e36a747cabc2c1d9bbeb852093cdba7d678d81f2e11e6e481da4",
+            "height": "0xb",
+            "stateRoot": "0xe62e15e263f873a036186ff350916e5e6ac99b1af16f55c9edac00ddee05ae15",
+            "finality": "finalized"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "p256",
+      "method": "rsc_getBalance",
+      "params": ["0x0000000000000000000000000000000000000001", "latest"],
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x55de6a779bbac0000"
+      },
+      "identity": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "authorizationCapability": "resilience/tx-auth/2",
+          "chainId": "0x539",
+          "genesisHash": "0x00000000000000000000000000000000000000000000000000000000000000aa",
+          "state": {
+            "blockHash": "0xf6cd5924d781e36a747cabc2c1d9bbeb852093cdba7d678d81f2e11e6e481da4",
+            "height": "0xb",
+            "stateRoot": "0xe62e15e263f873a036186ff350916e5e6ac99b1af16f55c9edac00ddee05ae15",
+            "finality": "finalized"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "p256",
       "method": "rsc_getSessionGrant",
       "params": [
         "0x0000000000000000000000000000000000000001",
@@ -1678,6 +1778,56 @@
             "finality": "finalized"
           }
         }
+      },
+      "identity": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "authorizationCapability": "resilience/tx-auth/2",
+          "chainId": "0x539",
+          "genesisHash": "0x00000000000000000000000000000000000000000000000000000000000000aa",
+          "state": {
+            "blockHash": "0xedd75f22d2594ba7e55c3a0838afcdabd18ec2d2cecec58eafedd24e6af7fa61",
+            "height": "0x0",
+            "stateRoot": "0xe8abded803f606fb663808cb5d77b703ee29b66740d5775ae3c8ba2a444ede47",
+            "finality": "finalized"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "direct",
+      "method": "rsc_getTransactionCount",
+      "params": ["0x9aea038cd4255baac26eac5a74e58a07ed2f1975", "latest"],
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x0"
+      },
+      "identity": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "authorizationCapability": "resilience/tx-auth/2",
+          "chainId": "0x539",
+          "genesisHash": "0x00000000000000000000000000000000000000000000000000000000000000aa",
+          "state": {
+            "blockHash": "0xedd75f22d2594ba7e55c3a0838afcdabd18ec2d2cecec58eafedd24e6af7fa61",
+            "height": "0x0",
+            "stateRoot": "0xe8abded803f606fb663808cb5d77b703ee29b66740d5775ae3c8ba2a444ede47",
+            "finality": "finalized"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "direct",
+      "method": "rsc_getBalance",
+      "params": ["0x9aea038cd4255baac26eac5a74e58a07ed2f1975", "latest"],
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x3b9aca00"
       },
       "identity": {
         "jsonrpc": "2.0",

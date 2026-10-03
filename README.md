@@ -8,8 +8,9 @@ hashes checked against pinned Chain and independent vectors, plus bounded HTTP
 JSON-RPC transport, validated Chain authorization/fee/simulation reads and raw
 Ed25519/P-256 transaction signers and canonical review data. Typed transaction/receipt observations and receipt commitments are implemented.
 Single-send submission and bounded same-ID reconciliation are available.
-Grant lifecycle, browser
-passkey APIs and release qualification
+Explicit funded DIRECT activation, grant controls and both native session schemes
+are exposed through the [lifecycle API](docs/reference/lifecycle.md) with canonical
+approval and coordinated nonces. Browser passkey APIs and release qualification
 remain planned work.
 
 ## Development
