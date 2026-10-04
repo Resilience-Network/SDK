@@ -26,6 +26,8 @@ references; physical devices and other engines remain separate.
   execution and actual Chromium virtual ceremonies; exact qualified profile and
   explicit unavailable engine/device gates.
 - [Protocol sources](reference/protocol-sources.md): immutable Chain source baseline.
+- [API/platform qualification](reference/api-qualification.md): reviewed export/type
+  inventory, installed consumers, dependency notices and measured local budgets.
 - [Canonical API](reference/canonical-api.md): supported codecs/hashes and their limits.
 - [HTTP RPC API](reference/http-rpc.md): envelope transport, limits, cancellation,
   errors, read retries and interoperability boundaries.

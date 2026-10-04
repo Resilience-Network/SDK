@@ -430,3 +430,11 @@ executes the [installed native consumer](native-integration.md) through the actu
 SDK tarball. It verifies funded lifecycle, known-secret log redaction and owned
 teardown; aggregate revision/archive/source hashes remain in ignored
 artifacts/installed-session/latest.json. This does not claim registry publication.
+
+## API/package budgets
+
+Run `npm run test:api-qualification` for the versioned export/declaration inventory,
+installed browser bundles, dependency notices and measured codec/raw signing paths.
+See [the exact qualification profile](../reference/api-qualification.md). This
+adds to `npm run check` and actual browser/native evidence; it is not publication
+authorization or a claim about untested platforms.
