@@ -90,6 +90,9 @@ signaled by its old PID; unexpected supervisor exit fails containment acceptance
 The live anchor prevents group-ID reuse during normal teardown, consistent with
 [POSIX group lifetime and ID reuse](https://pubs.opengroup.org/onlinepubs/009696699/basedefs/xbd_chap04.html).
 
+The candidate runner can propagate a private descriptor through tracked group
+supervisors to await their closure even if command stdout is ignored; forwarding
+requires matching descriptor identity. Native teardown still owns its handles.
 Owner IPC disconnect also starts supervisor-owned SIGTERM/5-second SIGKILL cleanup,
 so killing an integration owner cannot silently abandon its detached validator
 groups. This is bounded containment of tracked commands and descendants that stay

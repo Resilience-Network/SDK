@@ -1,7 +1,11 @@
 // POSIX-only owned group lease. Command arguments/environment are not logged.
 import { spawn } from "node:child_process";
+import { containmentIdentity } from "./processes.mjs";
 if (process.platform === "win32" || !process.send) throw Error("Owned IPC required");
 const [command, ...args] = process.argv.slice(2);
+const containment = process.env.RSC_OWNED_CONTAINMENT && containmentIdentity();
+if (containment) process.env.RSC_OWNED_CONTAINMENT = containment;
+else delete process.env.RSC_OWNED_CONTAINMENT;
 const send = (message) => {
   if (process.connected) process.send(message, () => {});
 };
@@ -24,7 +28,7 @@ const orphan = () => {
 process.on("SIGINT", () => {});
 process.on("disconnect", orphan);
 const child = spawn(command, args, {
-  stdio: ["inherit", "inherit", "inherit"],
+  stdio: ["inherit", "inherit", "inherit", "ignore", ...(containment ? [4] : [])],
   shell: false,
 });
 child.once("spawn", () => send({ type: "spawn", pid: child.pid }));

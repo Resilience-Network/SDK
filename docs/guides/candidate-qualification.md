@@ -46,22 +46,40 @@ arrays of distinct named passing checks, with minimums of 24 and 17 respectively
 missing, sparse or fabricated array-like objects do not establish coverage. Positive native runtimes must be removed; negative runs
 must retain their restricted safety state and close all owned children.
 
-Child commands are bounded with restricted retained output, and receive termination
-through their owned process group. Native feature entry scripts run directly after
-the clean build so their registered signal handlers own teardown; isolated native
-nodes remain under the existing harness's child handles. No process-name or stale
-PID killing occurs. Interrupted/failed candidates retain evidence and are not
-resumed by copying historical PASS claims. Investigate failures, fix/review changes
-and run a fresh candidate at the final revision.
+Each stage uses the actual [bounded controller](../../scripts/qualification/stage.mjs).
+Its command budget is defined in the versioned profile. Timeout, interruption or
+more than 8 MiB of combined output triggers owned group SIGTERM, a 10-second grace
+period and SIGKILL with a further 7-second descriptor-closure bound. Only the first
+8 MiB is retained, with observed and retained byte counts recorded separately.
+Successful command exit also goes through group teardown: command exit alone does
+not establish descendant closure. The controller regressions execute actual
+children for ignored SIGTERM, excessive output, abort, parent exit, retained
+pipes, spawn failure and detached owned groups.
+
+Native feature entry scripts run directly after the clean build so their signal
+handlers own teardown. A private inherited descriptor connects the candidate to
+tracked detached group supervisors; its identity is checked before forwarding so
+an unrelated reused descriptor is never inherited. Its EOF is required even when
+native commands ignore stdout. If a stage must be killed, native group supervisors
+lose their owner IPC connection and perform their own 5-second escalation; the
+candidate's closure budget includes this cleanup. Neither process-name searches
+nor stale PID files confer ownership.
+
+Deliberately untracked session escapes are outside this containment contract. If
+such an escape retains a pipe, bounded teardown fails and the controller detaches
+its readers to allow a final **failed** manifest; it records `cleanupClosed: false`
+and never presents reader disposal as verified process closure. No unrelated
+process is signaled and no runtime, key, wallet or signing record is deleted by
+that fallback. Failed/interrupted stage records retain their reason, byte counts
+and restricted output hash, and never count as passed stages. Investigate failures,
+fix/review changes and run a fresh candidate at the final revision.
 
 The [2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md)
-reproduced incomplete RP artifact acceptance (now addressed by strict count/array
-regressions in #85), a stage that remains running after its SIGTERM timeout (#86),
-and surviving owned descendants after their parent exits (addressed by live group
-supervision and leader-exit regressions in #87). Candidate stage termination #86
-still requires its own bounded-controller regressions and final full run. Historical successful qualification does not establish those
-failure-path guarantees. GitHub tracks their fixes; robust qualification requires
-their regressions and a fresh final candidate after reviewed delivery.
+records historical reproductions. Strict artifact regressions address #85, the
+bounded controller addresses #86, and live group supervision addresses #87.
+Truthful cleanup-error status is additionally covered by #93. Their focused
+regressions do not substitute for final whole-pipeline qualification, tracked by
+#94 after reviewed delivery of the corrections.
 
 ## Evidence and review
 

@@ -1,6 +1,6 @@
 // Serial owned candidate checks. No checkout mutation, publication or hosted dispatch.
 import assert from "node:assert/strict";
-import { spawn, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { createHash, randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,7 @@ import {
   entryScripts,
 } from "./profile.mjs";
 import { verifyCapturedLogs } from "../localnet/verify-logs.mjs";
+import { runStage } from "./stage.mjs";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const hash = (data) => createHash("sha256").update(data).digest("hex");
 const command = (name, args, cwd = root) =>
@@ -109,21 +110,17 @@ for (const file of [
   "qualification/api-v1.json",
   "scripts/qualification/run.mjs",
   "scripts/qualification/profile.mjs",
+  "scripts/qualification/stage.mjs",
+  "scripts/localnet/processes.mjs",
+  "scripts/localnet/group-supervisor.mjs",
+  "scripts/localnet/outcome.mjs",
 ])
   report.sourceSha256[file] = hash(await readFile(join(root, file)));
-let child,
-  interrupted = false;
-const terminate = () => {
-  if (!child || child.exitCode !== null || child.signalCode !== null) return;
-  try {
-    process.kill(-child.pid, "SIGTERM");
-  } catch (error) {
-    if (error.code !== "ESRCH") throw error;
-  }
-};
+let interrupted = false;
+const controller = new AbortController();
 const abort = () => {
   interrupted = true;
-  terminate();
+  controller.abort();
 };
 process.once("SIGINT", abort);
 process.once("SIGTERM", abort);
@@ -144,43 +141,30 @@ async function execute(stage) {
     : [process.env.npm_execpath, ...(stage.args ?? ["run", stage.script])];
   report.activeStage = stage.id;
   console.log("Starting candidate stage: " + stage.id);
-  const result = await new Promise((resolve, reject) => {
-    child = spawn(process.execPath, args, {
-      cwd: root,
-      env: process.env,
-      stdio: ["ignore", "pipe", "pipe"],
-      shell: false,
-      detached: true,
-    });
-    const chunks = [];
-    let size = 0,
-      failed = false;
-    const stop = () => {
-      failed = true;
-      terminate();
-    };
-    const timer = setTimeout(stop, stage.timeout);
-    const receive = (chunk) => {
-      size += chunk.length;
-      if (size > 8 * 1024 * 1024) stop();
-      else chunks.push(chunk);
-    };
-    child.stdout.on("data", receive);
-    child.stderr.on("data", receive);
-    child.once("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
-    });
-    child.once("close", (code, signal) => {
-      clearTimeout(timer);
-      resolve({ code, signal, failed, output: Buffer.concat(chunks) });
-    });
+  const result = await runStage({
+    command: process.execPath,
+    args,
+    cwd: root,
+    env: process.env,
+    timeoutMs: stage.timeout,
+    signal: controller.signal,
   });
-  child = undefined;
   const log = stage.id + ".log";
   await writeFile(join(directory, log), result.output, { mode: 0o600, flag: "wx" });
+  const record = {
+    id: stage.id,
+    command: ["node", ...args],
+    status: interrupted ? "interrupted" : "failed",
+    reason: result.reason ?? "evidence-rejected",
+    cleanupClosed: result.cleanupClosed,
+    durationMilliseconds: Date.now() - start,
+    outputSha256: hash(result.output),
+    outputBytes: result.output.length,
+    observedOutputBytes: result.outputBytes,
+  };
+  report.stages.push(record);
   assert(
-    !interrupted && !result.failed && result.code === 0,
+    !interrupted && !result.failed && result.cleanupClosed && result.code === 0,
     `Candidate stage failed: ${stage.id}; restricted log retained`,
   );
   const count = verifyOutput(stage, result.output.toString("utf8"));
@@ -243,17 +227,7 @@ async function execute(stage) {
   clean(chain);
   assert.equal(command("git", ["rev-parse", "HEAD"], chain), pin.revision);
   assert.equal(command("git", ["rev-parse", "HEAD"]), revision);
-  const record = {
-    id: stage.id,
-    command: ["node", ...args],
-    status: "pass",
-    count,
-    native,
-    durationMilliseconds: Date.now() - start,
-    outputSha256: hash(result.output),
-    outputBytes: result.output.length,
-  };
-  report.stages.push(record);
+  Object.assign(record, { status: "pass", reason: null, count, native });
   await writeFile(
     join(directory, "manifest.json"),
     JSON.stringify(report, null, 2) + "\n",
@@ -306,6 +280,6 @@ try {
     { mode: 0o600 },
   );
   console.log(
-    `Candidate ${report.result}: ${report.stages.length}/${stages.length} stages; manifest ${join(directory, "manifest.json")}`,
+    `Candidate ${report.result}: ${report.stages.filter((s) => s.status === "pass").length}/${stages.length} stages passed; manifest ${join(directory, "manifest.json")}`,
   );
 }

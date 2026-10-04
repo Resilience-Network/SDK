@@ -10,12 +10,21 @@ test("candidate acceptance rejects empty, stale-minimum and skipped SDK evidence
   for (const stage of stages) assert.throws(() => verifyOutput(stage, ""));
   const sdk = stages.find((s) => s.id === "sdk");
   assert.throws(() =>
-    verifyOutput(sdk, "ℹ tests 304\nℹ fail 0\nℹ skipped 0\nℹ todo 0"),
+    verifyOutput(sdk, "ℹ tests 327\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0"),
   );
   assert.throws(() =>
-    verifyOutput(sdk, "ℹ tests 305\nℹ fail 0\nℹ skipped 1\nℹ todo 0"),
+    verifyOutput(sdk, "ℹ tests 328\nℹ fail 0\nℹ cancelled 0\nℹ skipped 1\nℹ todo 0"),
   );
-  assert.equal(verifyOutput(sdk, "ℹ tests 305\nℹ fail 0\nℹ skipped 0\nℹ todo 0"), 305);
+  assert.equal(
+    verifyOutput(sdk, "ℹ tests 328\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0"),
+    328,
+  );
+  assert.throws(() =>
+    verifyOutput(sdk, "ℹ tests 328\nℹ fail 0\nℹ cancelled 1\nℹ skipped 0\nℹ todo 0"),
+  );
+  assert.throws(() =>
+    verifyOutput(sdk, "ℹ tests 328\nℹ fail 0\nℹ skipped 0\nℹ todo 0"),
+  );
   const differential = stages.find((s) => s.id === "differential");
   assert.throws(() => verifyOutput(differential, "differential PASS: 1925 cases"));
   assert.equal(
