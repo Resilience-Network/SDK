@@ -130,3 +130,9 @@ stateful unit tests. The wider replay/expiry/failure/concurrency qualification
 remains tracked by [SDK #29](https://github.com/Resilience-Network/sdk/issues/29).
 See the [native harness guide](../guides/native-localnet.md) for ownership,
 retained failure evidence and exact source/runtime requirements.
+
+External adapter/callback failures are reconstructed with bounded supported codes
+and fixed messages. Modified SDK error instances, invalid codes, throwing code
+getters and prototype traps do not forward caller messages, causes or objects.
+Constructor inspection failures produce `INVALID_ARGUMENT`. This normalization
+does not release signing/signed/uncertain reservations or imply safe resubmission.

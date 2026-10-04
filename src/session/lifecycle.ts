@@ -1,3 +1,4 @@
+import { adapterErrorCode } from "./adapter-errors.js";
 import {
   bytesToHex,
   checkedNumber,
@@ -83,6 +84,19 @@ export type LifecycleErrorCode =
   | "FLOW_FAILED"
   | "ABORTED"
   | "TIMEOUT";
+const boundaryCodes = new Set<string>([
+  "INVALID_ARGUMENT",
+  "STATE_DENIED",
+  "STALE_AUTHORITY",
+  "MUTATED_INPUT",
+  "REVIEW_REJECTED",
+  "REVIEW_FAILED",
+  "READ_FAILED",
+  "FLOW_FAILED",
+  "ABORTED",
+  "TIMEOUT",
+]);
+const deadlineCodes = new Set<string>(["ABORTED", "TIMEOUT"]);
 /** Sanitized: no adapter exceptions, endpoints, signatures or private material. */
 export class LifecycleError extends Error {
   override readonly name = "LifecycleError";
@@ -577,20 +591,24 @@ export class SessionLifecycle {
     readonly client: ChainRpcClient;
     readonly coordinator: NonceCoordinator;
   }) {
-    objectFields(options, ["context", "client", "coordinator"]);
-    objectFields(options.context, ["chainId", "genesisHash"]);
-    chainDomain(options.context);
-    insist(
-      options.client instanceof ChainRpcClient &&
-        options.coordinator instanceof NonceCoordinator,
-      "INVALID_ARGUMENT",
-    );
-    this.#context = {
-      chainId: options.context.chainId,
-      genesisHash: new Uint8Array(options.context.genesisHash),
-    };
-    this.#client = options.client;
-    this.#coordinator = options.coordinator;
+    try {
+      objectFields(options, ["context", "client", "coordinator"]);
+      objectFields(options.context, ["chainId", "genesisHash"]);
+      chainDomain(options.context);
+      insist(
+        options.client instanceof ChainRpcClient &&
+          options.coordinator instanceof NonceCoordinator,
+        "INVALID_ARGUMENT",
+      );
+      this.#context = {
+        chainId: options.context.chainId,
+        genesisHash: new Uint8Array(options.context.genesisHash),
+      };
+      this.#client = options.client;
+      this.#coordinator = options.coordinator;
+    } catch {
+      throw new LifecycleError("INVALID_ARGUMENT");
+    }
   }
   async #read(
     owner: Uint8Array,
@@ -965,13 +983,47 @@ export class SessionLifecycle {
       }
     } catch (e) {
       unchanged();
-      if (e instanceof LifecycleError) throw e;
-      if (e instanceof RpcClientError && ["ABORTED", "TIMEOUT"].includes(e.code))
-        throw new LifecycleError(e.code as "ABORTED" | "TIMEOUT");
-      if (e instanceof CoordinatorError) {
-        if (e.code === "FLOW_FAILED" && authorityError) throw authorityError;
-        if (["STALE_AUTHORITY", "MUTATED_INPUT", "ABORTED", "TIMEOUT"].includes(e.code))
-          throw new LifecycleError(e.code as LifecycleErrorCode);
+      const known = adapterErrorCode<LifecycleErrorCode>(
+        e,
+        LifecycleError,
+        boundaryCodes,
+      );
+      if (known) throw new LifecycleError(known);
+      const deadlineCode = adapterErrorCode<"ABORTED" | "TIMEOUT">(
+        e,
+        RpcClientError,
+        deadlineCodes,
+      );
+      if (deadlineCode) throw new LifecycleError(deadlineCode);
+      const coordinatorCode = adapterErrorCode<string>(
+        e,
+        CoordinatorError,
+        new Set([
+          "INVALID_ARGUMENT",
+          "INVALID_STORE",
+          "CONFLICT",
+          "STALE_AUTHORITY",
+          "MUTATED_INPUT",
+          "ADAPTER_FAILED",
+          "FLOW_FAILED",
+          "ABORTED",
+          "TIMEOUT",
+        ]),
+      );
+      if (coordinatorCode) {
+        const authorityCode = adapterErrorCode<LifecycleErrorCode>(
+          authorityError,
+          LifecycleError,
+          boundaryCodes,
+        );
+        if (coordinatorCode === "FLOW_FAILED" && authorityCode)
+          throw new LifecycleError(authorityCode);
+        if (
+          ["STALE_AUTHORITY", "MUTATED_INPUT", "ABORTED", "TIMEOUT"].includes(
+            coordinatorCode,
+          )
+        )
+          throw new LifecycleError(coordinatorCode as LifecycleErrorCode);
         throw new LifecycleError("FLOW_FAILED");
       }
       throw new LifecycleError("READ_FAILED");

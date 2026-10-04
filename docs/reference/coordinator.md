@@ -124,3 +124,9 @@ These guarantees cover cooperating clients using one correct adapter. Another
 wallet, process or signer that bypasses coordination can consume/revoke authority;
 fresh state checks and final reconciliation detect observations, but cannot stop
 external actors or make a signature atomic with chain execution.
+
+External adapter/callback failures are reconstructed with bounded supported codes
+and fixed messages. Modified SDK error instances, invalid codes, throwing code
+getters and prototype traps do not forward caller messages, causes or objects.
+Constructor inspection failures produce `INVALID_ARGUMENT`. This normalization
+does not release signing/signed/uncertain reservations or imply safe resubmission.
