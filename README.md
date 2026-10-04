@@ -12,7 +12,7 @@ Explicit funded DIRECT activation, grant controls and both native session scheme
 are exposed through the [lifecycle API](docs/reference/lifecycle.md) with canonical
 approval and coordinated nonces. Bounded WebAuthn representation parsers are
 available alongside explicit browser ceremony collection. Authoritative verifier
-conformance, actual engine qualification and release qualification remain planned work.
+conformance has an [executable Node reference](docs/reference/webauthn-rp-reference.md); actual engine, production RP durability and release qualification remain separate gates.
 
 ## Development
 

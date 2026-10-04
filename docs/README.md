@@ -37,6 +37,9 @@ verification qualification remain separate gates.
   registration/assertion collection and bounded immutable transport responses.
 - [WebAuthn representation API](reference/webauthn-parsers.md): bounded ES256
   COSE/authenticator/client-data/none-attestation/DER parsing; no verification claim.
+- [RP conformance reference](reference/webauthn-rp-reference.md): maintained
+  verifier, executable signed fixtures and single-process challenge/CAS evidence;
+  not a production server or durable store.
 - [Passkey authorization decision](decisions/0001-passkey-authorization-boundary.md).
 - [Authoritative relying-party contract](decisions/0002-authoritative-webauthn-rp.md):
   selected WebAuthn implementation profile, challenge/store ownership and future
