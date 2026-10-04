@@ -404,3 +404,17 @@ take/CAS, awaiting-proof enrollment, synced-counter adaptation and expiry rules.
 These Map-store results do not qualify multiple workers, durability/restarts,
 production deployment, actual browser engines, physical devices or independent
 review. Private fixture KeyObjects never leave memory.
+
+## Actual installed browser qualification
+
+`npm run test:browser` runs the strict requested-engine matrix. The available
+local profile is `RSC_BROWSER_ENGINES=chromium RSC_BROWSER_CHROMIUM_CHANNEL=chrome
+npm run test:browser`: actual installed Google Chrome154.0.8037.95/macOS26.6.2,
+public installed-package entrypoints, pure browser crypto/canonical vectors and
+CDP virtual ceremonies under the real RP verifier. Sanitized exact-revision/engine/
+source/tarball evidence is in ignored `artifacts/browser/latest.json`.
+See [browser qualification](browser-qualification.md) for limits and setup.
+Official bundled Chromium/Firefox/WebKit provisioning failed externally; #69
+retains that unpassed matrix. Requested missing engines fail, never skip. The
+Chrome results do not qualify Firefox/WebKit, another OS, physical biometrics,
+production RP durability or independent review.

@@ -136,3 +136,6 @@ Native adversity checks are separate: `npm run test:session-e2e`.
 Browser helpers are documented in the [browser API](docs/reference/webauthn-browser.md).
 They collect public responses for an application-owned verifier and never replace
 external native root/session signers.
+
+[Actual browser qualification](docs/guides/browser-qualification.md) identifies
+the tested installed Chrome profile and outstanding external engine/device gates.
