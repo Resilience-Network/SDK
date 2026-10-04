@@ -170,6 +170,23 @@ function passingChecks(checks, minimum, key = "name") {
   );
 }
 
+export function verifyNativeChecks(checks, minimum) {
+  if (
+    !Number.isSafeInteger(minimum) ||
+    minimum < 0 ||
+    !Array.isArray(checks) ||
+    checks.length < minimum ||
+    !Array.from(checks).every(
+      (c) =>
+        c !== null &&
+        typeof c === "object" &&
+        typeof c.name === "string" &&
+        c.name.length > 0,
+    )
+  )
+    throw Error("Incomplete native checks");
+}
+
 export function verifyArtifact(name, evidence, revision, archiveSha256) {
   if (evidence === null || typeof evidence !== "object" || Array.isArray(evidence))
     throw Error("Invalid artifact shape");

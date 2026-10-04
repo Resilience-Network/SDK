@@ -11,6 +11,7 @@ import {
   stages,
   verifyOutput,
   verifyArtifact,
+  verifyNativeChecks,
   entryScripts,
 } from "./profile.mjs";
 import { verifyCapturedLogs } from "../localnet/verify-logs.mjs";
@@ -202,13 +203,13 @@ async function execute(stage) {
       assert.equal(e.goVersion, profile.go);
       assert.equal(e.rustVersion, profile.rust);
       assert.equal(e.teardown.allOwnedChildrenClosed, true);
+      verifyNativeChecks(e.checks, stage.negative ? 0 : (stage.minimumChecks ?? 1));
       if (stage.negative) {
         assert(["failed", "interrupted"].includes(e.status));
         assert.equal(e.runtimeRetained, true);
       } else {
         assert.equal(e.status, "passed");
         assert.equal(e.runtimeRetained, false);
-        assert(e.checks.length >= (stage.minimumChecks ?? 1));
       }
       const failedFiles = e.logCapture.logs
         .filter((l) => l.status === "failed")

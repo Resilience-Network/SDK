@@ -4,6 +4,7 @@ import {
   stages,
   verifyOutput,
   verifyArtifact,
+  verifyNativeChecks,
 } from "../scripts/qualification/profile.mjs";
 test("candidate acceptance rejects empty, stale-minimum and skipped SDK evidence", () => {
   for (const stage of stages) assert.throws(() => verifyOutput(stage, ""));
@@ -114,6 +115,24 @@ test("RP artifact coverage requires actual safe integer counts", () => {
       assert.throws(() =>
         verifyArtifact("rp", { ...valid, [field]: value }, revision, digest),
       );
+});
+
+test("native evidence coverage requires a complete check array", () => {
+  verifyNativeChecks([], 0);
+  verifyNativeChecks([{ name: "both schemes" }, { name: "both schemes" }], 2);
+  for (const checks of [
+    undefined,
+    null,
+    { length: 67 },
+    "x".repeat(67),
+    [],
+    Array(67),
+    Array(67).fill(null),
+    [{ name: "" }],
+  ])
+    assert.throws(() => verifyNativeChecks(checks, 1), /Incomplete native/);
+  for (const minimum of [undefined, "0", -1, NaN, 1.5])
+    assert.throws(() => verifyNativeChecks([], minimum), /Incomplete native/);
 });
 
 test("browser and combined evidence requires complete arrays of distinct passing checks", () => {
