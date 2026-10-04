@@ -24,6 +24,7 @@ import {
 import { hexToBytes } from "../../dist/core/index.js";
 
 import { captureOwnedLogs } from "./logs.mjs";
+import { recordNativeTeardown } from "./outcome.mjs";
 
 const sdkRoot = fileURLToPath(new URL("../../", import.meta.url));
 const sha = (data) => createHash("sha256").update(data).digest("hex");
@@ -595,7 +596,8 @@ export async function withNativeLocalnet(options, work) {
     } finally {
       await portsLease?.release();
       for (const file of files) await file.close().catch(() => {});
-      evidence.teardown = { allOwnedChildrenClosed: teardown };
+      recordNativeTeardown(evidence, teardown);
+      if (!teardown) success = false;
       // Only the explicit log of an owned command/node is required; node starts
       // appear in commands but use node-N.log rather than command-N.log.
       evidence.logCapture = await captureOwnedLogs(

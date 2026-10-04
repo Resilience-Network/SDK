@@ -88,7 +88,7 @@ spawned supervisor's group, allows five seconds for SIGTERM, then escalates to
 SIGKILL with a two-second descriptor-closure bound. An exited supervisor is never
 signaled by its old PID; unexpected supervisor exit fails containment acceptance.
 The live anchor prevents group-ID reuse during normal teardown, consistent with
-[POSIX group lifetime and ID reuse](https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html).
+[POSIX group lifetime and ID reuse](https://pubs.opengroup.org/onlinepubs/009696699/basedefs/xbd_chap04.html).
 
 Owner IPC disconnect also starts supervisor-owned SIGTERM/5-second SIGKILL cleanup,
 so killing an integration owner cannot silently abandon its detached validator
@@ -107,7 +107,11 @@ After all owned child handles close, successful runs remove only their fresh own
 runtime, checking the direct path is not a symlink, the canonical temporary-root
 namespace and unchanged ownership marker/path/ID. This is planned disposal of a
 fresh test network. A failure/interrupt/ownership mismatch preserves the complete
-restricted runtime, including signing watermarks/locks/databases/keys. A timeout
+restricted runtime, including signing watermarks/locks/databases/keys. Failed
+teardown sets the top-level status to `failed` with `TEARDOWN_FAILED`, even when
+integration activity succeeded; it never retains a passing status or disposes the
+runtime. Supervisor command results and actual group/descriptor closure are
+separate evidence, as covered by [outcome regressions](../../tests/localnet-outcome.test.mjs). A timeout
 never deletes safety state. Keep retained failed directories for inspection and
 explicit retirement; do not restart them under another genesis/configuration.
 

@@ -14,12 +14,14 @@ const arm = () => {
   stopping = true;
   setTimeout(() => process.kill(-process.pid, "SIGKILL"), 5000);
 };
-process.on("SIGTERM", arm);
+// With a connected owner, only the owner escalates. Competing kill timers can
+// race process exit/reaping. Keep the anchor live through graceful termination.
+process.on("SIGTERM", () => {});
 const orphan = () => {
   arm();
   process.kill(-process.pid, "SIGTERM");
 };
-process.on("SIGINT", orphan);
+process.on("SIGINT", () => {});
 process.on("disconnect", orphan);
 const child = spawn(command, args, {
   stdio: ["inherit", "inherit", "inherit"],
