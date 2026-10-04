@@ -33,7 +33,9 @@ from two owned test-harness import URLs:
 RSC_CHAIN_DIR=/absolute/path/to/clean/pinned/chain npm run example:session-installed
 ```
 
-Its SDK imports resolve only inside the newly installed consumer. The native
+The copied application imports the SDK inside the newly installed consumer. The
+owned network harness remains repository test tooling and uses its own SDK for
+bootstrap/readiness; it does not supply the application lifecycle client. The native
 RPC client is constructed from the installed SDK, avoiding accidental class
 identity across source and installed module trees. This actually provisions a
 funded native four-validator network and runs DIRECT activation plus grant,

@@ -151,5 +151,5 @@ try {
   });
 }
 console.log(
-  "Installed tarball native example PASS: funded DIRECT activation, both raw session schemes and finalized ROOT revocation; no repository SDK import.",
+  "Installed tarball native example PASS: funded DIRECT activation, both raw session schemes and finalized ROOT revocation; application APIs resolve the installed SDK.",
 );
