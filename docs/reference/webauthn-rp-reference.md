@@ -37,7 +37,12 @@ The reference does not implement discoverable account selection or account recov
 `verify(requestId, originalBodyBytes, trustedContext, { signal })` atomically takes
 a matching pending challenge before response parsing or cryptographic work. Wrong
 bindings, unavailable IDs, invalid time or storage failure produce no authenticated
-result. Invalid bound responses burn a taken challenge. An error, timeout, lost
+result. An observed exclusive expiry changes a pending record to terminal
+`expired` before rejection. Rolling the supplied clock back cannot revive it;
+a new independent request/challenge is required. Unexpired wrong-binding requests
+still cannot burn another account's pending challenge. Production time-source
+and durable cross-worker expiry retirement remain application responsibilities.
+Invalid bound responses burn a taken challenge. An error, timeout, lost
 result or commit failure never restores it; obtain a fresh challenge. Browser UI
 success/cancellation and transport retries do not change this server record.
 

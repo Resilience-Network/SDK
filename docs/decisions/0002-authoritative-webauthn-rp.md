@@ -72,7 +72,11 @@ browser-session binding, allowed credential IDs, trusted RP/origin/profile
 snapshot, issued time, exclusive expiry and `pending` state. Reference lifetime
 is 180 seconds; browser UI timeout never extends authoritative validity. Reject
 server times before issuance or at/after expiry. Reissuance creates a new ID and
-challenge; it never resets a consumed or expired record.
+challenge; it never resets a consumed or expired record. Observing authoritative
+time at/after a pending record's expiry irreversibly retires it before rejecting
+the request; a later clock rollback cannot restore that expired challenge.
+The application owns a trusted time source and durable cross-worker retirement;
+client clocks and TTL cleanup do not supply these guarantees.
 
 Verification receives an untrusted response plus the request ID. The RP obtains
 session/account binding from its trusted request context. Atomically take a

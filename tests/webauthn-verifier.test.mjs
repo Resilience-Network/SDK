@@ -669,3 +669,38 @@ test("actual verifier accepts both mathematical s values while consumed challeng
   await assert.rejects(verify(state, response), error);
   assert.equal(state.store.authenticationCount(), 1);
 });
+
+test("observed RP expiry is terminal across rollback for registration and authentication", async () => {
+  for (const registration of [false, true]) {
+    const state = await setup({ registration }),
+      response = state.valid(),
+      before = state.store.credential(state.fixture.id);
+    state.clock(state.challenge.expiresAt);
+    await assert.rejects(
+      () => verify(state, response),
+      (failure) =>
+        failure instanceof ReferenceRpError && failure.code === "CHALLENGE_UNAVAILABLE",
+    );
+    assert.equal(state.store.challengeState(state.challenge.requestId), "expired");
+    state.clock(state.challenge.issuedAt + 1);
+    await assert.rejects(
+      () => verify(state, response),
+      (failure) =>
+        failure instanceof ReferenceRpError && failure.code === "CHALLENGE_UNAVAILABLE",
+    );
+    assert.equal(state.store.authenticationCount(), 0);
+    assert.deepEqual(state.store.credential(state.fixture.id), before);
+    const fresh = state.rp.issueChallenge(
+        registration ? "registration" : "authentication",
+        trusted(),
+      ),
+      next = registration
+        ? state.fixture.registration(fresh)
+        : state.fixture.assertion(fresh),
+      result = await state.rp.verify(fresh.requestId, responseBody(next), trusted());
+    assert.equal(result.status, registration ? "awaiting-proof" : "authenticated");
+    assert.notEqual(fresh.requestId, state.challenge.requestId);
+    assert.notEqual(fresh.challenge, state.challenge.challenge);
+    assert.equal(state.store.challengeState(state.challenge.requestId), "expired");
+  }
+});
