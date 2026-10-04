@@ -1,3 +1,4 @@
+import { adapterErrorCode } from "./adapter-errors.js";
 import {
   bytesToHex,
   checkedUint,
@@ -28,6 +29,18 @@ export type CoordinatorErrorCode =
   | "FLOW_FAILED"
   | "ABORTED"
   | "TIMEOUT";
+const boundaryCodes = new Set<string>([
+  "INVALID_ARGUMENT",
+  "INVALID_STORE",
+  "CONFLICT",
+  "STALE_AUTHORITY",
+  "MUTATED_INPUT",
+  "ADAPTER_FAILED",
+  "FLOW_FAILED",
+  "ABORTED",
+  "TIMEOUT",
+]);
+const deadlineCodes = new Set<string>(["ABORTED", "TIMEOUT"]);
 /** Public reservation references only; never callback exceptions, bytes, keys or causes. */
 export class CoordinatorError extends Error {
   override readonly name = "CoordinatorError";
@@ -176,7 +189,12 @@ function normalize(s: NonceAuthoritySnapshot): FrozenNonceSnapshot {
       stateRoot: bytesToHex(s.stateRoot),
     });
   } catch (e) {
-    if (e instanceof CoordinatorError) throw e;
+    const known = adapterErrorCode<CoordinatorErrorCode>(
+      e,
+      CoordinatorError,
+      boundaryCodes,
+    );
+    if (known) throw new CoordinatorError(known);
     throw new CoordinatorError("INVALID_ARGUMENT");
   }
 }
@@ -408,17 +426,26 @@ export interface CoordinatedTransactionOutcome {
 /** Rejects contention rather than choosing the next nonce or signing a replacement. */
 export class NonceCoordinator {
   constructor(readonly store: NonceReservationStore) {
-    requireValid(
-      store !== null &&
-        typeof store.read === "function" &&
-        typeof store.compareExchange === "function",
-    );
+    try {
+      requireValid(
+        store !== null &&
+          typeof store.read === "function" &&
+          typeof store.compareExchange === "function",
+      );
+    } catch {
+      throw new CoordinatorError("INVALID_ARGUMENT");
+    }
   }
   async #read(k: string): Promise<NonceReservationRecord | null> {
     try {
       return validateRecord(await this.store.read(k), k);
     } catch (e) {
-      if (e instanceof CoordinatorError) throw e;
+      const known = adapterErrorCode<CoordinatorErrorCode>(
+        e,
+        CoordinatorError,
+        boundaryCodes,
+      );
+      if (known) throw new CoordinatorError(known);
       throw new CoordinatorError("ADAPTER_FAILED");
     }
   }
@@ -430,7 +457,12 @@ export class NonceCoordinator {
     try {
       requireValid(await this.store.compareExchange(next.key, old, value), "CONFLICT");
     } catch (e) {
-      if (e instanceof CoordinatorError) throw e;
+      const known = adapterErrorCode<CoordinatorErrorCode>(
+        e,
+        CoordinatorError,
+        boundaryCodes,
+      );
+      if (known) throw new CoordinatorError(known);
       throw new CoordinatorError("ADAPTER_FAILED");
     }
     return value;
@@ -772,9 +804,18 @@ export class NonceCoordinator {
       return { reservation: record, submission, reconciliation: result };
     } catch (e) {
       checkMutations();
-      if (e instanceof CoordinatorError) throw e;
-      if (e instanceof RpcClientError && ["ABORTED", "TIMEOUT"].includes(e.code))
-        throw new CoordinatorError(e.code as "ABORTED" | "TIMEOUT");
+      const known = adapterErrorCode<CoordinatorErrorCode>(
+        e,
+        CoordinatorError,
+        boundaryCodes,
+      );
+      if (known) throw new CoordinatorError(known);
+      const deadlineCode = adapterErrorCode<"ABORTED" | "TIMEOUT">(
+        e,
+        RpcClientError,
+        deadlineCodes,
+      );
+      if (deadlineCode) throw new CoordinatorError(deadlineCode);
       throw new CoordinatorError("FLOW_FAILED");
     } finally {
       deadline.dispose();
@@ -845,12 +886,18 @@ export class NonceCoordinator {
       return { reservation: settled, reconciliation: result };
     } catch (error) {
       unchanged();
-      if (error instanceof CoordinatorError) throw error;
-      if (
-        error instanceof RpcClientError &&
-        ["ABORTED", "TIMEOUT"].includes(error.code)
-      )
-        throw new CoordinatorError(error.code as "ABORTED" | "TIMEOUT");
+      const known = adapterErrorCode<CoordinatorErrorCode>(
+        error,
+        CoordinatorError,
+        boundaryCodes,
+      );
+      if (known) throw new CoordinatorError(known);
+      const deadlineCode = adapterErrorCode<"ABORTED" | "TIMEOUT">(
+        error,
+        RpcClientError,
+        deadlineCodes,
+      );
+      if (deadlineCode) throw new CoordinatorError(deadlineCode);
       throw new CoordinatorError("FLOW_FAILED");
     } finally {
       deadline.dispose();

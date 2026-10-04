@@ -602,3 +602,72 @@ test("odd-count Merkle proofs use position-derived padding siblings and reject w
     ),
   );
 });
+
+test("lifecycle reconstructs hostile typed approval failures without signing", async () => {
+  for (const mutation of ["message", "invalid-code", "code-getter", "prototype-trap"]) {
+    const f = await setup();
+    let injected = new sdk.LifecycleError("REVIEW_FAILED");
+    injected.message = "private-sentinel";
+    injected.cause = "private-sentinel";
+    if (mutation === "invalid-code") injected.code = "private-sentinel";
+    if (mutation === "code-getter")
+      Object.defineProperty(injected, "code", {
+        get() {
+          throw Error("private-sentinel");
+        },
+      });
+    if (mutation === "prototype-trap")
+      injected = new Proxy(
+        {},
+        {
+          getPrototypeOf() {
+            throw Error("private-sentinel");
+          },
+        },
+      );
+    await assert.rejects(
+      f.lifecycle.execute({
+        ...f.options,
+        approve: () => {
+          throw injected;
+        },
+      }),
+      (failure) => {
+        assert(failure instanceof sdk.LifecycleError);
+        assert.notEqual(failure, injected);
+        assert.equal(
+          failure.code,
+          mutation === "message" ? "REVIEW_FAILED" : "READ_FAILED",
+        );
+        assert.ok(!failure.message.includes("private-sentinel"));
+        assert.equal(failure.cause, undefined);
+        return true;
+      },
+    );
+    assert.equal(f.stats().signs, 0);
+    assert.equal(f.stats().sends, 0);
+    assert.equal(f.records.size, 0);
+  }
+});
+
+test("lifecycle constructor sanitizes hostile option inspection", () => {
+  assert.throws(
+    () =>
+      new sdk.SessionLifecycle(
+        new Proxy(
+          {},
+          {
+            ownKeys() {
+              throw Error("private-sentinel");
+            },
+          },
+        ),
+      ),
+    (failure) => {
+      assert(failure instanceof sdk.LifecycleError);
+      assert.equal(failure.code, "INVALID_ARGUMENT");
+      assert.ok(!failure.message.includes("private-sentinel"));
+      return true;
+    },
+  );
+});

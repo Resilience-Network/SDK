@@ -688,3 +688,79 @@ test("synchronous callback failure still checks mutated authorization inputs", a
   await assert.rejects(f.coordinator.execute(f.options), code("MUTATED_INPUT"));
   assert.equal(f.stats().sends, 0);
 });
+
+test("coordinator sanitizes typed store read/write errors before signing", async () => {
+  for (const boundary of ["read", "write"])
+    for (const mutation of [
+      "message",
+      "invalid-code",
+      "code-getter",
+      "prototype-trap",
+    ]) {
+      let injected = new sdk.CoordinatorError("CONFLICT");
+      injected.message = "private-sentinel";
+      injected.cause = "private-sentinel";
+      if (mutation === "invalid-code") injected.code = "private-sentinel";
+      if (mutation === "code-getter")
+        Object.defineProperty(injected, "code", {
+          get() {
+            throw Error("private-sentinel");
+          },
+        });
+      if (mutation === "prototype-trap")
+        injected = new Proxy(
+          {},
+          {
+            getPrototypeOf() {
+              throw Error("private-sentinel");
+            },
+          },
+        );
+      const store = {
+          async read() {
+            if (boundary === "read") throw injected;
+            return null;
+          },
+          async compareExchange() {
+            throw injected;
+          },
+        },
+        f = setup("direct", store, 99);
+      await assert.rejects(
+        boundary === "read"
+          ? f.coordinator.inspect(f.key)
+          : f.coordinator.execute(f.options),
+        (failure) => {
+          assert(failure instanceof sdk.CoordinatorError);
+          assert.notEqual(failure, injected);
+          assert.equal(
+            failure.code,
+            mutation === "message" ? "CONFLICT" : "ADAPTER_FAILED",
+          );
+          assert.ok(!failure.message.includes("private-sentinel"));
+          assert.equal(failure.cause, undefined);
+          return true;
+        },
+      );
+      assert.equal(f.stats().signs, 0);
+      assert.equal(f.stats().sends, 0);
+    }
+});
+
+test("coordinator constructor sanitizes hostile store accessors", () => {
+  assert.throws(
+    () =>
+      new sdk.NonceCoordinator({
+        get read() {
+          throw Error("private-sentinel");
+        },
+        compareExchange() {},
+      }),
+    (failure) => {
+      assert(failure instanceof sdk.CoordinatorError);
+      assert.equal(failure.code, "INVALID_ARGUMENT");
+      assert.ok(!failure.message.includes("private-sentinel"));
+      return true;
+    },
+  );
+});
