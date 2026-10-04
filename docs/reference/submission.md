@@ -70,13 +70,16 @@ is also checked. A legitimately changed authority domain is preserved explicitly
 Finalized observations cannot move backward; equal-height state tuples must agree.
 Each logical bracket may refresh within the existing bound on a moving head.
 
-Known baseline limitation: the
-[2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md) reproduced
-cross-poll height regression and equal-height block/state-root contradictions
-accepted as terminal results. The current implementation enforces the checks
-within a poll but does not retain a context watermark across polls.
-[Issue #88](https://github.com/Resilience-Network/sdk/issues/88) tracks the fix;
-do not infer cross-poll monotonicity from the existing passing tests.
+One invocation retains a finalized context watermark across every successful
+receipt, authority and block observation, including unknown or pruned lookups.
+A later lower height or conflicting equal-height block hash/state root returns
+`unknown` with `observation-error` and `STATE_CONTEXT_MISMATCH`; it cannot produce
+a terminal result. The watermark belongs to this invocation and does not establish
+consistency between separate clients or invocations. The
+[historical review](../security/reviews/2026-10-04-local-candidate.md) and
+[issue #88](https://github.com/Resilience-Network/sdk/issues/88) document the
+previous cross-poll gap. The regression suite covers each observation source,
+same-state polling and advancing native success/failure fixtures.
 
 These are node-reported finality outcomes, not independent proof verification.
 Block projection fields such as nonce, bloom, difficulty/size and decimal

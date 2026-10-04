@@ -276,6 +276,97 @@ test("receipt/authority/block contradictions stay unknown with sanitized diagnos
     assert.equal(h.sends(), 0);
   }
 });
+test("reconciliation retains finalized context across receipt, authority and block polls", async () => {
+  for (const source of ["receipt", "authority", "block"])
+    for (const contradiction of ["height", "blockHash", "stateRoot"]) {
+      let first = true;
+      const h = harness(fixture, {
+        mutate: (r, request, call) => {
+          if (!first) return;
+          if (request.method === "rsc_getTransactionReceipt" && source !== "block")
+            r.result = null;
+          if (request.method === "rsc_getTransactionByHash" && source !== "block")
+            r.result = null;
+          if (request.method === "rsc_getBlockByNumber") r.result = null;
+          const startsAt = { receipt: 1, authority: 2, block: 3 }[source];
+          if (call < startsAt) return;
+          const state =
+            request.method === "rsc_getAuthorizationFinalityStatus"
+              ? r.result.state
+              : request.method === "rsc_getRootAuthority"
+                ? r.result.state
+                : null;
+          if (!state) return;
+          if (contradiction === "height")
+            state.height = `0x${(BigInt(state.height) + 5n).toString(16)}`;
+          else state[contradiction] = `0x${"aa".repeat(32)}`;
+        },
+      });
+      const pending = h.client.reconcileTransaction(bytes(fixture.canonical), {
+        maxPolls: 2,
+        pollIntervalMs: 5,
+        timeoutMs: 100,
+      });
+      await flush();
+      first = false;
+      await h.clock.advance(5);
+      const result = await pending;
+      assert.equal(result.status, "unknown", `${source}/${contradiction}`);
+      assert.equal(result.reason, "observation-error");
+      assert.equal(result.diagnostic.code, "STATE_CONTEXT_MISMATCH");
+      assert.equal(
+        result.polls,
+        contradiction === "height" || source === "receipt" ? 2 : 1,
+      );
+      assert.equal(h.sends(), 0);
+      assert.equal(h.clock.tasks.size, 0);
+    }
+});
+test("same-state and advancing cross-poll contexts preserve native success and failure", async () => {
+  for (const f of fixtures)
+    for (const advancing of [false, true]) {
+      let first = true;
+      const h = harness(f, {
+        mutate: (r, request) => {
+          if (!first) return;
+          if (
+            request.method === "rsc_getTransactionReceipt" ||
+            request.method === "rsc_getTransactionByHash"
+          )
+            r.result = null;
+          if (
+            advancing &&
+            (request.method === "rsc_getAuthorizationFinalityStatus" ||
+              request.method === "rsc_getRootAuthority" ||
+              request.method === "rsc_getSessionGrant")
+          ) {
+            r.result.state.height = `0x${(BigInt(r.result.state.height) - 1n).toString(16)}`;
+            if (request.method === "rsc_getSessionGrant")
+              r.result.usableAtObservedBlock =
+                BigInt(r.result.state.height) >= BigInt(r.result.validAfterHeight);
+          }
+        },
+      });
+      const pending = h.client.reconcileTransaction(bytes(f.canonical), {
+        maxPolls: 2,
+        pollIntervalMs: 5,
+        timeoutMs: 100,
+      });
+      await flush();
+      first = false;
+      await h.clock.advance(5);
+      const result = await pending;
+      assert.equal(
+        result.status,
+        f.scenario.endsWith("failure")
+          ? "reported-finalized-failure"
+          : "reported-finalized-success",
+      );
+      assert.equal(result.polls, 2);
+      assert.equal(h.sends(), 0);
+      assert.equal(h.clock.tasks.size, 0);
+    }
+});
 test("reconciliation is bounded under ignored cancellation, deadline, exhausted polling and invalid options", async () => {
   const controller = new AbortController();
   controller.abort();
