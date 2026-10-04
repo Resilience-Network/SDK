@@ -135,3 +135,7 @@ engines/virtual authenticators; #31 records physical devices; #27 qualifies the
 maintained authoritative verifier/store wrapper. Independent review remains #34.
 The API follows [W3C WebAuthn](https://www.w3.org/TR/webauthn-3/), with an explicitly
 narrower application profile.
+
+Hostile input validation reconstructs errors with fixed messages and validated
+codes. It does not forward caller-supplied error objects, messages or causes,
+including modified SDK error instances or throwing classification properties.

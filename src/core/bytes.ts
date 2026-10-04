@@ -6,6 +6,15 @@ export type CodecErrorCode =
   | "UNSUPPORTED_FEATURE"
   | "CONTEXT_MISMATCH";
 
+const sanitizedCodes = new Set<string>([
+  "MALFORMED",
+  "NON_CANONICAL",
+  "LIMIT_EXCEEDED",
+  "UNSUPPORTED_VERSION",
+  "UNSUPPORTED_FEATURE",
+  "CONTEXT_MISMATCH",
+]);
+
 export class CodecError extends Error {
   constructor(
     public readonly code: CodecErrorCode,
@@ -84,8 +93,15 @@ export function checkedBytes(value: Uint8Array, maximum: number): Uint8Array {
     }
     return new Uint8Array(value);
   } catch (error) {
-    if (error instanceof CodecError) throw error;
-    throw new CodecError("MALFORMED", "Invalid byte view");
+    let code: CodecErrorCode = "MALFORMED";
+    try {
+      if (error instanceof CodecError) {
+        const candidate = error.code;
+        if (typeof candidate === "string" && sanitizedCodes.has(candidate))
+          code = candidate;
+      }
+    } catch {}
+    throw new CodecError(code, "Invalid byte view");
   }
 }
 

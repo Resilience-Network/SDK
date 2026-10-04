@@ -9,6 +9,18 @@ export type WebAuthnBrowserErrorCode =
   | "INVALID_RESPONSE"
   | "BROWSER_FAILED";
 
+const sanitizedCodes = new Set<string>([
+  "INVALID_ARGUMENT",
+  "INVALID_CONTEXT",
+  "UNSUPPORTED",
+  "CANCELLED",
+  "TIMEOUT",
+  "DENIED_OR_UNAVAILABLE",
+  "ALREADY_REGISTERED",
+  "INVALID_RESPONSE",
+  "BROWSER_FAILED",
+]);
+
 export class WebAuthnBrowserError extends Error {
   constructor(public readonly code: WebAuthnBrowserErrorCode) {
     super("WebAuthn ceremony failed");
@@ -28,7 +40,12 @@ export function browserFailure(
   fallback: WebAuthnBrowserErrorCode = "BROWSER_FAILED",
 ): WebAuthnBrowserError {
   try {
-    if (error instanceof WebAuthnBrowserError) return error;
+    if (error instanceof WebAuthnBrowserError) {
+      const code = error.code;
+      return new WebAuthnBrowserError(
+        typeof code === "string" && sanitizedCodes.has(code) ? code : fallback,
+      );
+    }
     const name = (error as { name?: unknown } | null)?.name;
     const codes: Record<string, WebAuthnBrowserErrorCode> = {
       AbortError: "CANCELLED",

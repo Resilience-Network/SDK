@@ -10,6 +10,19 @@ export type WebAuthnParseErrorCode =
   | "INVALID_CLIENT_DATA"
   | "INVALID_DER";
 
+const sanitizedCodes = new Set<string>([
+  "INVALID_ARGUMENT",
+  "LIMIT_EXCEEDED",
+  "INVALID_CBOR",
+  "UNSUPPORTED_COSE",
+  "INVALID_POINT",
+  "INVALID_AUTHENTICATOR_DATA",
+  "UNSUPPORTED_EXTENSION",
+  "UNSUPPORTED_ATTESTATION",
+  "INVALID_CLIENT_DATA",
+  "INVALID_DER",
+]);
+
 export class WebAuthnParseError extends Error {
   constructor(public readonly code: WebAuthnParseErrorCode) {
     super("Invalid or unsupported WebAuthn representation");
@@ -28,8 +41,15 @@ export function guarded<T>(work: () => T): T {
   try {
     return work();
   } catch (error) {
-    if (error instanceof WebAuthnParseError) throw error;
-    throw new WebAuthnParseError("INVALID_ARGUMENT");
+    let code: WebAuthnParseErrorCode = "INVALID_ARGUMENT";
+    try {
+      if (error instanceof WebAuthnParseError) {
+        const candidate = error.code;
+        if (typeof candidate === "string" && sanitizedCodes.has(candidate))
+          code = candidate;
+      }
+    } catch {}
+    throw new WebAuthnParseError(code);
   }
 }
 
