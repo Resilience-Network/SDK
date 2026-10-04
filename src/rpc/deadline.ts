@@ -1,4 +1,4 @@
-import { RpcClientError } from "./errors.js";
+import { createRpcFailure } from "./errors.js";
 import type { RpcClock } from "./types.js";
 
 export const systemClock: RpcClock = {
@@ -22,8 +22,19 @@ export class Deadline {
   ) {
     this.#endsAt = clock.now() + timeoutMs;
     this.#timer = clock.setTimeout(() => this.#stop("TIMEOUT"), timeoutMs);
-    caller?.addEventListener("abort", this.#onAbort, { once: true });
-    if (caller?.aborted) this.#onAbort();
+    try {
+      caller?.addEventListener("abort", this.#onAbort, { once: true });
+      if (caller?.aborted) this.#onAbort();
+    } catch (error) {
+      // A caller hook can register and then throw; undo both owned resources.
+      clock.clearTimeout(this.#timer);
+      try {
+        caller?.removeEventListener("abort", this.#onAbort);
+      } catch {
+        /* caller hook */
+      }
+      throw error;
+    }
   }
 
   #stop(code: "ABORTED" | "TIMEOUT"): void {
@@ -38,13 +49,13 @@ export class Deadline {
     if (!this.controller.signal.aborted && this.clock.now() >= this.#endsAt)
       this.#stop("TIMEOUT");
     if (this.controller.signal.aborted)
-      throw new RpcClientError(this.#code, this.attempts);
+      throw createRpcFailure(this.#code, this.attempts);
   }
 
   race<T>(pending: Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const signal = this.controller.signal;
-      const abort = () => reject(new RpcClientError(this.#code, this.attempts));
+      const abort = () => reject(createRpcFailure(this.#code, this.attempts));
       signal.addEventListener("abort", abort, { once: true });
       // Both handlers stay attached even when abort wins, consuming late failures.
       pending.then(

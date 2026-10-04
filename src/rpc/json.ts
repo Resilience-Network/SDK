@@ -1,4 +1,4 @@
-import { RpcClientError } from "./errors.js";
+import { createRpcFailure } from "./errors.js";
 import type { JsonValue } from "./types.js";
 
 const MAX_DEPTH = 64;
@@ -11,8 +11,8 @@ export function encodeRequest(value: unknown, maxBytes: number): string {
   const encoder = new TextEncoder();
   let bytes = 0;
   let nodes = 0;
-  const invalid = () => new RpcClientError("INVALID_REQUEST");
-  const limit = () => new RpcClientError("REQUEST_LIMIT");
+  const invalid = () => createRpcFailure("INVALID_REQUEST");
+  const limit = () => createRpcFailure("REQUEST_LIMIT");
   const append = (chunk: string) => {
     bytes += encoder.encode(chunk).byteLength;
     if (bytes > maxBytes) throw limit();
@@ -80,7 +80,7 @@ export function parseResponse(text: string, attempts: number): JsonValue {
   let at = 0;
   let nodes = 0;
   const numberToken = /-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/y;
-  const invalid = () => new RpcClientError("INVALID_JSON", attempts);
+  const invalid = () => createRpcFailure("INVALID_JSON", attempts);
   const whitespace = () => {
     while (at < text.length && /[ \t\r\n]/.test(text[at]!)) at++;
   };
@@ -101,7 +101,7 @@ export function parseResponse(text: string, attempts: number): JsonValue {
   };
   const value = (depth: number): JsonValue => {
     if (depth > MAX_DEPTH || ++nodes > MAX_NODES)
-      throw new RpcClientError("RESPONSE_LIMIT", attempts);
+      throw createRpcFailure("RESPONSE_LIMIT", attempts);
     whitespace();
     const char = text[at];
     if (char === '"') return string();

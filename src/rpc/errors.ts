@@ -77,3 +77,50 @@ export class RpcClientError extends Error {
     this.requestMayHaveReachedNode = attempts > 0;
   }
 }
+
+// Internal provenance, deliberately absent from the package entrypoints. Never
+// inspect a thrown caller object's prototype or properties to classify it.
+type FailureMetadata = readonly [
+  RpcErrorCode,
+  number | undefined,
+  number | undefined,
+  AuthorizationErrorFamily | undefined,
+];
+const internalFailures = new WeakMap<object, FailureMetadata>();
+export function createRpcFailure(
+  code: RpcErrorCode,
+  attempts = 0,
+  httpStatus?: number,
+  rpcCode?: number,
+  authorizationFamily?: AuthorizationErrorFamily,
+): RpcClientError {
+  const error = new RpcClientError(
+    code,
+    attempts,
+    httpStatus,
+    rpcCode,
+    authorizationFamily,
+  );
+  internalFailures.set(error, [code, httpStatus, rpcCode, authorizationFamily]);
+  return error;
+}
+export function reconstructRpcFailure(
+  error: unknown,
+  fallback: RpcErrorCode,
+  attempts: number,
+  allowed?: readonly RpcErrorCode[],
+): RpcClientError {
+  const metadata =
+    error !== null && typeof error === "object"
+      ? internalFailures.get(error)
+      : undefined;
+  if (metadata && (!allowed || allowed.includes(metadata[0])))
+    return createRpcFailure(
+      metadata[0],
+      attempts,
+      metadata[1],
+      metadata[2],
+      metadata[3],
+    );
+  return createRpcFailure(fallback, attempts);
+}

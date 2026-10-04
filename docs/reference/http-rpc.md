@@ -140,13 +140,16 @@ only the fixed known tokens listed in the [typed RPC reference](rpc.md); unknown
 tokens are discarded. There is no logging hook. Applications must also
 avoid logging their secrets.
 
-Known baseline limitation: the
-[2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md) reproduced
-a hostile request Proxy forwarding a caller-modified `RpcClientError` object,
-including its message and cause, before any fetch. The serializer's typed-error
-catch does not fully enforce the intended diagnostic boundary.
-[Issue #84](https://github.com/Resilience-Network/sdk/issues/84) tracks fresh error
-reconstruction and adversarial regressions.
+Request inspection reconstructs fresh fixed errors. Only internally created
+request-limit failures preserve `REQUEST_LIMIT`; caller-thrown objects, including
+modified SDK errors, proxies, invalid codes and throwing classification getters,
+become `INVALID_REQUEST` before dispatch. Injected response/dependency failures
+become fresh bounded transport diagnostics with the actual attempt count. Internal
+provenance is held separately from mutable public error fields; messages, causes,
+stacks and payloads from dependency exceptions are never forwarded. The
+[historical review](../security/reviews/2026-10-04-local-candidate.md) and
+[issue #84](https://github.com/Resilience-Network/sdk/issues/84) record the prior
+request/response gap.
 
 Endpoints are absolute HTTP(S) URLs without credentials, queries or fragments.
 HTTP supports local development; use HTTPS for deployed services. Fetch uses
