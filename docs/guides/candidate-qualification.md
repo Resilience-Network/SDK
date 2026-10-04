@@ -56,7 +56,8 @@ and run a fresh candidate at the final revision.
 Each run owns `artifacts/qualification/<UUID>/` with restricted command output and
 `manifest.json`; `latest.json` is a convenience copy. The manifest records exact
 source/lock/profile hashes, candidate/native revisions, toolchains, stage counts,
-output hashes, native ownership IDs, evidence/log verification and hashes of fresh
+output hashes, a common enforced installed-archive digest, native ownership IDs,
+evidence/log verification and hashes of fresh
 API/RP/browser/installed/combined artifacts. Only the structured manifest is suitable
 for review sharing after inspection. Command output stays restricted local evidence;
 do not upload entire artifacts, retained runtimes, keys or wallet/signing state.

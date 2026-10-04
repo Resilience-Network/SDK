@@ -17,7 +17,7 @@ export const stages = Object.freeze([
     id: "sdk",
     script: "check",
     pattern: /ℹ tests (\d+)/,
-    minimum: 304,
+    minimum: 305,
     timeout: 180000,
   },
   {
@@ -153,3 +153,47 @@ export const entryScripts = Object.freeze({
   installed: "scripts/check_installed_session_example.mjs",
   combined: "examples/passkey-session/run.mjs",
 });
+
+export function verifyArtifact(name, evidence, revision, archiveSha256) {
+  if ((evidence.sdkRevision ?? evidence.revision) !== revision)
+    throw Error("Stale artifact revision");
+  if (name === "api" ? evidence.dirty !== false : evidence.trackedClean !== true)
+    throw Error("Dirty or missing artifact cleanliness");
+  if (name === "api") {
+    if (evidence.status !== "PASS") throw Error("API artifact failed");
+  } else if (name === "rp") {
+    if (
+      evidence.failures !== 0 ||
+      evidence.skipped !== 0 ||
+      evidence.todo !== 0 ||
+      evidence.tests < 76
+    )
+      throw Error("Incomplete RP artifact");
+  } else {
+    if (evidence.result !== "pass") throw Error("Child artifact failed");
+    if (
+      name === "browser" &&
+      (evidence.engines?.length !== 1 ||
+        evidence.engines[0].version !== profile.browser ||
+        evidence.engines[0].checks?.length < 24 ||
+        !evidence.engines[0].checks.every((c) => c.result === "pass") ||
+        evidence.failures !== 0 ||
+        evidence.skipped !== 0 ||
+        evidence.todo !== 0)
+    )
+      throw Error("Unqualified browser artifact");
+    if (
+      name === "combined" &&
+      (evidence.browser?.version !== profile.browser ||
+        evidence.checks?.length < 17 ||
+        !evidence.checks.every((c) => c.result === "pass"))
+    )
+      throw Error("Incomplete combined artifact");
+  }
+  if (
+    name !== "rp" &&
+    (!/^[a-f0-9]{64}$/.test(evidence.archiveSha256 ?? "") ||
+      evidence.archiveSha256 !== archiveSha256)
+  )
+    throw Error("Installed archive digest mismatch");
+}

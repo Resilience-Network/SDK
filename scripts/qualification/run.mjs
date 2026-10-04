@@ -6,7 +6,13 @@ import { createHash, randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { platform, arch } from "node:os";
-import { profile, stages, verifyOutput, entryScripts } from "./profile.mjs";
+import {
+  profile,
+  stages,
+  verifyOutput,
+  verifyArtifact,
+  entryScripts,
+} from "./profile.mjs";
 import { verifyCapturedLogs } from "../localnet/verify-logs.mjs";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const hash = (data) => createHash("sha256").update(data).digest("hex");
@@ -272,21 +278,8 @@ try {
   ]) {
     const bytes = await readFile(join(root, "artifacts", relative, "latest.json")),
       e = JSON.parse(bytes);
-    assert.equal(e.sdkRevision ?? e.revision, revision);
-    assert.equal(e.trackedClean ?? !e.dirty, true);
-    if (name === "api") assert.equal(e.status, "PASS");
-    else if (name === "rp") {
-      assert.equal(e.failures, 0);
-      assert.equal(e.skipped, 0);
-      assert(e.tests >= 76);
-    } else {
-      assert.equal(e.result, "pass");
-      if (name === "browser") {
-        assert.equal(e.engines.length, 1);
-        assert.equal(e.engines[0].version, profile.browser);
-        assert(e.engines[0].checks.length >= 24);
-      }
-    }
+    if (name === "api") report.archiveSha256 = e.archiveSha256;
+    verifyArtifact(name, e, revision, report.archiveSha256);
     summaries.push({ name, sha256: hash(bytes) });
   }
   report.activeStage = null;
