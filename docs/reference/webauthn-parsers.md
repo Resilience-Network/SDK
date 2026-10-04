@@ -116,3 +116,7 @@ Normative standards:
 [W3C WebAuthn key/format rules](https://www.w3.org/TR/webauthn-3/#sctn-attested-credential-data),
 [CTAP2 canonical CBOR](https://fidoalliance.org/specs/fido-v2.1-ps-20210615/fido-client-to-authenticator-protocol-v2.1-ps-errata-20220621.html#message-encoding),
 and [ES256 DER signatures](https://www.w3.org/TR/webauthn-3/#sctn-signature-attestation-types).
+
+Hostile input validation reconstructs errors with fixed messages and validated
+codes. It does not forward caller-supplied error objects, messages or causes,
+including modified SDK error instances or throwing classification properties.

@@ -105,3 +105,7 @@ review. See [testing](../guides/testing.md) for executable commands and limits.
 The independent fixture contains deterministic test-only identities/signatures.
 Native Go fills specific layout gaps rather than treating self-roundtrips as
 independent evidence. No fixture encodes real wallet secrets.
+
+Hostile input validation reconstructs errors with fixed messages and validated
+codes. It does not forward caller-supplied error objects, messages or causes,
+including modified SDK error instances or throwing classification properties.
