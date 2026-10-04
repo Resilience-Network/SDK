@@ -548,3 +548,11 @@ links the complete hierarchy, milestones and definition of complete.
 - [[FR-013:WebAuthn] Implement browser ceremonies and strict ES256 response parsing](https://github.com/Resilience-Network/sdk/issues/7) — P5.
 - [[HARNESS:Testing] Add browser and disposable localnet SDK lifecycle evidence](https://github.com/Resilience-Network/sdk/issues/8) — P6.
 - [[SEC-GATE:Client] Qualify SDK signing security and reproducible package release](https://github.com/Resilience-Network/sdk/issues/9) — P7.
+
+## Local candidate execution profile
+
+[Candidate qualification](docs/guides/candidate-qualification.md) composes the
+implemented local suites at one clean explicit revision. The #8 browser/device
+umbrella remains open for #31/#69; its reviewed local child deliveries unblock
+#37 pipeline implementation without waiving physical, other-engine or release
+acceptance. #34/#35/#38 remain external review/ownership/publication gates.
