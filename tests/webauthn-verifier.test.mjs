@@ -704,3 +704,52 @@ test("observed RP expiry is terminal across rollback for registration and authen
     assert.equal(state.store.challengeState(state.challenge.requestId), "expired");
   }
 });
+
+test("RP verification reconstructs hostile typed errors without leaking payloads", async () => {
+  const modified = new ReferenceRpError("INVALID_RESPONSE");
+  modified.message = "synthetic-private-sentinel";
+  modified.cause = { secret: "synthetic-cause" };
+  const invalid = new ReferenceRpError("INVALID_RESPONSE");
+  invalid.code = "synthetic-private-code";
+  const getter = new ReferenceRpError("INVALID_RESPONSE");
+  Object.defineProperty(getter, "code", {
+    get() {
+      throw modified;
+    },
+  });
+  const hostile = new Proxy(
+    {},
+    {
+      getPrototypeOf() {
+        throw modified;
+      },
+    },
+  );
+  for (const [injected, expected] of [
+    [modified, "INVALID_RESPONSE"],
+    [invalid, "VERIFICATION_FAILED"],
+    [getter, "VERIFICATION_FAILED"],
+    [hostile, "VERIFICATION_FAILED"],
+  ]) {
+    const state = await setup();
+    const before = state.store.credential(state.fixture.id);
+    const body = new Proxy(new Uint8Array(1), {
+      getPrototypeOf() {
+        throw injected;
+      },
+    });
+    await assert.rejects(
+      state.rp.verify(state.challenge.requestId, body, trusted()),
+      (failure) => {
+        assert.notEqual(failure, injected);
+        error(failure);
+        assert.equal(failure.code, expected);
+        assert.equal(failure.cause, undefined);
+        return true;
+      },
+    );
+    assert.equal(state.store.authenticationCount(), 0);
+    assert.deepEqual(state.store.credential(state.fixture.id), before);
+    assert.equal(state.store.challengeState(state.challenge.requestId), "taken");
+  }
+});

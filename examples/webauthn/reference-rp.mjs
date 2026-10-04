@@ -568,12 +568,11 @@ export class ReferenceRelyingParty {
         counter: committed.counter,
       });
     } catch (error) {
-      let known = false;
+      let code = "VERIFICATION_FAILED";
       try {
-        known = error instanceof ReferenceRpError;
+        if (error instanceof ReferenceRpError) code = error.code;
       } catch {}
-      if (known) throw error;
-      throw new ReferenceRpError("VERIFICATION_FAILED");
+      throw new ReferenceRpError(code);
     }
   }
 }

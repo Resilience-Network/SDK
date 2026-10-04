@@ -121,3 +121,9 @@ Actual engine/virtual authenticator qualification remains #30 and physical devic
 coverage #31. The combined application/native example is #32. Independent review
 is #34; this reference never turns a WebAuthn assertion into raw SessionDigest
 signing or waives production RP/store obligations.
+
+Verification failures reconstruct a fresh fixed-message `ReferenceRpError` and
+preserve only an allowed code. Hostile response/store exceptions cannot forward
+caller-controlled messages, causes or error object identity. Classification and
+code access are guarded; unknown failures become `VERIFICATION_FAILED`. This
+reference boundary does not replace production logging/privacy review.
