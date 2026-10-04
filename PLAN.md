@@ -215,7 +215,7 @@ Source modules and export boundaries:
   ES256 response parsing; `@resilience-network/sdk/webauthn` provides bounded
   [representation parsers](docs/reference/webauthn-parsers.md) and
   [ceremony helpers](docs/reference/webauthn-browser.md). Authoritative RP
-  conformance and actual engine qualification remain separate tasks.
+  conformance is executed by a separate [Node reference](docs/reference/webauthn-rp-reference.md); actual engine qualification remains a separate task.
 - `src/display/`: implemented frozen canonical review fields and exact formatting;
   entry `@resilience-network/sdk/display`.
 - `tests/`: unit/adversarial, versioned vectors, Go differential and browser suites.
@@ -226,7 +226,7 @@ Core/session codecs, hashes, typed authorization RPC reads, HTTP transport and
 [canonical review](docs/reference/display.md), nonce coordination, single-send
 reconciliation and [explicit account/session lifecycle](docs/reference/lifecycle.md)
 are available, alongside bounded WebAuthn representation parsers and browser ceremony
-collection. Authoritative RP conformance, actual engines and complete release qualification remain planned.
+collection and [reference RP conformance](docs/reference/webauthn-rp-reference.md). Actual engines, production RP durability and complete release qualification remain separate gates.
 Canonical signer approval binds review to the exact signing snapshot. Do not add
 placeholder functions that claim support.
 

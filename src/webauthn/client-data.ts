@@ -34,7 +34,8 @@ export function decodeBase64url(value: string, maximum: number): Uint8Array {
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
-class JsonReader {
+// Internal bounded reader reused by the reference RP; not a public package export.
+export class JsonReader {
   #offset = 0;
   #items = 0;
   constructor(readonly text: string) {}

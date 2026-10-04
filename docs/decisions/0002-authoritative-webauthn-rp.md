@@ -1,8 +1,9 @@
 # ADR-0002: Authoritative WebAuthn relying-party contract
 
 Status: selected implementation contract under SDK #23; acceptance requires the
-linked PR review and merge. This decision specifies future helpers/reference
-tests, not a shipped authentication service or completed verifier qualification.
+linked PR review and merge. This decision defines the implemented helpers and
+[executable RP conformance reference](../reference/webauthn-rp-reference.md), not a
+shipped authentication service or production durable-store qualification.
 
 ## Decision and responsibilities
 
@@ -14,11 +15,11 @@ CSRF protection, rate limits and trusted configuration. SDK browser helpers
 collect and serialize public ceremony responses; their parsing success and any
 client-supplied `verified` field are never authoritative results.
 
-The reference conformance boundary in #27 will use
+The reference conformance boundary in #27 uses
 [`@simplewebauthn/server`](https://simplewebauthn.dev/docs/packages/server) for
 registration/assertion cryptographic verification, with an explicit application
 wrapper enforcing this narrower profile and transactional storage semantics.
-Select and exact-pin its reviewed version/lockfile in that implementation PR.
+Its development dependency is exact-pinned at 14.0.3 in package/lock files.
 Keep this Node test/reference dependency outside browser/core/session imports;
 do not implement a second cryptographic verifier or install a backend implicitly.
 A production RP adapter must satisfy the same conformance cases with its actual
@@ -152,8 +153,9 @@ no legacy decoder or relaxed fallback. Parser #26 and browser #25 must publish
 their exact implemented bounds and account for these contracts.
 
 [Normative case inventory](../../tests/webauthn/rp-contract-cases.json) records
-required outcomes for real signed fixtures and storage races in #27. It is a
-design input, not an executed signature/browser test. #30 adds actual browser
+required outcomes for real signed fixtures and storage races in #27. The inventory
+is a design input; the linked executable reference suite and exact-revision
+evidence report establish actual signature/store results, not browser evidence. #30 adds actual browser
 engines/virtual authenticators; #31 retains physical-device evidence. #32 may
 combine app login and native signing only after #24/#25/#26/#27 review/merge and
 those separate boundaries are visible. Independent security sign-off remains #34.

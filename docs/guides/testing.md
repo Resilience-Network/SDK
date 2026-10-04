@@ -355,8 +355,8 @@ use the normal flow budget; a scheduling race is not approval behavior evidence.
 ## WebAuthn contract inventory
 
 [ADR-0002](../decisions/0002-authoritative-webauthn-rp.md) and its
-[normative cases](../../tests/webauthn/rp-contract-cases.json) define future real
-verifier/storage coverage for SDK #27. The inventory contains scenario IDs,
+[normative cases](../../tests/webauthn/rp-contract-cases.json) define required real
+verifier/storage coverage executed by the reference suite for SDK #27. The inventory contains scenario IDs,
 mutations and required outcomes, not signed fixtures or executed test results.
 It does not increase the SDK passing-test count. Implemented parser/browser/
 verifier suites must supply actual bytes, cryptographic checks and store races;
@@ -390,3 +390,17 @@ does not verify that signature. The suite is included in `npm run check`.
 Installed-package checks cover types/exports and cold Node imports. Actual browser
 engine/virtual-authenticator qualification remains #30, verifier/store conformance
 #27 and physical-device evidence #31. See the [browser API](../reference/webauthn-browser.md).
+
+## Authoritative WebAuthn RP reference tests
+
+`npm run test:webauthn-verifier` builds and executes every one of the 67 normative
+ADR-0002 cases using real Node/OpenSSL-signed fixtures and maintained
+`@simplewebauthn/server` 14.0.3, plus store/crypto integrity regressions. It retains
+sanitized revision/runtime/dependency/source-hash/case evidence in ignored
+`artifacts/webauthn-verifier/latest.json`, with zero required skips/todos. The
+ordinary SDK check also includes this executable suite. See the
+[RP reference](../reference/webauthn-rp-reference.md) for atomic single-process
+take/CAS, awaiting-proof enrollment, synced-counter adaptation and expiry rules.
+These Map-store results do not qualify multiple workers, durability/restarts,
+production deployment, actual browser engines, physical devices or independent
+review. Private fixture KeyObjects never leave memory.
