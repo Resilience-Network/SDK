@@ -51,6 +51,13 @@ PID killing occurs. Interrupted/failed candidates retain evidence and are not
 resumed by copying historical PASS claims. Investigate failures, fix/review changes
 and run a fresh candidate at the final revision.
 
+The [2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md)
+reproduced incomplete RP artifact acceptance (#85), a stage that remains running
+after its SIGTERM timeout (#86), and surviving owned descendants after their
+parent exits (#87). Historical successful qualification does not establish those
+failure-path guarantees. GitHub tracks their fixes; robust qualification requires
+their regressions and a fresh final candidate after reviewed delivery.
+
 ## Evidence and review
 
 Each run owns `artifacts/qualification/<UUID>/` with restricted command output and

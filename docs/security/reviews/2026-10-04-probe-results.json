@@ -1,0 +1,58 @@
+{
+  "kind": "historical-known-defect-reproductions",
+  "baseline": "fac5ba1843be7ed51562f4387c34e82677c4216d",
+  "qualificationPassed": false,
+  "results": [
+    {
+      "issue": 84,
+      "originalErrorForwarded": true,
+      "fetches": 0
+    },
+    {
+      "issue": 85,
+      "acceptedCount": "missing"
+    },
+    {
+      "issue": 85,
+      "acceptedCount": "76"
+    },
+    {
+      "issue": 88,
+      "scenario": "height regression",
+      "previousHeight": "106",
+      "terminalHeight": "101",
+      "status": "reported-finalized-success",
+      "sends": 0
+    },
+    {
+      "issue": 88,
+      "scenario": "equal-height contradiction",
+      "previousHeight": "101",
+      "terminalHeight": "101",
+      "status": "reported-finalized-success",
+      "sends": 0
+    },
+    {
+      "issue": 86,
+      "timeoutMs": 200,
+      "elapsedMs": 753,
+      "settled": false,
+      "childStillRunning": true
+    },
+    {
+      "issue": 86,
+      "probeOwnedChildClosed": true
+    },
+    {
+      "issue": 87,
+      "leaderExited": true,
+      "stopRejected": true,
+      "elapsedMs": 2025,
+      "descendantPipeStillOpen": true
+    },
+    {
+      "issue": 87,
+      "probeOwnedGroupClosed": true
+    }
+  ]
+}
