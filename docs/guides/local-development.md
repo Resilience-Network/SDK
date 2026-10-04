@@ -1,7 +1,9 @@
 # Local development
 
-Use this guide to build and verify the canonical codec SDK. It does not provision
-a live chain, store a private key or implement a wallet.
+Use this guide to build and verify the implemented SDK. Ordinary checks cover
+codecs, hashes, RPC, raw signing, review, coordination and WebAuthn contracts.
+[Native integration](native-integration.md) describes installed consumers and
+explicitly owned native/browser gates; the SDK does not custody private keys.
 
 ## Prerequisites
 
@@ -37,16 +39,18 @@ as an incidental development step.
   clean consumer, verify import and TypeScript resolution, then remove that temp directory.
 - `npm run check`: formatting, types, docs, unit/vector tests and packaging in sequence.
 
-The tests establish the supported codec/hash scope, not live authorization,
-transaction signing or browser behavior. Successful import establishes packaging
-only. See [testing](testing.md) for exact gates and coverage limits.
+Ordinary tests cover the implemented APIs and adversarial contracts; mocked
+browser methods do not establish actual engine behavior. Successful import
+establishes packaging only. Separate native/browser/combined gates execute real
+features under their declared profiles. See [testing](testing.md) for evidence
+boundaries and [native integration](native-integration.md) for consumers.
 
 ## Working with Chain
 
 Chain is an external source/test dependency pinned in
 [protocol-source.json](../../protocol-source.json). A sibling checkout is
 convenient for development, but neither builds nor docs require that path.
-Use the pinned revision in a disposable checkout for future integration runs.
+Use the pinned revision in a clean disposable checkout for integration runs.
 Do not change another checkout's branch or wipe its data to align an SDK example.
 
 Native node builds and any Chain changes follow Chain's own contributor rules.

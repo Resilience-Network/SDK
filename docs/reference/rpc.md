@@ -112,8 +112,9 @@ AbortSignal. Wire spelling is always `rsc_`, including registered `eth_` aliases
   `rsc_simulateAuthorizedTransaction([signedV2Hex])`: also binds transaction ID/
   sponsor to request, checks status/failure codes, gas, fee arithmetic, widths,
   event count ≤2 and version/type/303-byte framing. `authorized: true` can have
-  action status 0/failed. Counter-delta/event-root hashes and full event semantics
-  remain observations pending independent receipt verification in #16.
+  action status 0/failed. Simulation remains an advisory node observation. Canonical receipt/event/counter
+  commitment verification is implemented in the [receipt API](receipts.md) for
+  supplied bounded receipt data; it is not an independent inclusion proof.
   [Handler](https://github.com/Resilience-Network/Chain/blob/007356ef5e5e1769cfda2290fcafc9db5d48bbfd/internal/rpc/authorization_api.go#L252).
 
 `getAuthorizationSnapshot(owner20, grantId32, options?)` composes root/grant/nonce/
@@ -162,8 +163,8 @@ fetch ignores AbortSignal.
 
 ## Evidence and remaining gates
 
-[35 native fixtures](../../tests/fixtures/rpc-contracts.json) cover all 12 wire
-methods, both grant schemes, DIRECT/ROOT, buckets, revoked stale grants, warnings
+[41 native fixtures](../../tests/fixtures/rpc-contracts.json) cover 14 wire
+methods (including account balance/nonce reads), both grant schemes, DIRECT/ROOT, buckets, revoked stale grants, warnings
 and node errors. The [Go producer](../../tests/go-rpc-reference/contracts_test.go)
 uses production Handler/API with owned in-memory state. The
 [native checker](../../scripts/check_rpc_contracts.mjs) checks the pin, CGO and

@@ -7,7 +7,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 import { ed25519 } from "@noble/curves/ed25519.js";
 import { p256 } from "@noble/curves/nist.js";
-import * as sdk from "../dist/index.js";
+import * as sdk from "@resilience-network/sdk";
 import { withNativeLocalnet } from "../scripts/localnet/harness.mjs";
 import { verifyCapturedLogs } from "../scripts/localnet/verify-logs.mjs";
 const counts = new WeakMap();
@@ -52,7 +52,12 @@ export async function nativeSessionFixture(
     },
   } = {},
 ) {
-  const client = h.clients[0],
+  const client = new sdk.ChainRpcClient({
+      url: h.urls[0],
+      expected: h.expected,
+      timeoutMs: 3000,
+      maxContextRefreshes: 3,
+    }),
     context = { chainId: h.expected.chainId, genesisHash: h.expected.genesisHash };
   const owner = sdk.hexToBytes(h.publicWallets.owner.address),
     recipient = sdk.hexToBytes(h.publicWallets.recipient.address);

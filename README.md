@@ -144,3 +144,7 @@ The [combined passkey/session example](docs/guides/passkey-session-example.md)
 executes actual virtual-browser app authentication and a separate funded native
 session lifecycle. Login does not confer native key authority; external test keys
 and explicit canonical approvals remain distinct.
+
+Use the [native integration and troubleshooting guide](docs/guides/native-integration.md)
+for actual local-tarball consumption, trusted deployment, external signers, durable
+nonce storage and same-ID recovery. Registry publication remains separately gated.

@@ -4,7 +4,8 @@ This index separates intended SDK capabilities from the currently available
 implemented canonical codecs/hashes, HTTP transport, typed Chain reads
 and raw transaction signer adapters, canonical review data and account/session
 lifecycle and bounded WebAuthn parsers/browser helpers. Actual engine and RP
-verification qualification remain separate gates.
+verification use separate evidence gates with the exact qualified scope in their
+references; physical devices and other engines remain separate.
 
 - [Implementation plan](../PLAN.md): feature scope, architecture and delivery gates.
 - [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
@@ -13,6 +14,9 @@ verification qualification remain separate gates.
 - [Testing](guides/testing.md): available commands and required feature evidence.
 - [Owned native localnet](guides/native-localnet.md): generated funded genesis,
   real native validators, bounded ownership, evidence and failure/interrupt checks.
+- [Native integration and troubleshooting](guides/native-integration.md): actual
+  installed-tarball consumer, external authority, trusted configuration and safe
+  ambiguity/failure recovery.
 - [Native session example](guides/session-example.md): executable funded lifecycle,
   approval/signing boundaries and adversity/uncertainty checks.
 - [Combined passkey/session example](guides/passkey-session-example.md): actual

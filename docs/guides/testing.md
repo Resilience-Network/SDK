@@ -424,3 +424,9 @@ gate: `RSC_CHAIN_DIR=/absolute/clean/pinned/chain RSC_BROWSER_CHROMIUM_CHANNEL=c
 npm run example:passkey-session`. It verifies application login and separate raw
 native grant/use/finalized revocation, app denials and actual revoked admission.
 Its selected virtual profile does not qualify other engines or physical devices.
+
+`RSC_CHAIN_DIR=/absolute/clean/pinned/chain npm run example:session-installed`
+executes the [installed native consumer](native-integration.md) through the actual
+SDK tarball. It verifies funded lifecycle, known-secret log redaction and owned
+teardown; aggregate revision/archive/source hashes remain in ignored
+artifacts/installed-session/latest.json. This does not claim registry publication.
