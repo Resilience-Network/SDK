@@ -4,6 +4,7 @@ import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { setTimeout as delay } from "node:timers/promises";
 import {
   OwnedProcesses,
   leaseLoopbackPorts,
@@ -121,5 +122,72 @@ test(
     // parent pipe closure confirms every inherited writer closed, so it cannot run.
     assert.equal(entry.closed, true);
     assert.equal(entry.child.stdout.readableEnded, true);
+  },
+);
+
+test(
+  "owned cleanup closes inherited descendants after their command leader exits",
+  { timeout: 10000 },
+  async () => {
+    const processes = new OwnedProcesses(),
+      other = new OwnedProcesses();
+    const unrelated = other.start(
+      process.execPath,
+      ["-e", "setInterval(()=>{},1000)"],
+      { stdio: "ignore" },
+    );
+    const script = `const {spawn}=require('node:child_process');const child=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});console.log('descendant-ready');setInterval(()=>{},1000)"],{stdio:['ignore','inherit','ignore']});child.unref();process.exit(0);`;
+    const entry = processes.start(process.execPath, ["-e", script], {
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    try {
+      await new Promise((resolve) => entry.child.stdout.once("data", resolve));
+      const deadline = Date.now() + 2000;
+      while (!entry.exited && Date.now() < deadline) await delay(5);
+      assert.equal(entry.exited, true);
+      assert.equal(entry.closed, false);
+      await processes.stop(20);
+      assert.equal(entry.closed, true);
+      assert.equal(entry.child.stdout.readableEnded, true);
+      assert.equal(unrelated.closed, false);
+      await processes.stop(20);
+    } finally {
+      // The pre-fix fixture leaves this known inherited group alive. Close only
+      // that freshly spawned public fixture; never infer ownership from old files.
+      if (!entry.closed) {
+        try {
+          process.kill(-entry.child.pid, "SIGKILL");
+        } catch (e) {
+          if (e.code !== "ESRCH") throw e;
+        }
+        await new Promise((resolve) => entry.child.once("close", resolve));
+      }
+      await other.stop(20);
+    }
+  },
+);
+
+test(
+  "group lease preserves command exit and spawn-failure results until cleanup",
+  { timeout: 10000 },
+  async () => {
+    for (const missing of [false, true]) {
+      const processes = new OwnedProcesses();
+      const entry = processes.start(
+        missing ? "/sdk-fixture/nonexistent-command" : process.execPath,
+        missing ? [] : ["-e", "process.exit(3)"],
+        { stdio: "ignore" },
+      );
+      try {
+        const result = await entry.done;
+        assert.equal(result.code, missing ? null : 3);
+        assert.equal(Boolean(entry.error), missing);
+        assert.equal(entry.exited, true);
+        assert.equal(entry.closed, false);
+      } finally {
+        await processes.stop(20);
+      }
+      assert.equal(entry.closed, true);
+    }
   },
 );
