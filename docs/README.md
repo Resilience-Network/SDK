@@ -15,6 +15,9 @@ verification qualification remain separate gates.
   real native validators, bounded ownership, evidence and failure/interrupt checks.
 - [Native session example](guides/session-example.md): executable funded lifecycle,
   approval/signing boundaries and adversity/uncertainty checks.
+- [Browser qualification](guides/browser-qualification.md): installed tarball
+  execution and actual Chromium virtual ceremonies; exact qualified profile and
+  explicit unavailable engine/device gates.
 - [Protocol sources](reference/protocol-sources.md): immutable Chain source baseline.
 - [Canonical API](reference/canonical-api.md): supported codecs/hashes and their limits.
 - [HTTP RPC API](reference/http-rpc.md): envelope transport, limits, cancellation,
