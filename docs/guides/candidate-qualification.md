@@ -72,7 +72,10 @@ and never presents reader disposal as verified process closure. No unrelated
 process is signaled and no runtime, key, wallet or signing record is deleted by
 that fallback. Failed/interrupted stage records retain their reason, byte counts
 and restricted output hash, and never count as passed stages. Investigate failures,
-fix/review changes and run a fresh candidate at the final revision.
+fix/review changes and run a fresh candidate at the final revision. Prepare any
+final source/documentation edits through a reviewed PR first, then qualify the
+clean merged revision. Record final acceptance in GitHub so updating an evidence
+summary does not mutate the candidate that was just tested.
 
 The [2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md)
 records historical reproductions. Strict artifact regressions address #85, the
