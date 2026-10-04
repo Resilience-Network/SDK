@@ -40,7 +40,10 @@ localnet; seven actual failure/interrupt/log-capture scenarios; lifecycle;
 browser/native example. Each command requires its actual result marker and minimum
 coverage. Empty output, insufficient counts, skipped/todo SDK tests, missing native
 runs, stale/dirty artifact revisions, wrong native context/toolchain and missing
-teardown/log hashes fail. Positive native runtimes must be removed; negative runs
+teardown/log hashes fail. RP counts must be safe integers with at least 76 tests
+and 67 distinct passing normative cases. Browser/combined coverage requires actual
+arrays of distinct named passing checks, with minimums of 24 and 17 respectively;
+missing, sparse or fabricated array-like objects do not establish coverage. Positive native runtimes must be removed; negative runs
 must retain their restricted safety state and close all owned children.
 
 Child commands are bounded with restricted retained output, and receive termination
@@ -52,9 +55,9 @@ resumed by copying historical PASS claims. Investigate failures, fix/review chan
 and run a fresh candidate at the final revision.
 
 The [2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md)
-reproduced incomplete RP artifact acceptance (#85), a stage that remains running
-after its SIGTERM timeout (#86), and surviving owned descendants after their
-parent exits (#87). Historical successful qualification does not establish those
+reproduced incomplete RP artifact acceptance (now addressed by strict count/array
+regressions in #85), a stage that remains running after its SIGTERM timeout (#86),
+and surviving owned descendants after their parent exits (#87). Historical successful qualification does not establish those
 failure-path guarantees. GitHub tracks their fixes; robust qualification requires
 their regressions and a fresh final candidate after reviewed delivery.
 
