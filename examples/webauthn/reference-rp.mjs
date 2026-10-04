@@ -87,10 +87,15 @@ export class ReferenceMemoryRpStore {
   take(requestId, context, now) {
     if (this.faults.take) throw new ReferenceRpError("STORE_FAILURE");
     const record = this.#challenges.get(requestId);
-    requireState(
-      record && record.state === "pending" && nowValid(record, now),
-      "CHALLENGE_UNAVAILABLE",
-    );
+    requireState(record && record.state === "pending", "CHALLENGE_UNAVAILABLE");
+    // An observed expiry is terminal, even if the application clock later rolls
+    // backward. This synchronous transition precedes parsing/crypto and cannot
+    // revive through a failed binding or a repeated request.
+    if (Number.isSafeInteger(now) && now >= record.expiresAt) {
+      record.state = "expired";
+      throw new ReferenceRpError("CHALLENGE_UNAVAILABLE");
+    }
+    requireState(nowValid(record, now), "CHALLENGE_UNAVAILABLE");
     requireState(
       record.accountId === context.accountId &&
         record.browserSessionId === context.browserSessionId,
