@@ -66,7 +66,9 @@
     "test:browser": "npm run build && node scripts/check_browser.mjs",
     "example:passkey-session": "npm run build && node examples/passkey-session/run.mjs",
     "example:session-installed": "npm run build && node scripts/check_installed_session_example.mjs",
-    "test:api-qualification": "npm run build && node scripts/check_api_qualification.mjs"
+    "test:api-qualification": "npm run build && node scripts/check_api_qualification.mjs",
+    "qualify:candidate": "node scripts/qualification/run.mjs",
+    "qualify:preflight": "node scripts/qualification/run.mjs --preflight"
   },
   "devDependencies": {
     "@simplewebauthn/server": "14.0.3",

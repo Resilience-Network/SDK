@@ -438,3 +438,10 @@ installed browser bundles, dependency notices and measured codec/raw signing pat
 See [the exact qualification profile](../reference/api-qualification.md). This
 adds to `npm run check` and actual browser/native evidence; it is not publication
 authorization or a claim about untested platforms.
+
+## Consolidated local candidate
+
+Use `npm run qualify:preflight` and `npm run qualify:candidate` with the explicit
+reviewed revision and private pinned checkout described in
+[candidate qualification](candidate-qualification.md). A preflight does not execute
+tests; missing external platform/security/publication gates remain open.

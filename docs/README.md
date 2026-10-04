@@ -11,6 +11,8 @@ references; physical devices and other engines remain separate.
 - [GitHub tracking](guides/project-tracking.md): delivery goal, milestones, tasks,
   dependencies, status labels and progress views.
 - [Local development](guides/local-development.md): install, build and package checks.
+- [Candidate qualification](guides/candidate-qualification.md): strict exact-revision
+  local suite, hash-linked evidence and separate publication approval gates.
 - [Testing](guides/testing.md): available commands and required feature evidence.
 - [Owned native localnet](guides/native-localnet.md): generated funded genesis,
   real native validators, bounded ownership, evidence and failure/interrupt checks.
