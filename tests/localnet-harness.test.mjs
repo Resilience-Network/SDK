@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
+import { spawn } from "node:child_process";
 import {
   OwnedProcesses,
   leaseLoopbackPorts,
@@ -188,6 +189,54 @@ test(
         await processes.stop(20);
       }
       assert.equal(entry.closed, true);
+    }
+  },
+);
+
+test(
+  "owner IPC disconnect closes its detached owned group",
+  { timeout: 10000 },
+  async () => {
+    const url = new URL("../scripts/localnet/processes.mjs", import.meta.url).href;
+    const script = `import {OwnedProcesses} from ${JSON.stringify(url)};
+    const entry=new OwnedProcesses().start(process.execPath,['-e',"process.on('SIGTERM',()=>{});console.log('OWNED_READY');setInterval(()=>{},1000)"],{stdio:['ignore','inherit','inherit']});
+    console.log('LEASE='+entry.child.pid);setTimeout(()=>process.exit(0),500);`;
+    const owner = spawn(process.execPath, ["--input-type=module", "-e", script], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let output = "";
+    owner.stdout.on("data", (data) => (output += data));
+    owner.stderr.resume();
+    const closed = new Promise((resolve) =>
+      owner.once("close", (code) => resolve(code)),
+    );
+    let timer;
+    try {
+      const code = await Promise.race([
+        closed,
+        new Promise((_, reject) => {
+          timer = setTimeout(
+            () => reject(Error("Owner-disconnect containment deadline")),
+            8000,
+          );
+        }),
+      ]);
+      assert.equal(code, 0);
+      assert(output.includes("OWNED_READY"));
+      assert.equal(owner.stdout.readableEnded, true);
+    } finally {
+      clearTimeout(timer);
+      if (!owner.stdout.readableEnded) {
+        const pid = Number(/LEASE=(\d+)/.exec(output)?.[1]);
+        if (Number.isSafeInteger(pid) && pid > 0)
+          try {
+            process.kill(-pid, "SIGKILL");
+          } catch (e) {
+            if (e.code !== "ESRCH") throw e;
+          }
+        if (owner.exitCode === null) owner.kill("SIGKILL");
+        await closed;
+      }
     }
   },
 );
