@@ -91,11 +91,18 @@ zero cap, recipient/proof and authority boundary is explicit. See the
 and limits. Structure-only review does not establish live authority or signature
 validity.
 
-## Planned capabilities
+## Browser and application integration
 
-- WebAuthn registration/authentication helpers with explicit trust boundaries.
-- Authoritative RP verifier/store and actual browser-engine conformance.
-- Reviewed combined passkey-login/native-session example and release qualification.
+- Explicit WebAuthn registration/authentication helpers collect bounded public
+  responses for an application-owned verifier.
+- The maintained verifier reference has actual signed conformance coverage;
+  installed Chrome virtual ceremonies have actual engine qualification.
+- The reviewed combined example separates passkey app login from external native
+  signer approval and funded session create/use/revoke.
+
+See the implemented references below for exact tested scope. Production RP
+persistence/multi-worker deployment, physical devices, other engines, independent
+security review, licensing/registry decisions and publication remain separate gates.
 
 P-256 session verification already exists in Chain. WebAuthn assertions sign a
 different message: DER conversion alone cannot make a passkey assertion a valid
@@ -148,3 +155,11 @@ and explicit canonical approvals remain distinct.
 Use the [native integration and troubleshooting guide](docs/guides/native-integration.md)
 for actual local-tarball consumption, trusted deployment, external signers, durable
 nonce storage and same-ID recovery. Registry publication remains separately gated.
+
+The [API/platform qualification profile](docs/reference/api-qualification.md)
+records the reviewed export/type inventory, dependency notices and executable
+bundle/codec/signing ceilings. [Candidate qualification](docs/guides/candidate-qualification.md)
+runs all applicable local suites at an explicit clean revision with a private
+pinned Chain checkout, fresh hash-linked evidence and one enforced installed
+archive digest. Preflight alone is not test evidence; external release gates
+remain open.
