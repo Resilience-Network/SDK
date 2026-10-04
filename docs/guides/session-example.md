@@ -8,6 +8,7 @@ node, validator signing and database state is outside the run's ownership.
 ```sh
 npm ci
 RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run example:session
+RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run example:session-installed
 RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:lifecycle-native
 RSC_CHAIN_DIR=/absolute/path/to/pinned-chain npm run test:session-e2e
 ```
@@ -58,3 +59,9 @@ ownership checks; failed/interrupted runtimes, keys/DB/signing records remain
 restricted and retained. Known generated test-key/closure-secret strings are
 checked against public log evidence. Never reuse disposable keys/genesis for
 valuable assets. Browser/device/security-review/publication gates remain separate.
+
+The [installed native consumer](native-integration.md) runs this reviewed example
+from the actual SDK tarball in a fresh application; only owned harness import
+URLs change. SDK/signers resolve inside that consumer, and its typed client is
+constructed from the installed module. This is local archive consumption, not
+registry publication.
