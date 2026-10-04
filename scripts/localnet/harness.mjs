@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import {
   chmod,
@@ -25,86 +24,13 @@ import {
 import { hexToBytes } from "../../dist/core/index.js";
 
 import { captureOwnedLogs } from "./logs.mjs";
+import { recordNativeTeardown } from "./outcome.mjs";
 
 const sdkRoot = fileURLToPath(new URL("../../", import.meta.url));
 const sha = (data) => createHash("sha256").update(data).digest("hex");
-/** Tracks actual child handles only. Never scans/kills processes by name or stale PID files. */
-export class OwnedProcesses {
-  #children = [];
-  get pids() {
-    return this.#children.map((entry) => entry.child.pid).filter(Boolean);
-  }
-  start(command, args, options = {}) {
-    const child = spawn(command, args, {
-      ...options,
-      shell: false,
-      detached: process.platform !== "win32",
-    });
-    const entry = { child, closed: false, exited: false, error: null };
-    entry.done = new Promise((resolve) => {
-      child.once("error", (error) => {
-        entry.error = error;
-        entry.closed = true;
-        resolve({ code: null, signal: null });
-      });
-      child.once("close", (code, signal) => {
-        entry.closed = true;
-        resolve({ code, signal });
-      });
-    });
-    child.once("exit", () => {
-      entry.exited = true;
-    });
-    this.#children.push(entry);
-    return entry;
-  }
-  // PIDs exposed only in evidence; termination uses the still-owned ChildProcess handle.
-  async stop(graceMs = 5000) {
-    assert(Number.isSafeInteger(graceMs) && graceMs >= 1 && graceMs <= 10000);
-    const terminate = (entry, signal) => {
-      if (entry.closed || entry.exited) return;
-      try {
-        if (process.platform === "win32") entry.child.kill(signal);
-        else process.kill(-entry.child.pid, signal);
-      } catch (error) {
-        if (error.code !== "ESRCH") throw error;
-      }
-    };
-    for (const e of this.#children) terminate(e, "SIGTERM");
-    let timer;
-    let stopped;
-    try {
-      stopped = await Promise.race([
-        Promise.all(this.#children.map((e) => e.done)).then(() => true),
-        new Promise((resolve) => {
-          timer = setTimeout(() => resolve(false), graceMs);
-        }),
-      ]);
-    } finally {
-      clearTimeout(timer);
-    }
-    if (!stopped) {
-      for (const e of this.#children) terminate(e, "SIGKILL");
-      try {
-        await Promise.race([
-          Promise.all(this.#children.map((e) => e.done)),
-          new Promise((_, reject) => {
-            timer = setTimeout(
-              () => reject(Error("Owned child did not close after kill")),
-              2000,
-            );
-          }),
-        ]);
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-    assert(
-      this.#children.every((e) => e.closed),
-      "owned children still active",
-    );
-  }
-}
+import { OwnedProcesses } from "./processes.mjs";
+export { OwnedProcesses } from "./processes.mjs";
+
 export async function leaseLoopbackPorts(count) {
   assert(Number.isSafeInteger(count) && count >= 1 && count <= 24);
   const servers = [],
@@ -485,12 +411,15 @@ export async function withNativeLocalnet(options, work) {
         check();
         assert(performance.now() < endsAt, `${label} readiness deadline`);
         for (const e of entries)
-          assert(!e.closed && !e.error, "owned validator exited during readiness");
+          assert(
+            !e.closed && !e.exited && !e.error,
+            "owned validator exited during readiness",
+          );
         try {
           const result = await probe();
           if (result) return result;
         } catch (error) {
-          if (entries.some((e) => e.closed || e.error)) throw error;
+          if (entries.some((e) => e.closed || e.exited || e.error)) throw error;
         }
         await delay(100, undefined, { signal: controller.signal }).catch(() => check());
       }
@@ -562,7 +491,9 @@ export async function withNativeLocalnet(options, work) {
       });
       assert.equal(observed.chainId, expected.chainId);
     }
-    evidence.nodePids = entries.map((e) => e.child.pid);
+    evidence.nodePids = entries.map((e) => e.targetPid);
+    evidence.groupSupervisorPids = entries.map((e) => e.child.pid);
+    assert(evidence.nodePids.every((pid) => Number.isSafeInteger(pid) && pid > 0));
     evidence.urls = urls;
     await wait("native finalized progress", async () => {
       const heights = await Promise.all(
@@ -658,14 +589,20 @@ export async function withNativeLocalnet(options, work) {
     signal?.removeEventListener("abort", cancel);
     clearTimeout(readinessTimer);
     controller.abort();
-    let teardown = false;
+    let teardown = false,
+      teardownFailed = false;
     try {
       await processes.stop();
-      teardown = true;
+      teardown = processes.allClosed;
+    } catch (error) {
+      teardownFailed = true;
+      teardown = processes.allClosed;
+      throw error;
     } finally {
       await portsLease?.release();
       for (const file of files) await file.close().catch(() => {});
-      evidence.teardown = { allOwnedChildrenClosed: teardown };
+      recordNativeTeardown(evidence, teardown, teardownFailed);
+      if (!teardown || teardownFailed) success = false;
       // Only the explicit log of an owned command/node is required; node starts
       // appear in commands but use node-N.log rather than command-N.log.
       evidence.logCapture = await captureOwnedLogs(

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { verifyCapturedLogs } from "./localnet/verify-logs.mjs";
-import { withNativeLocalnet } from "./localnet/harness.mjs";
+import { withNativeLocalnet, OwnedProcesses } from "./localnet/harness.mjs";
 // Real native failure/interrupt qualification, separately from supervisor unit tests.
 const sentinelDir = await mkdtemp(join(tmpdir(), "sdk-native-external-sentinel-")),
   sentinel = join(sentinelDir, "signing-record.json");
@@ -96,8 +96,27 @@ try {
     { file: "node-1.log", status: "failed", code: "ENOENT" },
   );
   assert((await readFile(retainedLog)).length > 0);
+  const beforeTeardown = new Set(await readdir(artifactRoot));
+  const originalStop = OwnedProcesses.prototype.stop;
+  OwnedProcesses.prototype.stop = async function (...args) {
+    await originalStop.apply(this, args);
+    assert.equal(this.allClosed, true);
+    // Actual groups close first: this controlled procedure error cannot leak
+    // children, and the failure must still preserve runtime/evidence.
+    throw Error("Injected cleanup procedure failure");
+  };
+  try {
+    await assert.rejects(
+      withNativeLocalnet({}, async () => {}),
+      /Injected cleanup procedure failure/,
+    );
+  } finally {
+    OwnedProcesses.prototype.stop = originalStop;
+  }
+  const teardownFailure = await checkEvidence(beforeTeardown, "failed");
+  assert.equal(teardownFailure.failure.code, "TEARDOWN_FAILED");
   console.log(
-    "Native setup/ready-node/readiness/hung-callback failures and actual SIGINT/SIGTERM plus injected missing-log capture retain owned restricted runtime, close owned nodes and preserve external safety sentinel; manifests/hashes/redaction verified.",
+    "Native setup/ready-node/readiness/hung-callback failures and actual SIGINT/SIGTERM plus injected missing-log capture and cleanup-procedure failure retain owned restricted runtime, close owned nodes and preserve external safety sentinel; manifests/hashes/redaction verified.",
   );
 } finally {
   await rm(sentinelDir, { recursive: true });

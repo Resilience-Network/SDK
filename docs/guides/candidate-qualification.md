@@ -35,7 +35,7 @@ Preflight validates inputs without executing suites and is never PASS evidence f
 implementation. Qualification runs serially: locked install; complete SDK/package
 checks; installed API budgets; signed RP conformance; actual Chrome ceremonies;
 native RPC fixtures; codec/receipt differentials; native signatures; owned positive
-localnet; seven actual failure/interrupt/log-capture scenarios; lifecycle;
+localnet; eight actual failure/interrupt/log-capture/cleanup-error scenarios; lifecycle;
 67-check session adversity; session example; installed-tarball example; combined
 browser/native example. Each command requires its actual result marker and minimum
 coverage. Empty output, insufficient counts, skipped/todo SDK tests, missing native
@@ -57,7 +57,9 @@ and run a fresh candidate at the final revision.
 The [2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md)
 reproduced incomplete RP artifact acceptance (now addressed by strict count/array
 regressions in #85), a stage that remains running after its SIGTERM timeout (#86),
-and surviving owned descendants after their parent exits (#87). Historical successful qualification does not establish those
+and surviving owned descendants after their parent exits (addressed by live group
+supervision and leader-exit regressions in #87). Candidate stage termination #86
+still requires its own bounded-controller regressions and final full run. Historical successful qualification does not establish those
 failure-path guarantees. GitHub tracks their fixes; robust qualification requires
 their regressions and a fresh final candidate after reviewed delivery.
 

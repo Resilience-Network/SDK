@@ -4,6 +4,8 @@ import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { setTimeout as delay } from "node:timers/promises";
+import { spawn } from "node:child_process";
 import {
   OwnedProcesses,
   leaseLoopbackPorts,
@@ -121,5 +123,120 @@ test(
     // parent pipe closure confirms every inherited writer closed, so it cannot run.
     assert.equal(entry.closed, true);
     assert.equal(entry.child.stdout.readableEnded, true);
+  },
+);
+
+test(
+  "owned cleanup closes inherited descendants after their command leader exits",
+  { timeout: 10000 },
+  async () => {
+    const processes = new OwnedProcesses(),
+      other = new OwnedProcesses();
+    const unrelated = other.start(
+      process.execPath,
+      ["-e", "setInterval(()=>{},1000)"],
+      { stdio: "ignore" },
+    );
+    const script = `const {spawn}=require('node:child_process');const child=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});console.log('descendant-ready');setInterval(()=>{},1000)"],{stdio:['ignore','inherit','ignore']});child.unref();process.exit(0);`;
+    const entry = processes.start(process.execPath, ["-e", script], {
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    try {
+      await new Promise((resolve) => entry.child.stdout.once("data", resolve));
+      const deadline = Date.now() + 2000;
+      while (!entry.exited && Date.now() < deadline) await delay(5);
+      assert.equal(entry.exited, true);
+      assert.equal(entry.closed, false);
+      await processes.stop(20);
+      assert.equal(entry.closed, true);
+      assert.equal(entry.child.stdout.readableEnded, true);
+      assert.equal(unrelated.closed, false);
+      await processes.stop(20);
+    } finally {
+      // The pre-fix fixture leaves this known inherited group alive. Close only
+      // that freshly spawned public fixture; never infer ownership from old files.
+      if (!entry.closed) {
+        try {
+          process.kill(-entry.child.pid, "SIGKILL");
+        } catch (e) {
+          if (e.code !== "ESRCH") throw e;
+        }
+        await new Promise((resolve) => entry.child.once("close", resolve));
+      }
+      await other.stop(20);
+    }
+  },
+);
+
+test(
+  "group lease preserves command exit and spawn-failure results until cleanup",
+  { timeout: 10000 },
+  async () => {
+    for (const missing of [false, true]) {
+      const processes = new OwnedProcesses();
+      const entry = processes.start(
+        missing ? "/sdk-fixture/nonexistent-command" : process.execPath,
+        missing ? [] : ["-e", "process.exit(3)"],
+        { stdio: "ignore" },
+      );
+      try {
+        const result = await entry.done;
+        assert.equal(result.code, missing ? null : 3);
+        assert.equal(Boolean(entry.error), missing);
+        assert.equal(entry.exited, true);
+        assert.equal(entry.closed, false);
+      } finally {
+        await processes.stop(20);
+      }
+      assert.equal(entry.closed, true);
+    }
+  },
+);
+
+test(
+  "owner IPC disconnect closes its detached owned group",
+  { timeout: 10000 },
+  async () => {
+    const url = new URL("../scripts/localnet/processes.mjs", import.meta.url).href;
+    const script = `import {OwnedProcesses} from ${JSON.stringify(url)};
+    const entry=new OwnedProcesses().start(process.execPath,['-e',"process.on('SIGTERM',()=>{});console.log('OWNED_READY');setInterval(()=>{},1000)"],{stdio:['ignore','inherit','inherit']});
+    console.log('LEASE='+entry.child.pid);setTimeout(()=>process.exit(0),500);`;
+    const owner = spawn(process.execPath, ["--input-type=module", "-e", script], {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let output = "";
+    owner.stdout.on("data", (data) => (output += data));
+    owner.stderr.resume();
+    const closed = new Promise((resolve) =>
+      owner.once("close", (code) => resolve(code)),
+    );
+    let timer;
+    try {
+      const code = await Promise.race([
+        closed,
+        new Promise((_, reject) => {
+          timer = setTimeout(
+            () => reject(Error("Owner-disconnect containment deadline")),
+            8000,
+          );
+        }),
+      ]);
+      assert.equal(code, 0);
+      assert(output.includes("OWNED_READY"));
+      assert.equal(owner.stdout.readableEnded, true);
+    } finally {
+      clearTimeout(timer);
+      if (!owner.stdout.readableEnded) {
+        const pid = Number(/LEASE=(\d+)/.exec(output)?.[1]);
+        if (Number.isSafeInteger(pid) && pid > 0)
+          try {
+            process.kill(-pid, "SIGKILL");
+          } catch (e) {
+            if (e.code !== "ESRCH") throw e;
+          }
+        if (owner.exitCode === null) owner.kill("SIGKILL");
+        await closed;
+      }
+    }
   },
 );

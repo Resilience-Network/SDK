@@ -79,20 +79,39 @@ inside that directory. Existing repositories' nodes, keys, wallets, databases,
 locks and signing records are outside its ownership. It never scans process names,
 loads stale PID files or removes shared `.localnet` directories.
 
-Native commands and nodes start in owned POSIX process groups. Teardown sends
-SIGTERM only to a still-owned live spawned leader's group, allows five seconds,
-then escalates the owned group to SIGKILL with a two-second closure bound. Exited
-leaders are never targeted. The Windows fallback supervises the direct child;
-the native gate has currently been executed on macOS, and Windows descendant
-termination is not qualified. A command ignoring termination cannot extend the
-SDK test's teardown indefinitely. Supervisor unit tests separately cover a nested
-child ignoring SIGTERM and an unrelated process that stays running.
+Native commands and nodes run inside owned POSIX groups anchored by a separate
+live [group supervisor](../../scripts/localnet/group-supervisor.mjs). Command
+exit and supervisor closure are separate: command results remain available while
+the supervisor holds the group identity for descendant teardown. The
+[process controller](../../scripts/localnet/processes.mjs) signals only a live
+spawned supervisor's group, allows five seconds for SIGTERM, then escalates to
+SIGKILL with a two-second descriptor-closure bound. An exited supervisor is never
+signaled by its old PID; unexpected supervisor exit fails containment acceptance.
+The live anchor prevents group-ID reuse during normal teardown, consistent with
+[POSIX group lifetime and ID reuse](https://pubs.opengroup.org/onlinepubs/009696699/basedefs/xbd_chap04.html).
+
+Owner IPC disconnect also starts supervisor-owned SIGTERM/5-second SIGKILL cleanup,
+so killing an integration owner cannot silently abandon its detached validator
+groups. This is bounded containment of tracked commands and descendants that stay
+in their owned group. Commands deliberately creating untracked sessions or an
+external SIGKILL of the supervisor alone are outside that containment contract;
+retained descriptors or unexpected lease death fail rather than authorize stale
+PID killing or runtime deletion. The Windows direct-child fallback remains
+unqualified for descendants. Actual native evidence is currently macOS only.
+Supervisor tests cover command exit with inherited-pipe descendants, stuck
+termination, actual nonzero/spawn-failure results and an unrelated process that
+stays running. Evidence records actual node PIDs separately from supervisor PIDs;
+neither is later authorization to kill a process.
 
 After all owned child handles close, successful runs remove only their fresh owned
 runtime, checking the direct path is not a symlink, the canonical temporary-root
 namespace and unchanged ownership marker/path/ID. This is planned disposal of a
 fresh test network. A failure/interrupt/ownership mismatch preserves the complete
-restricted runtime, including signing watermarks/locks/databases/keys. A timeout
+restricted runtime, including signing watermarks/locks/databases/keys. Failed
+teardown sets the top-level status to `failed` with `TEARDOWN_FAILED`, even when
+integration activity succeeded; it never retains a passing status or disposes the
+runtime. Supervisor command results and actual group/descriptor closure are
+separate evidence, as covered by [outcome regressions](../../tests/localnet-outcome.test.mjs). A timeout
 never deletes safety state. Keep retained failed directories for inspection and
 explicit retirement; do not restart them under another genesis/configuration.
 
@@ -107,6 +126,11 @@ Capture refuses symlinks, nonregular sources, artifact replacements and logs ove
 8 MiB; it checks the actual read bound as well as file size. Qualification verifies
 the copied bytes, manifest coverage and generated-key redaction. A required capture
 failure rejects an otherwise successful run and preserves its restricted runtime.
+The closure field describes actual supervised group/descriptor closure. A failed
+cleanup procedure still rejects delivery and retains its runtime even if those
+groups already closed. The native failure suite injects that post-closure error
+without abandoning any child, then verifies failed status/TEARDOWN_FAILED, retained
+safety state and unchanged external sentinel.
 An early failed run may have no commands/logs; it is never passing native evidence.
 Key files, databases and signing records are never copied into public artifacts. Exact generated private-key strings are redacted from copied logs;
 callback errors use a fixed evidence code. These artifacts can still contain
