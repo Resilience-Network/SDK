@@ -1,5 +1,10 @@
 import { Deadline, systemClock } from "./deadline.js";
-import { RpcClientError, authorizationErrorFamily } from "./errors.js";
+import {
+  RpcClientError,
+  authorizationErrorFamily,
+  createRpcFailure,
+  reconstructRpcFailure,
+} from "./errors.js";
 import { encodeRequest, parseResponse } from "./json.js";
 import type {
   HttpRpcOptions,
@@ -70,7 +75,7 @@ function bounded(
 ): number {
   const result = value === undefined ? fallback : value;
   if (!Number.isSafeInteger(result) || result < min || result > max)
-    throw new RpcClientError("INVALID_OPTIONS");
+    throw createRpcFailure("INVALID_OPTIONS");
   return result;
 }
 
@@ -111,7 +116,7 @@ function configure(options: HttpRpcOptions): Config {
     if (config.retryDelayMs > config.maxRetryDelayMs) throw new Error();
     return config;
   } catch {
-    throw new RpcClientError("INVALID_OPTIONS");
+    throw createRpcFailure("INVALID_OPTIONS");
   }
 }
 
@@ -133,7 +138,7 @@ function responses(
   batch: boolean,
   attempts: number,
 ): RpcOutcome[] {
-  const invalid = () => new RpcClientError("INVALID_RESPONSE", attempts);
+  const invalid = () => createRpcFailure("INVALID_RESPONSE", attempts);
   if (batch !== Array.isArray(value)) throw invalid();
   const list = batch ? (value as readonly JsonValue[]) : [value];
   if (list.length !== ids.length) throw invalid();
@@ -167,7 +172,7 @@ function responses(
         throw invalid();
       found.set(item.id, {
         ok: false,
-        error: new RpcClientError(
+        error: createRpcFailure(
           "NODE_ERROR",
           attempts,
           undefined,
@@ -213,6 +218,7 @@ export class HttpRpcClient {
   ): Promise<RpcOutcome[]> {
     const config = this.#config;
     let signal: AbortSignal | undefined;
+    let aborted = false;
     try {
       if (!options || typeof options !== "object") throw new Error();
       signal = options.signal;
@@ -223,19 +229,24 @@ export class HttpRpcClient {
           typeof signal.removeEventListener !== "function")
       )
         throw new Error();
+      aborted = signal?.aborted ?? false;
     } catch {
-      throw new RpcClientError("INVALID_REQUEST");
+      throw createRpcFailure("INVALID_REQUEST");
     }
-    if (signal?.aborted) throw new RpcClientError("ABORTED");
-    if (!Array.isArray(calls) || calls.length < 1 || calls.length > config.maxBatchSize)
-      throw new RpcClientError("REQUEST_LIMIT");
+    if (aborted) throw createRpcFailure("ABORTED");
     const ids: number[] = [];
     const methods: string[] = [];
     let body: string;
     try {
+      if (
+        !Array.isArray(calls) ||
+        calls.length < 1 ||
+        calls.length > config.maxBatchSize
+      )
+        throw createRpcFailure("REQUEST_LIMIT");
       const requests = calls.map((call) => {
         if (!call || typeof call !== "object")
-          throw new RpcClientError("INVALID_REQUEST");
+          throw createRpcFailure("INVALID_REQUEST");
         const methodDescriptor = Object.getOwnPropertyDescriptor(call, "method");
         const paramsDescriptor = Object.getOwnPropertyDescriptor(call, "params");
         if (
@@ -243,7 +254,7 @@ export class HttpRpcClient {
           !("value" in methodDescriptor) ||
           (paramsDescriptor && !("value" in paramsDescriptor))
         )
-          throw new RpcClientError("INVALID_REQUEST");
+          throw createRpcFailure("INVALID_REQUEST");
         const method: unknown = methodDescriptor.value;
         const params: unknown =
           paramsDescriptor?.value === undefined ? [] : paramsDescriptor.value;
@@ -252,11 +263,11 @@ export class HttpRpcClient {
           !/^[a-zA-Z][a-zA-Z0-9_.]{0,127}$/.test(method) ||
           method.startsWith("rpc.")
         )
-          throw new RpcClientError("INVALID_REQUEST");
+          throw createRpcFailure("INVALID_REQUEST");
         if (!params || typeof params !== "object")
-          throw new RpcClientError("INVALID_REQUEST");
+          throw createRpcFailure("INVALID_REQUEST");
         if (!Number.isSafeInteger(this.#nextId))
-          throw new RpcClientError("REQUEST_LIMIT");
+          throw createRpcFailure("REQUEST_LIMIT");
         const id = this.#nextId++;
         ids.push(id);
         methods.push(method);
@@ -264,11 +275,18 @@ export class HttpRpcClient {
       });
       body = encodeRequest(batch ? requests : requests[0], config.maxRequestBytes);
     } catch (error) {
-      if (error instanceof RpcClientError) throw error;
-      throw new RpcClientError("INVALID_REQUEST");
+      throw reconstructRpcFailure(error, "INVALID_REQUEST", 0, [
+        "INVALID_REQUEST",
+        "REQUEST_LIMIT",
+      ]);
     }
     const canRetry = methods.every((method) => retryableMethods.has(method));
-    const deadline = new Deadline(config.clock, config.timeoutMs, signal);
+    let deadline: Deadline;
+    try {
+      deadline = new Deadline(config.clock, config.timeoutMs, signal);
+    } catch (error) {
+      throw reconstructRpcFailure(error, "INVALID_REQUEST", 0);
+    }
     try {
       for (;;) {
         deadline.check();
@@ -279,10 +297,11 @@ export class HttpRpcClient {
           return responses(response, ids, batch, deadline.attempts);
         } catch (error) {
           deadline.check();
-          const failure =
-            error instanceof RpcClientError
-              ? error
-              : new RpcClientError("NETWORK_ERROR", deadline.attempts);
+          const failure = reconstructRpcFailure(
+            error,
+            "NETWORK_ERROR",
+            deadline.attempts,
+          );
           const transient =
             failure.kind === "transport" ||
             (failure.kind === "http" && RETRY_STATUSES.has(failure.httpStatus!));
@@ -292,16 +311,26 @@ export class HttpRpcClient {
             config.retryDelayMs * 2 ** (deadline.attempts - 1),
             config.maxRetryDelayMs,
           );
-          if (failure instanceof HttpFailure) {
-            const hinted = failure.delay(delay, config.maxRetryDelayMs);
+          if (error !== null && typeof error === "object" && httpHints.has(error)) {
+            const hinted = retryDelay(
+              httpHints.get(error)!,
+              delay,
+              config.maxRetryDelayMs,
+            );
             if (hinted === undefined) throw failure;
             delay = hinted;
           }
           await deadline.delay(delay);
         }
       }
+    } catch (error) {
+      throw reconstructRpcFailure(error, "NETWORK_ERROR", deadline.attempts);
     } finally {
-      deadline.dispose();
+      try {
+        deadline.dispose();
+      } catch (error) {
+        throw reconstructRpcFailure(error, "NETWORK_ERROR", deadline.attempts);
+      }
     }
   }
 
@@ -334,7 +363,7 @@ export class HttpRpcClient {
         response = await deadline.race(pending);
       } catch {
         deadline.check();
-        throw new RpcClientError("NETWORK_ERROR", deadline.attempts);
+        throw createRpcFailure("NETWORK_ERROR", deadline.attempts);
       }
       if (signal.aborted) {
         discard(response);
@@ -347,10 +376,10 @@ export class HttpRpcClient {
         response.status > 599 ||
         typeof response.headers?.get !== "function"
       )
-        throw new RpcClientError("INVALID_RESPONSE", deadline.attempts);
+        throw createRpcFailure("INVALID_RESPONSE", deadline.attempts);
       if (response.status < 200 || response.status > 299) {
         discard(response);
-        throw new HttpFailure(
+        throw httpFailure(
           deadline.attempts,
           response.status,
           response.headers.get("Retry-After"),
@@ -368,14 +397,14 @@ export class HttpRpcClient {
     const declared = response.headers.get("Content-Length");
     if (declared !== null && /^\d+$/.test(declared) && Number(declared) > limit) {
       discard(response);
-      throw new RpcClientError("RESPONSE_LIMIT", deadline.attempts);
+      throw createRpcFailure("RESPONSE_LIMIT", deadline.attempts);
     }
-    if (!response.body) throw new RpcClientError("INVALID_RESPONSE", deadline.attempts);
+    if (!response.body) throw createRpcFailure("INVALID_RESPONSE", deadline.attempts);
     let reader: ReadableStreamDefaultReader<Uint8Array>;
     try {
       reader = response.body.getReader();
     } catch {
-      throw new RpcClientError("INVALID_RESPONSE", deadline.attempts);
+      throw createRpcFailure("INVALID_RESPONSE", deadline.attempts);
     }
     let buffer = new Uint8Array(Math.min(limit, 8_192));
     let size = 0;
@@ -389,16 +418,16 @@ export class HttpRpcClient {
           part = await deadline.race(reader.read());
         } catch {
           deadline.check();
-          throw new RpcClientError("NETWORK_ERROR", deadline.attempts);
+          throw createRpcFailure("NETWORK_ERROR", deadline.attempts);
         }
         if (part.done) {
           complete = true;
           break;
         }
         if (!(part.value instanceof Uint8Array))
-          throw new RpcClientError("INVALID_RESPONSE", deadline.attempts);
+          throw createRpcFailure("INVALID_RESPONSE", deadline.attempts);
         if (++chunks > MAX_RESPONSE_CHUNKS || part.value.byteLength > limit - size)
-          throw new RpcClientError("RESPONSE_LIMIT", deadline.attempts);
+          throw createRpcFailure("RESPONSE_LIMIT", deadline.attempts);
         const next = size + part.value.byteLength;
         if (next > buffer.byteLength) {
           const grown = new Uint8Array(
@@ -416,7 +445,7 @@ export class HttpRpcClient {
           buffer.subarray(0, size),
         );
       } catch {
-        throw new RpcClientError("INVALID_JSON", deadline.attempts);
+        throw createRpcFailure("INVALID_JSON", deadline.attempts);
       }
     } finally {
       if (!complete) {
@@ -435,18 +464,25 @@ export class HttpRpcClient {
   }
 }
 
-class HttpFailure extends RpcClientError {
-  readonly #retryAfter: string | null;
-  constructor(attempts: number, status: number, retryAfter: string | null) {
-    super("HTTP_ERROR", attempts, status);
-    this.#retryAfter = retryAfter;
-  }
-  delay(fallback: number, max: number): number | undefined {
-    if (this.#retryAfter === null) return fallback;
-    // Dates/invalid hints or hints beyond our bound prevent a retry.
-    if (!/^\d+$/.test(this.#retryAfter)) return undefined;
-    const hint = Number(this.#retryAfter) * 1_000;
-    if (!Number.isSafeInteger(hint) || hint > max) return undefined;
-    return Math.max(fallback, hint);
-  }
+const httpHints = new WeakMap<object, string | null>();
+function httpFailure(
+  attempts: number,
+  status: number,
+  retryAfter: string | null,
+): RpcClientError {
+  const error = createRpcFailure("HTTP_ERROR", attempts, status);
+  httpHints.set(error, retryAfter);
+  return error;
+}
+function retryDelay(
+  hint: string | null,
+  fallback: number,
+  max: number,
+): number | undefined {
+  if (hint === null) return fallback;
+  // Dates/invalid hints or hints beyond our bound prevent a retry.
+  if (!/^\d+$/.test(hint)) return undefined;
+  const milliseconds = Number(hint) * 1000;
+  if (!Number.isSafeInteger(milliseconds) || milliseconds > max) return undefined;
+  return Math.max(fallback, milliseconds);
 }

@@ -41,6 +41,182 @@ test("RPC dependency exceptions cannot impersonate SDK diagnostics or leak paylo
   }
 });
 
+test("hostile request inspection cannot forward caller errors or classification traps", async () => {
+  const original = new RpcClientError("NETWORK_ERROR", 99);
+  original.message = "PUBLIC_ERROR_SENTINEL";
+  original.cause = "PUBLIC_ERROR_SENTINEL";
+  original.payload = "PUBLIC_ERROR_SENTINEL";
+  const invalidCode = new RpcClientError("REQUEST_LIMIT");
+  Object.defineProperty(invalidCode, "code", {
+    get() {
+      throw original;
+    },
+  });
+  const forged = new RpcClientError("NODE_ERROR");
+  forged.code = "PUBLIC_ERROR_SENTINEL";
+  const classificationTrap = new Proxy(
+    {},
+    {
+      getPrototypeOf() {
+        throw original;
+      },
+    },
+  );
+  const revoked = Proxy.revocable({}, {});
+  revoked.revoke();
+  for (const thrown of [
+    original,
+    invalidCode,
+    forged,
+    classificationTrap,
+    revoked.proxy,
+  ])
+    for (const trap of ["getPrototypeOf", "ownKeys", "getOwnPropertyDescriptor"]) {
+      const h = harness((request) => reply(request));
+      const params = new Proxy(
+        { field: "public" },
+        {
+          [trap]() {
+            throw thrown;
+          },
+        },
+      );
+      await assert.rejects(h.client.request("rsc_chainId", params), (failure) => {
+        assert(failure instanceof RpcClientError);
+        assert.notEqual(failure, thrown);
+        assert.equal(failure.code, "INVALID_REQUEST");
+        assert.equal(failure.attempts, 0);
+        assert.equal(failure.requestMayHaveReachedNode, false);
+        assert.equal(failure.cause, undefined);
+        assert.equal(failure.payload, undefined);
+        assert(
+          !`${failure.message}${failure.stack}${JSON.stringify(failure)}`.includes(
+            "PUBLIC_ERROR_SENTINEL",
+          ),
+        );
+        return true;
+      });
+      assert.equal(h.calls.length, 0);
+    }
+});
+
+test("injected response inspection errors become fresh diagnostics with actual attempt counts", async () => {
+  for (const stage of ["status", "headers", "header-get", "body", "reader-part"]) {
+    const original = new RpcClientError("NODE_ERROR", 99, undefined, -32000);
+    original.message = "PUBLIC_ERROR_SENTINEL";
+    original.cause = "PUBLIC_ERROR_SENTINEL";
+    const response = {
+      status: 200,
+      headers: { get: () => null },
+      body: {
+        getReader: () => ({
+          read: async () => ({
+            get done() {
+              throw original;
+            },
+          }),
+          cancel: async () => {},
+          releaseLock: () => {},
+        }),
+      },
+    };
+    if (stage === "header-get")
+      response.headers.get = () => {
+        throw original;
+      };
+    else if (stage !== "reader-part")
+      Object.defineProperty(response, stage, {
+        get() {
+          throw original;
+        },
+      });
+    const h = harness(() => response, { maxRetries: 0 });
+    await assert.rejects(h.client.request("rsc_chainId"), (failure) => {
+      assert(failure instanceof RpcClientError);
+      assert.notEqual(failure, original);
+      assert.equal(failure.code, "NETWORK_ERROR");
+      assert.equal(failure.attempts, 1);
+      assert.equal(failure.requestMayHaveReachedNode, true);
+      assert.equal(failure.cause, undefined);
+      assert.equal(failure.rpcCode, undefined);
+      assert(
+        !`${failure.message}${failure.stack}${JSON.stringify(failure)}`.includes(
+          "PUBLIC_ERROR_SENTINEL",
+        ),
+      );
+      return true;
+    });
+    assert.equal(h.calls.length, 1);
+    assert.equal(h.clock.tasks.size, 0);
+  }
+});
+
+test("batch and abort-hook inspection failures are sanitized before dispatch and release timers", async () => {
+  const original = new RpcClientError("NETWORK_ERROR");
+  original.message = "PUBLIC_ERROR_SENTINEL";
+  const h = harness((request) => reply(request));
+  const calls = new Proxy([{ method: "rsc_chainId" }], {
+    get(target, key) {
+      if (key === "length") throw original;
+      return Reflect.get(target, key);
+    },
+  });
+  for (const pending of [
+    h.client.batch(calls),
+    h.client.request("rsc_chainId", [], {
+      signal: {
+        aborted: false,
+        addEventListener() {
+          throw original;
+        },
+        removeEventListener() {},
+      },
+    }),
+  ])
+    await assert.rejects(pending, (failure) => {
+      assert(failure instanceof RpcClientError);
+      assert.notEqual(failure, original);
+      assert.equal(failure.code, "INVALID_REQUEST");
+      assert.equal(failure.attempts, 0);
+      assert(!failure.message.includes("PUBLIC_ERROR_SENTINEL"));
+      return true;
+    });
+  assert.equal(h.calls.length, 0);
+  assert.equal(h.clock.tasks.size, 0);
+});
+
+test("reintroduced SDK failures cannot alter captured diagnostic metadata", async () => {
+  const h = harness((request) => reply(request));
+  let original;
+  try {
+    await h.client.batch([]);
+  } catch (error) {
+    original = error;
+  }
+  assert.equal(original.code, "REQUEST_LIMIT");
+  original.code = "NODE_ERROR";
+  original.attempts = 99;
+  original.message = "PUBLIC_ERROR_SENTINEL";
+  original.cause = "PUBLIC_ERROR_SENTINEL";
+  const params = new Proxy(
+    {},
+    {
+      getPrototypeOf() {
+        throw original;
+      },
+    },
+  );
+  await assert.rejects(h.client.request("rsc_chainId", params), (error) => {
+    assert.notEqual(error, original);
+    assert.equal(error.code, "REQUEST_LIMIT");
+    assert.equal(error.attempts, 0);
+    assert.equal(error.cause, undefined);
+    assert.equal(error.message, "RPC request exceeds a configured limit.");
+    return true;
+  });
+  assert.equal(h.calls.length, 0);
+});
+
 test("RPC pre-abort prevents dispatch and listener/timer ownership ends on completion", async () => {
   const controller = new AbortController();
   controller.abort("secret-reason");
