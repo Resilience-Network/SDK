@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { fstatSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 const supervisor = fileURLToPath(new URL("./group-supervisor.mjs", import.meta.url));
+export function containmentIdentity() {
+  try {
+    const stat = fstatSync(4, { bigint: true });
+    if ((!stat.isFIFO() && !stat.isSocket()) || stat.ino === 0n) return null;
+    return [stat.dev, stat.ino, stat.mode].join(":");
+  } catch {
+    return null;
+  }
+}
 
 /** A live spawned supervisor leases each POSIX group until bounded teardown. */
 export class OwnedProcesses {
@@ -14,16 +24,28 @@ export class OwnedProcesses {
   }
   start(command, args, options = {}) {
     const posix = process.platform !== "win32";
+    const { containment = false, ...spawnOptions } = options;
+    const inherited = process.env.RSC_OWNED_CONTAINMENT;
+    const forward = Boolean(inherited && inherited === containmentIdentity());
+    const env = { ...(options.env ?? process.env) };
+    if (posix && containment) env.RSC_OWNED_CONTAINMENT = "new";
+    else if (posix && forward) env.RSC_OWNED_CONTAINMENT = inherited;
+    else delete env.RSC_OWNED_CONTAINMENT;
     const stdio = options.stdio ?? "pipe";
     const child = spawn(
       posix ? process.execPath : command,
       posix ? [supervisor, command, ...args] : args,
       {
-        ...options,
+        ...spawnOptions,
+        env,
         shell: false,
         detached: posix,
         stdio: posix
-          ? [...(Array.isArray(stdio) ? stdio : [stdio, stdio, stdio]), "ipc"]
+          ? [
+              ...(Array.isArray(stdio) ? stdio.slice(0, 3) : [stdio, stdio, stdio]),
+              "ipc",
+              ...(containment ? ["pipe"] : forward ? [4] : []),
+            ]
           : stdio,
       },
     );

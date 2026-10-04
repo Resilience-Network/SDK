@@ -17,7 +17,7 @@ export const stages = Object.freeze([
     id: "sdk",
     script: "check",
     pattern: /ℹ tests (\d+)/,
-    minimum: 305,
+    minimum: 328,
     timeout: 180000,
   },
   {
@@ -126,10 +126,11 @@ export function verifyOutput(stage, output) {
   if (
     stage.id === "sdk" &&
     (!/ℹ fail 0\b/.test(output) ||
+      !/ℹ cancelled 0\b/.test(output) ||
       !/ℹ skipped 0\b/.test(output) ||
       !/ℹ todo 0\b/.test(output))
   )
-    throw Error("SDK failed/skipped/todo coverage");
+    throw Error("SDK failed/cancelled/skipped/todo coverage");
   if (
     stage.id === "differential" &&
     !/receipt commitment PASS: 166 independent fixtures, 26294 cases/.test(output)
