@@ -135,6 +135,32 @@ matrix and measured budgets; reproducible package and complete evidence inventor
 Review final source and clean consumers. An implementer's review does not close
 independent security sign-off. Keep registry publishing disabled until its gates.
 
+### G6 — Requalify after reproduced review findings
+
+[Local candidate acceptance #94](https://github.com/Resilience-Network/sdk/issues/94)
+repeats G5 after any reproduced correctness or evidence failure. Review #83 found
+RPC diagnostics (#84), artifact coverage (#85), candidate termination (#86),
+owned descendant teardown (#87) and cross-poll finalized context (#88); investigation
+also found cleanup-outcome reporting (#93). Each correction needs an actual failing
+regression, a reviewed topic PR and fresh affected checks before final qualification.
+Historical passing manifests remain bound to their original source and cannot
+establish acceptance of corrected code.
+
+Prepare final canonical behavior/ownership/qualification docs through the same
+review workflow. Then run the entire serial candidate pipeline at the clean final
+merged revision, with the explicit native pin and supported local browser profile.
+Inspect stage and artifact predicates, source/lock/archive/evidence hashes, owned
+process closure and safety-state retention. A failed stage or discovered defect
+returns to claim/implementation/review and a new complete candidate; never waive a
+required check to reach a numeric readiness estimate.
+
+Exit: all locally actionable reproduced findings corrected, reviewed and tested;
+one final clean 15-stage qualification with no required failures, skips, todos or
+cancellations; evidence-backed restoration of affected acceptance in #14/#17/#28/
+#37 and the native foundation/RPC umbrella. Record actual final revision, runtime,
+manifest digest and exact commands in GitHub. Keep external approvals below open;
+owner-authorized implementer review does not establish independent security sign-off.
+
 ### External gates retained outside the autonomous implementation target
 
 - #31: physical passkey/biometric device evidence requires the corresponding

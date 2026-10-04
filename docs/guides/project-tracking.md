@@ -5,7 +5,7 @@ the supported v1 scope and the definition of complete. GitHub owns live work
 status, assignments, dependencies and acceptance evidence. [PLAN.md](../../PLAN.md)
 owns architecture and sequencing; this guide defines the tracking workflow.
 
-The [ordered completion goals](../../PLAN.md) map existing leaf issues to G0–G5
+The [ordered completion goals](../../PLAN.md) map existing leaf issues to G0–G6
 and distinguish the locally executable release candidate from external device,
 independent-review, licensing/registry and publication gates. The owner authorized
 the agent's self-review and merge of completed implementation tasks on 2026-10-03.
