@@ -154,7 +154,42 @@ export const entryScripts = Object.freeze({
   combined: "examples/passkey-session/run.mjs",
 });
 
+function passingChecks(checks, minimum, key = "name") {
+  return (
+    Array.isArray(checks) &&
+    checks.length >= minimum &&
+    Array.from(checks).every(
+      (c) =>
+        c !== null &&
+        typeof c === "object" &&
+        typeof c[key] === "string" &&
+        c[key].length > 0 &&
+        c.result === "pass",
+    ) &&
+    new Set(checks.map((c) => c[key])).size === checks.length
+  );
+}
+
+export function verifyNativeChecks(checks, minimum) {
+  if (
+    !Number.isSafeInteger(minimum) ||
+    minimum < 0 ||
+    !Array.isArray(checks) ||
+    checks.length < minimum ||
+    !Array.from(checks).every(
+      (c) =>
+        c !== null &&
+        typeof c === "object" &&
+        typeof c.name === "string" &&
+        c.name.length > 0,
+    )
+  )
+    throw Error("Incomplete native checks");
+}
+
 export function verifyArtifact(name, evidence, revision, archiveSha256) {
+  if (evidence === null || typeof evidence !== "object" || Array.isArray(evidence))
+    throw Error("Invalid artifact shape");
   if ((evidence.sdkRevision ?? evidence.revision) !== revision)
     throw Error("Stale artifact revision");
   if (name === "api" ? evidence.dirty !== false : evidence.trackedClean !== true)
@@ -166,17 +201,19 @@ export function verifyArtifact(name, evidence, revision, archiveSha256) {
       evidence.failures !== 0 ||
       evidence.skipped !== 0 ||
       evidence.todo !== 0 ||
-      evidence.tests < 76
+      !Number.isSafeInteger(evidence.tests) ||
+      evidence.tests < 76 ||
+      !passingChecks(evidence.normativeCases, 67, "id")
     )
       throw Error("Incomplete RP artifact");
   } else {
     if (evidence.result !== "pass") throw Error("Child artifact failed");
     if (
       name === "browser" &&
-      (evidence.engines?.length !== 1 ||
-        evidence.engines[0].version !== profile.browser ||
-        evidence.engines[0].checks?.length < 24 ||
-        !evidence.engines[0].checks.every((c) => c.result === "pass") ||
+      (!Array.isArray(evidence.engines) ||
+        evidence.engines.length !== 1 ||
+        evidence.engines[0]?.version !== profile.browser ||
+        !passingChecks(evidence.engines[0]?.checks, 24) ||
         evidence.failures !== 0 ||
         evidence.skipped !== 0 ||
         evidence.todo !== 0)
@@ -185,8 +222,7 @@ export function verifyArtifact(name, evidence, revision, archiveSha256) {
     if (
       name === "combined" &&
       (evidence.browser?.version !== profile.browser ||
-        evidence.checks?.length < 17 ||
-        !evidence.checks.every((c) => c.result === "pass"))
+        !passingChecks(evidence.checks, 17))
     )
       throw Error("Incomplete combined artifact");
   }
