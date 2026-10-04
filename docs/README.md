@@ -15,6 +15,9 @@ verification qualification remain separate gates.
   real native validators, bounded ownership, evidence and failure/interrupt checks.
 - [Native session example](guides/session-example.md): executable funded lifecycle,
   approval/signing boundaries and adversity/uncertainty checks.
+- [Combined passkey/session example](guides/passkey-session-example.md): actual
+  browser app authentication with separate native test-key approvals and finalized
+  session lifecycle; no direct passkey authority or production custody.
 - [Browser qualification](guides/browser-qualification.md): installed tarball
   execution and actual Chromium virtual ceremonies; exact qualified profile and
   explicit unavailable engine/device gates.
