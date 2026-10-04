@@ -139,3 +139,8 @@ external native root/session signers.
 
 [Actual browser qualification](docs/guides/browser-qualification.md) identifies
 the tested installed Chrome profile and outstanding external engine/device gates.
+
+The [combined passkey/session example](docs/guides/passkey-session-example.md)
+executes actual virtual-browser app authentication and a separate funded native
+session lifecycle. Login does not confer native key authority; external test keys
+and explicit canonical approvals remain distinct.

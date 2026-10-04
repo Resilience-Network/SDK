@@ -63,7 +63,8 @@
     "test:session-e2e": "npm run build && node scripts/check_session_end_to_end.mjs",
     "example:session": "npm run build && node examples/session-localnet.mjs",
     "test:webauthn-verifier": "npm run build && node scripts/check_webauthn_verifier.mjs",
-    "test:browser": "npm run build && node scripts/check_browser.mjs"
+    "test:browser": "npm run build && node scripts/check_browser.mjs",
+    "example:passkey-session": "npm run build && node examples/passkey-session/run.mjs"
   },
   "devDependencies": {
     "@simplewebauthn/server": "14.0.3",

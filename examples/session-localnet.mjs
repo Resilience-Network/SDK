@@ -42,7 +42,16 @@ export function testSigner(
   return signer;
 }
 export const signingCalls = (signer) => counts.get(signer)();
-export async function nativeSessionFixture(h, { observeSecret = () => {} } = {}) {
+export async function nativeSessionFixture(
+  h,
+  {
+    observeSecret = () => {},
+    approve = ({ review }) => {
+      assert(Object.isFrozen(review));
+      return true;
+    },
+  } = {},
+) {
   const client = h.clients[0],
     context = { chainId: h.expected.chainId, genesisHash: h.expected.genesisHash };
   const owner = sdk.hexToBytes(h.publicWallets.owner.address),
@@ -76,10 +85,7 @@ export async function nativeSessionFixture(h, { observeSecret = () => {} } = {})
     signal: h.signal,
     timeoutMs: 120000,
     reconciliation,
-    approve: ({ review }) => {
-      assert(Object.isFrozen(review));
-      return true;
-    },
+    approve,
   });
   const run = async (operation, expected = "reported-finalized-success") => {
     const result = await lifecycle.execute(options(operation));
@@ -182,7 +188,7 @@ export async function nativeSessionFixture(h, { observeSecret = () => {} } = {})
       credential: sdk.sessionCredentialFromGrant(grant),
       signer,
       signal: h.signal,
-      approve: () => true,
+      approve,
     });
   return {
     client,

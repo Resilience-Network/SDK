@@ -418,3 +418,9 @@ Official bundled Chromium/Firefox/WebKit provisioning failed externally; #69
 retains that unpassed matrix. Requested missing engines fail, never skip. The
 Chrome results do not qualify Firefox/WebKit, another OS, physical biometrics,
 production RP durability or independent review.
+
+The [combined example](passkey-session-example.md) is an actual browser/native
+gate: `RSC_CHAIN_DIR=/absolute/clean/pinned/chain RSC_BROWSER_CHROMIUM_CHANNEL=chrome
+npm run example:passkey-session`. It verifies application login and separate raw
+native grant/use/finalized revocation, app denials and actual revoked admission.
+Its selected virtual profile does not qualify other engines or physical devices.
