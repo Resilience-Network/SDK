@@ -12,6 +12,9 @@ import { verifyArtifact } from "../../../scripts/qualification/profile.mjs";
 import { OwnedProcesses } from "../../../scripts/localnet/harness.mjs";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
+assert.equal(process.platform, "darwin", "Use the reviewed macOS process profile");
+assert.equal(process.arch, "arm64", "Use the reviewed arm64 process profile");
+assert.equal(process.version, "v24.21.0", "Use the reviewed Node runtime");
 const hashes = {
   "src/rpc/http.ts": "71ce0b27105dbd7e7f356a588670c7f52da1927b551a2c7a6fae11731ffdfb37",
   "src/rpc/methods.ts":

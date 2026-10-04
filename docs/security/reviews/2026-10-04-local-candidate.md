@@ -61,7 +61,8 @@ closed using its own recorded ownership, without process-name kills.
 [Historical executable probes](2026-10-04-probes.mjs) reproduce all five findings,
 including both R1 scenarios. From the SDK root, run `npm run build`, then
 `node docs/security/reviews/2026-10-04-probes.mjs`. They refuse changed reviewed
-source hashes, use public fixtures/injected responses, and clean up only their
+source hashes or a different macOS arm64/Node 24.21.0 profile, use public
+fixtures/injected responses, and clean up only their
 own newly spawned processes/runtime. Successful execution confirms known defects
 in this baseline; it is deliberately **not** a passing qualification suite.
 The [sanitized probe output](2026-10-04-probe-results.json) records a repeated
