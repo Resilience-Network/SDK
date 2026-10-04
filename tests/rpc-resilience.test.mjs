@@ -185,6 +185,38 @@ test("batch and abort-hook inspection failures are sanitized before dispatch and
   assert.equal(h.clock.tasks.size, 0);
 });
 
+test("reintroduced SDK failures cannot alter captured diagnostic metadata", async () => {
+  const h = harness((request) => reply(request));
+  let original;
+  try {
+    await h.client.batch([]);
+  } catch (error) {
+    original = error;
+  }
+  assert.equal(original.code, "REQUEST_LIMIT");
+  original.code = "NODE_ERROR";
+  original.attempts = 99;
+  original.message = "PUBLIC_ERROR_SENTINEL";
+  original.cause = "PUBLIC_ERROR_SENTINEL";
+  const params = new Proxy(
+    {},
+    {
+      getPrototypeOf() {
+        throw original;
+      },
+    },
+  );
+  await assert.rejects(h.client.request("rsc_chainId", params), (error) => {
+    assert.notEqual(error, original);
+    assert.equal(error.code, "REQUEST_LIMIT");
+    assert.equal(error.attempts, 0);
+    assert.equal(error.cause, undefined);
+    assert.equal(error.message, "RPC request exceeds a configured limit.");
+    return true;
+  });
+  assert.equal(h.calls.length, 0);
+});
+
 test("RPC pre-abort prevents dispatch and listener/timer ownership ends on completion", async () => {
   const controller = new AbortController();
   controller.abort("secret-reason");
