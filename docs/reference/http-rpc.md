@@ -149,7 +149,9 @@ provenance is held separately from mutable public error fields; messages, causes
 stacks and payloads from dependency exceptions are never forwarded. The
 [historical review](../security/reviews/2026-10-04-local-candidate.md) and
 [issue #84](https://github.com/Resilience-Network/sdk/issues/84) record the prior
-request/response gap.
+request/response gap. The installed declaration inventory records the added
+internal error factories in `rpc/errors.d.ts`; package entrypoints and the 95
+public runtime exports are unchanged. No protocol golden is regenerated.
 
 Endpoints are absolute HTTP(S) URLs without credentials, queries or fragments.
 HTTP supports local development; use HTTPS for deployed services. Fetch uses
