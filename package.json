@@ -65,7 +65,8 @@
     "test:webauthn-verifier": "npm run build && node scripts/check_webauthn_verifier.mjs",
     "test:browser": "npm run build && node scripts/check_browser.mjs",
     "example:passkey-session": "npm run build && node examples/passkey-session/run.mjs",
-    "example:session-installed": "npm run build && node scripts/check_installed_session_example.mjs"
+    "example:session-installed": "npm run build && node scripts/check_installed_session_example.mjs",
+    "test:api-qualification": "npm run build && node scripts/check_api_qualification.mjs"
   },
   "devDependencies": {
     "@simplewebauthn/server": "14.0.3",
