@@ -436,7 +436,18 @@ export class ChainRpcClient {
     const deadline = new Deadline(this.#clock, config.timeoutMs, options.signal);
     let polls = 0,
       lastObservation: ReceiptObservation | null = null,
-      authority: AuthorityNonceObservation | null = null;
+      authority: AuthorityNonceObservation | null = null,
+      finalizedContext: FinalizedState | null = null;
+    const observeContext = (current: FinalizedState) => {
+      if (
+        finalizedContext !== null &&
+        (current.height < finalizedContext.height ||
+          (current.height === finalizedContext.height &&
+            !sameState(current, finalizedContext)))
+      )
+        throw new RpcContractError("STATE_CONTEXT_MISMATCH");
+      finalizedContext = current;
+    };
     const unknown = (
       reason: "poll-limit" | "deadline" | "aborted" | "observation-error",
       error?: unknown,
@@ -461,21 +472,12 @@ export class ChainRpcClient {
           }),
         );
         deadline.check();
+        observeContext(lastObservation.identity.state);
         authority = await deadline.race(
           this.#authority(prepared.transaction, { signal: deadline.controller.signal }),
         );
         deadline.check();
-        resultGuard(() => {
-          requireResult(
-            authority!.identity.state.height >= lastObservation!.identity.state.height,
-          );
-          if (
-            authority!.identity.state.height === lastObservation!.identity.state.height
-          )
-            requireResult(
-              sameState(authority!.identity.state, lastObservation!.identity.state),
-            );
-        });
+        observeContext(authority.identity.state);
         if (lastObservation.status === "reported-included") {
           const receipt = lastObservation.receipt;
           const read = await deadline.race(
@@ -503,12 +505,8 @@ export class ChainRpcClient {
             ),
           );
           deadline.check();
+          observeContext(read.identity.state);
           resultGuard(() => {
-            requireResult(
-              read.identity.state.height >= authority!.identity.state.height,
-            );
-            if (read.identity.state.height === authority!.identity.state.height)
-              requireResult(sameState(read.identity.state, authority!.identity.state));
             requireResult(
               !authority!.authorityMatches ||
                 (authority!.observedNonce !== null &&
