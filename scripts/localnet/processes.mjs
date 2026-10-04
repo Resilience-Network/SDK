@@ -6,6 +6,9 @@ const supervisor = fileURLToPath(new URL("./group-supervisor.mjs", import.meta.u
 /** A live spawned supervisor leases each POSIX group until bounded teardown. */
 export class OwnedProcesses {
   #children = [];
+  get allClosed() {
+    return this.#children.every((e) => e.closed && !e.containmentLost);
+  }
   get pids() {
     return this.#children.map((entry) => entry.child.pid).filter(Boolean);
   }
@@ -105,9 +108,6 @@ export class OwnedProcesses {
       for (const entry of this.#children) terminate(entry, "SIGKILL");
       assert(await bounded(killWaitMs), "Owned child did not close after kill");
     }
-    assert(
-      this.#children.every((e) => e.closed && !e.containmentLost),
-      "Owned process containment lost",
-    );
+    assert(this.allClosed, "Owned process containment lost");
   }
 }

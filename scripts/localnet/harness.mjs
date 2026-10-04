@@ -589,15 +589,20 @@ export async function withNativeLocalnet(options, work) {
     signal?.removeEventListener("abort", cancel);
     clearTimeout(readinessTimer);
     controller.abort();
-    let teardown = false;
+    let teardown = false,
+      teardownFailed = false;
     try {
       await processes.stop();
-      teardown = true;
+      teardown = processes.allClosed;
+    } catch (error) {
+      teardownFailed = true;
+      teardown = processes.allClosed;
+      throw error;
     } finally {
       await portsLease?.release();
       for (const file of files) await file.close().catch(() => {});
-      recordNativeTeardown(evidence, teardown);
-      if (!teardown) success = false;
+      recordNativeTeardown(evidence, teardown, teardownFailed);
+      if (!teardown || teardownFailed) success = false;
       // Only the explicit log of an owned command/node is required; node starts
       // appear in commands but use node-N.log rather than command-N.log.
       evidence.logCapture = await captureOwnedLogs(

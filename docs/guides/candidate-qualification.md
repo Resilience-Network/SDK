@@ -35,7 +35,7 @@ Preflight validates inputs without executing suites and is never PASS evidence f
 implementation. Qualification runs serially: locked install; complete SDK/package
 checks; installed API budgets; signed RP conformance; actual Chrome ceremonies;
 native RPC fixtures; codec/receipt differentials; native signatures; owned positive
-localnet; seven actual failure/interrupt/log-capture scenarios; lifecycle;
+localnet; eight actual failure/interrupt/log-capture/cleanup-error scenarios; lifecycle;
 67-check session adversity; session example; installed-tarball example; combined
 browser/native example. Each command requires its actual result marker and minimum
 coverage. Empty output, insufficient counts, skipped/todo SDK tests, missing native

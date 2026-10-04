@@ -126,6 +126,11 @@ Capture refuses symlinks, nonregular sources, artifact replacements and logs ove
 8 MiB; it checks the actual read bound as well as file size. Qualification verifies
 the copied bytes, manifest coverage and generated-key redaction. A required capture
 failure rejects an otherwise successful run and preserves its restricted runtime.
+The closure field describes actual supervised group/descriptor closure. A failed
+cleanup procedure still rejects delivery and retains its runtime even if those
+groups already closed. The native failure suite injects that post-closure error
+without abandoning any child, then verifies failed status/TEARDOWN_FAILED, retained
+safety state and unchanged external sentinel.
 An early failed run may have no commands/logs; it is never passing native evidence.
 Key files, databases and signing records are never copied into public artifacts. Exact generated private-key strings are redacted from copied logs;
 callback errors use a fixed evidence code. These artifacts can still contain

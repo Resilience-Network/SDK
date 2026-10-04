@@ -27,3 +27,10 @@ test("successful teardown preserves failed/interrupted activity and original dia
     assert.deepEqual(evidence.failure, { code: "TEARDOWN_FAILED" });
   }
 });
+test("cleanup procedure failure remains failed even after actual group closure", () => {
+  const evidence = { status: "passed" };
+  recordNativeTeardown(evidence, true, true);
+  assert.equal(evidence.teardown.allOwnedChildrenClosed, true);
+  assert.equal(evidence.status, "failed");
+  assert.deepEqual(evidence.failure, { code: "TEARDOWN_FAILED" });
+});

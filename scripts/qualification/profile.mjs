@@ -73,7 +73,7 @@ export const stages = Object.freeze([
     id: "failures",
     script: "test:localnet-failures",
     pattern: /actual SIGINT\/SIGTERM plus injected missing-log/,
-    nativeRuns: 7,
+    nativeRuns: 8,
     negative: true,
     timeout: 600000,
   },
