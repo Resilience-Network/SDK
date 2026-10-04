@@ -59,6 +59,9 @@ references; physical devices and other engines remain separate.
   selected WebAuthn implementation profile, challenge/store ownership and future
   verifier conformance; this decision is not a shipped server/browser API.
 - [Security boundaries](security/threat-model.md).
+- [2026-10-04 local candidate review](security/reviews/2026-10-04-local-candidate.md):
+  historical implementer findings, reproductions and fresh verification limits;
+  independent security approval remains separate.
 - [Documentation policy](documentation-policy.md).
 - [Contribution workflow](../CONTRIBUTING.md) and [agent instructions](../AGENTS.md).
 

@@ -3,6 +3,11 @@
 This initial threat model covers the planned client SDK. It is a design checklist,
 not an audit report or a claim that any feature is implemented or qualified.
 
+The [2026-10-04 implementer review](reviews/2026-10-04-local-candidate.md)
+records reproduced RPC context/error and qualification/cleanup defects in its
+exact baseline. GitHub owns their disposition. Passing existing suites did not
+exercise those failures; the review does not satisfy independent sign-off #34.
+
 ## Assets and trusted boundaries
 
 Root/session private keys, exact reviewed transaction bytes, grant authority,

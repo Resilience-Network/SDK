@@ -70,6 +70,14 @@ is also checked. A legitimately changed authority domain is preserved explicitly
 Finalized observations cannot move backward; equal-height state tuples must agree.
 Each logical bracket may refresh within the existing bound on a moving head.
 
+Known baseline limitation: the
+[2026-10-04 review](../security/reviews/2026-10-04-local-candidate.md) reproduced
+cross-poll height regression and equal-height block/state-root contradictions
+accepted as terminal results. The current implementation enforces the checks
+within a poll but does not retain a context watermark across polls.
+[Issue #88](https://github.com/Resilience-Network/sdk/issues/88) tracks the fix;
+do not infer cross-poll monotonicity from the existing passing tests.
+
 These are node-reported finality outcomes, not independent proof verification.
 Block projection fields such as nonce, bloom, difficulty/size and decimal
 slot/round/epoch follow the [immutable baseline](protocol-sources.md). The SDK
